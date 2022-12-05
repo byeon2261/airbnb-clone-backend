@@ -3,3 +3,6 @@ $ python3
 
 git을 생성 및 초기화
 $ git init
+
+#### 4 Django App - 4.3 admin
+    __str__을 구현하여 해당 app 데이터를 불러올때 표시할 값을 정한다.

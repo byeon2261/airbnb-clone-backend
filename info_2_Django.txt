@@ -46,6 +46,7 @@ $ python manage.py createsuperuser
 admin user 가 생성되면 로그인이 되며 user리스트에서 추가된것을 확인 가능하다. 데이터 변경에 정적이지 않으며 실시간 동작한다. 
 functional하게 실행된며 유저인증도 쉽게 얻을 수 있다. 유저정보 변경 및 권한 변경도 패널에서 가능하다. awesome!
 비밀번호는 hash화 되어 저장되면 원본 비밀번호는 저장되지 않는다. 유저가 생성된 날짜와 마지막 접속일자도 확인 가능.
+user 패널은 리스트 컬럼명과 filter기능이 기본 구현되어있다.
 
 라이브러리는 코드에서 해당 라이브러리를 request하여 사용하지만 프레임워크는 프레임워크에서 내 코드를 찾아서 실행한다. 프레임워크가 요구하는 위치에 코드가 있어야 실행이 된다.
 
@@ -60,3 +61,45 @@ config>url.py 은 url path, 실행될 app을 구현한다.
 settings.py, urls.py 파일명과 구현된 variable은 프레임워크 요건에 충족시켜야 실행된다.
 
 장고 app 은 어플리케이션의 로직과 데이터를 합쳐서 캡슐화한다.
+
+
+    #### 4. Django Apps
+
+house 엡을 생성한다.
+$ python manage.py startapp houses
+    [app]> migrations폴더, __init.py, admin.py, apps.py, models.py, tests.py, views.py 생성된다.
+각 파일에는 구현해야할 코드가 무엇인지 주석이 있다.
+
+config>settings.py 에 INSTALLED_APPS 리스트에 앱을 추가하여 설치한다.
+    "houses.apps.HousesConfig",
+추가를 해주면 설치가 완료되며 django가 해당 app을 인지한다.
+
+models.py엔 app 에 데이터형태를 구현한다. 구현된 형태를 migration 하면 django 는 database를 만들어준다.
+model을 구현할때 djanog의 models.Model을 overriding한다. 
+    CharField : 최대길이값이 필수 (max_length)
+    PositiveIntegerField : 양수인 정수값만 받음
+
+Django 는 커스텀 데이터에 대한 관리 패널을 자동으로 생성해준다. admin.py에 해당 앱 관리에 추가해준다.
+    from .models import House
+    
+    @admin.register(House)  # admin(통제)할 앱을 넣어준다. 여러개 넣을 수 있다.
+    class HouseAdmin(admin.ModelAdmin):  # ModelAdmin 은 admin패널이다.
+        # admin 패널 화면 구현
+        pass
+pass로 overriding 하면 구현된 model을 전부 넣어준다.
+
+해당 app을 데이터베이스에 알려줘야한다. 데이터베이스에 모델을 생성해준다.
+$ python manage.py makemigrations
+    [app]>migrations 폴더에 새로운 db 모델을 설명하는 파일이 생성된다.
+그리고 migrate를 실행하여 데이터베이스의 모양을 update한다.
+    __pycache__폴더에 변경된 데이터를 설명하는 파일이 생성된다.
+
+    # 도중에 `db.sqlite3`파일을 지워서 migrate해도 no such table이 뜨신다면,
+    # $ python manage.py migrate --run-syncdb
+
+서버를 실행하여 앱 admin패널에서 데이터 검색, 추가, 수정, 삭제가 가능하다. django는 데이터 저장 및 수정에서 데이터 유효검사를 해준다.
+
+settings.py 에 INSTALLED_APPS 을 SYSTEM_APPS와 CUSTOM_APPS로 분류 적용한다.
+    INSTALLED_APPS = SYSTEM_APPS + CUSTOM_APPS
+Django 에서 INSTALLED_APPS 를 찾는다.
+
