@@ -177,7 +177,7 @@
 
         프로젝트 시스템에 Django의 User를 상속받아 구현하여 사용할 것을 알려줘야한다. config>settings.py에 설정값을 넣어준다. 상단 User Document에 내용이 있다.
             #AUTH
-            AUTH_USER_MODEL = '[myapp='users'].[MyUser='User']'
+            AUTH_USER_MODEL = "[myapp='users'].[MyUser='User']"
         
         migration시 오류가 발생한다.
             >>> Migration admin.0001_initial is applied before its dependency users.0001_initial on database 'default'.
@@ -217,3 +217,25 @@
         추후에 ORM을 사용하여 데이터를 갖고오는 작업을 할 것이다. 매우 간단하게 구현할 수 있다.
 
         db.sqlite3를 시각화 하기위해서는 sqlite viewer 확장프로그램을 설치하면 된다.
+
+
+#### 6. Models and Admin
+
+
+    [2_Django]
+
+        user model에 imagefield를 추가하면 서버에서 에러가 발생한다. pillow 프로그램이 있어야 ImageField를 사용할 수 있다.
+        pillow를 설치한다.
+        $ poetry add pillow
+
+        db에는 text값을 넣어주면서 선택지를 고르는 field를 구현할 수 있다.
+            class GenderChoices(models.TextChoices):
+                {
+                    "[VALUE]": ("[actual value]", "[human readable name]"),
+                    ...,
+                }
+
+            gender = models.CharField(
+                choice=GenderChoices.choices,
+            )
+        더보기. https://docs.djangoproject.com/en/4.1/ref/models/fields/#choices
