@@ -6,11 +6,13 @@ from .models import Experience, Perk
 class ExperienceAdmin(admin.ModelAdmin):
     list_display = (
         "name",
+        "category",
         "price",
         "start",
         "end",
         "created_at",
     )
+    list_filter = ("category",)
 
 
 @admin.register(Perk)

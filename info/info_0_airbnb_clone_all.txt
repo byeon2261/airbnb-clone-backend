@@ -273,3 +273,19 @@
         experience model과 experience model에서 사용할 perks model을 구현한다. 역시 many-to-many
 
         django는 add-change하는 도중에 foriegn컬럼을 추가할 수 있다.
+
+
+        categories app을 생성 및 설치한다. category는 room과 experience에서 사용할 것이다.
+        model 구현 후 room과 Experience에 추가해준다. migrate진행.        
+
+
+    [1_python]
+
+        문자열 메서드 title()을 사용하면 앞글자를 대문자로 표기해준다.
+        # https://zetawiki.com/wiki/%ED%8C%8C%EC%9D%B4%EC%8D%AC_title()
+        category __str__ return 부분에 kind 명을 대문자로 title()로 적용했다.
+
+
+    [2_Django]
+
+        외래키를 사용하여 filter를 할 수 있다.
