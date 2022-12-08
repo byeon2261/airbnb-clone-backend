@@ -247,7 +247,7 @@
         country와 city를 위한 package가 있다. 추후에 적용할 예정이다. TextChoices ?
 
         Room 모델을 구현후 amenity도 구현한다. rooms와 amenity는 many-to-many 관계를 갖는다.
-        many-to-many는 room에서 여러 Amenity를 등록할 수 있다.
+        many-to-many는 room에서 여러 Amenity를 등록할 수 있다. many-to-many는  Foriegn과 다르게 on_delete값이 필수가 아니다.
 
         만들어진 날짜와 수정된 날짜를 추가해준다. 
             created = models.DateTimeField(auto_now_add=True)
@@ -292,12 +292,21 @@
 
 
         review app 생성 및 설치를 한다.
-
         최대값을 설정할 수 있다.
             from django.core.validators import MaxValueValidator
 
             rating = models.PositiveIntegerField(
                 validators=[MaxValueValidator(5)],
-            )
-        
-        
+            )        
+        migrate 진행
+
+
+        wishlists app 생성 및 설치. 
+        wishlist는 admin에서 생성을 진행하지 않기때문에 blank=True는 제외했다.
+        migrate 진행
+
+
+        bookings app 생성 및 설치. migrate 진행
+
+
+        medias app 생성 및 설치. model> Photo, Video 구현.
