@@ -310,3 +310,130 @@
 
 
         medias app 생성 및 설치. model> Photo, Video 구현.
+
+        Direct Messages app 생성 및 설치. model> ChattingRoom, Message 구현
+        apps.py>config 에 verbose_name 추가
+            verbose_name = "Direct Messages"
+
+        model, admin 구현은 마무리되었다.
+
+
+#### 7 ORM
+
+    [2_Django]
+
+        ORM = Object Relationship Mapping. SQL 문을 사용하지 않고 엔티티를 객체로 표현할 수 있다.
+        # ORM 의 정의
+        https://hanamon.kr/orm%EC%9D%B4%EB%9E%80-nodejs-lib-sequelize-%EC%86%8C%EA%B0%9C/
+
+        # Django making Query
+        https://docs.djangoproject.com/en/4.1/topics/db/queries/
+         데이터 모델을 생성한 후 데이터베이스에 코드로 어떻게 접근할지 확인해보자.
+
+        console로 명령어를 사용하요 확인할 수 있다. django>settings와 함께 python을 실행한다. shell 외에 python을 실행하면 Django를 포함하지 않는다.
+        $ python manage.py shell
+
+        model을 갖고 있기때문에 python에서 가져올 수 있다.
+        >>> from rooms.models import Room
+
+        django가 model을 생성할때 기본 제공하는 database objects가 있으며 여러 method를 갖고 있다.
+            all()
+            get([key]="[value]") # get()은 복수의 값을 가져올 수 없습니다. 복수의 값은 filter()를 사용
+            save()
+
+            >>> Room.objects.get(pk=1).amenities.all().get(name="Wi-Fi").description
+
+            >>> r1 = Room.objects.get(pk=1)  
+            >>> r1
+            <Room: beautiful Tent>
+            >>> amenities = r1.amenities.all()  
+            >>> amenities
+            <QuerySet [<Amenity: Wi-Fi>, <Amenity: swimming pool>]>
+            >>> amenities.get(name="Wi-Fi").description 
+            '무선 인터넷'
+    
+
+    [1_python]
+
+        변수 정의 및 대입 한 다음 Django save()로 저장 가능.
+
+
+    [2_Django]
+
+        obects는 Manager라 불린다. Manager는 데이터베이스와 소통할 수 있는 Interface 이다.
+        # ORM 이란 무엇인가
+        https://docs.djangoproject.com/en/4.1/topics/db/managers/
+        model을 생성하면 Manager도 같이 생성된다. Manager도 수정적용 가능하다.
+        
+        여러객체 조회하기
+            >>> for a in Room.objects.get(pk=1).amenities.all():
+            ...     print(a.name)
+            ... 
+            Wi-Fi
+            swimming pool
+
+        ? get()으로 가져오는 QuerySet에서는 var값으로 다시 가져올 수 가 있다.
+            >>> Room.objects.get(pk=1).name
+        하지만 filter()로 가져오면 오류가 발생한다.
+            >>> Room.objects.filter(pk=1).name
+            Traceback (most recent call last):
+              File "<console>", line 1, in <module>
+            AttributeError: 'QuerySet' object has no attribute 'name'
+        get은 데이터 하나를 갖고 오지만 filter는 queryset으로 묶음으로 가져온다. get은 데이터가 없다면 오류가 발생하지만 filter는 빈 querySet을 반환한다.
+
+
+        filter를 사용할 때 조건을 붙일 수 있다. field에 언더바 두개를 사용하여 조건값을 붙이거나 외부 모델 필드를 사용한다. lookup 이라 한다.
+            >>> Room.objects.filter(price__gte=15)  # 15보다 크거나 같은 값
+            # lookup 종류
+            https://velog.io/@may_soouu/Django-%EB%A9%94%EC%86%8C%EB%93%9C-%EC%A0%95%EB%A6%AC
+            https://docs.djangoproject.com/en/4.1/ref/models/querysets/#field-lookups
+
+        console에서 데이터를 생성 및 대입하여 저장이 가능하며 삭제도 가능하다.
+            create(): 데이터가 없는 빈 데이터 row가 생성된다.
+            create([key]="[value]"): 데이터를 넣어주면서 row를 생성한다.
+            get(...).delete(): 해당 데이터 삭제한다.
+
+        QuerySet은 매우 게을러서 요청한 값만 전달해 준다. 내부에 어떤 값이 있는지 알지 못한다.
+            get(...) -> <Room: beautiful Tent> # 이런식으로 <[model명]: [__str__]> 가져와서 전달한다.
+        query에 select from ... 로 데이터를 다 긁어와서 한세월 걸리는 일을 방지해준다.
+
+        Room admin에서 Room마다 amenities를 몇개 갖고 있는지 표시한다.
+            1. amenities 를 계산한는 methon 를 model 에 추가한다.
+            2. admin에 method를 넣어준다. admin method에 두번째 매개변수에 model 값을 보내준다.
+        amenities 는 rooms 과 manyToMany관계이다. 그럼으로 querySet으로 데이터를 받아온다. filter().exclude().count() 사용가능하다.
+            room.amenities.count()
+
+        foriegn key를 역순으로 접근이 가능하다. 역순으로 접근을 filter를 사용할 때 lookup 과 컬럼명을 붙여서 사용가능하다.
+            Room.objects.filter(owner__username='admin')
+            Room.objects.filter(owner__username__startswith='ad')
+
+        dir() 을 사용하여 속성들을 확인하자
+            >>> dir(r1)
+            ['DoesNotExist', 'Meta', 'MultipleObjectsReturned', 'RoomKindChoice', '__class__', '__delattr__', 
+            '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', 
+            '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', 
+            '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__setstate__', '__sizeof__', 
+            '__str__', '__subclasshook__', '__weakref__', '_check_column_name_clashes', '_check_constraints', 
+            '_check_default_pk', '_check_field_name_clashes', '_check_fields', '_check_id_field', 
+            '_check_index_together', '_check_indexes', '_check_local_fields', '_check_long_column_names', 
+            '_check_m2m_through_same_relationship', '_check_managers', '_check_model', 
+            '_check_model_name_db_lookup_clashes', '_check_ordering', 
+            '_check_property_name_related_field_accessor_clashes', '_check_single_primary_key', '_check_swappable', 
+            '_check_unique_together', '_do_insert', '_do_update', '_get_FIELD_display', '_get_expr_references', 
+            '_get_field_value_map', '_get_next_or_previous_by_FIELD', '_get_next_or_previous_in_order', 
+            '_get_pk_val', '_get_unique_checks', '_meta', '_perform_date_checks', '_perform_unique_checks', 
+            '_prepare_related_fields_for_save', '_save_parents', '_save_table', '_set_pk_val', '_state', 'address', 
+            'amenities', 'booking_set', 'category', 'category_id', 'check', 'city', 'clean', 'clean_fields', 
+            'country', 'created_at', 'date_error_message', 'delete', 'description', 'from_db', 'full_clean', 
+            'get_constraints', 'get_deferred_fields', 'get_kind_display', 'get_next_by_created_at', 
+            'get_next_by_updated_at', 'get_previous_by_created_at', 'get_previous_by_updated_at', 'id', 'kind', 
+            'name', 'objects', 'owner', 'owner_id', 'pet_friendly', 'photo_set', 'pk', 'prepare_database_save', 
+            'price', 'refresh_from_db', 'review_set', 'rooms', 'save', 'save_base', 'serializable_value', 'toilets', 
+            'total_amenities', 'unique_error_message', 'updated_at', 'validate_constraints', 'validate_unique', 
+            'wishlist_set']
+        목록에 속성중 ..._set 항목이 역참조(reverse accesser) model이다. booking_set. Booking 모델에서 Room 모델을 참조한 것이다.
+        모델명을 소문자로 가져온다음 _set을 붙여 생성한다.
+
+        model 에 foriegn 지정한 칼럼에 related_name 값을 지정하여 _set 이름을 변경 할 수 있다. foreignKey, ManyToManyField 다 변경가능.
+            related_name="rooms"
+        [...]_set >>> [...]s 로 변경하였다.

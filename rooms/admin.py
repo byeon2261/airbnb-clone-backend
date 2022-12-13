@@ -7,6 +7,7 @@ class RoomAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "owner",
+        "total_amenities",
         "description",
         "created_at",
         "updated_at",
@@ -22,6 +23,10 @@ class RoomAdmin(admin.ModelAdmin):
         "kind",
         "amenities",
     )
+
+    def total_amenities(self, room):
+        print(room.amenities.all())
+        return room.amenities.count()
 
 
 @admin.register(Amenity)
