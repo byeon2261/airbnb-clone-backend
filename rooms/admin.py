@@ -2,13 +2,27 @@ from django.contrib import admin
 from .models import Room, Amenity
 
 
+@admin.action(description="Set all prices to zero.")
+def reset_price(model_admin, request, rooms):
+    # print(model_admin)
+    # print(dir(request))
+    for room in rooms.all():
+        # print(room.price)
+        room.price = 0
+        room.save()
+
+
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
+
+    actions = (reset_price,)
+
     list_display = (
         "name",
         "owner",
+        "price",
         "total_amenities",
-        "description",
+        "rating",
         "created_at",
         "updated_at",
     )
@@ -23,10 +37,13 @@ class RoomAdmin(admin.ModelAdmin):
         "kind",
         "amenities",
     )
+    search_fields = (
+        "name",
+        "^price",
+        "=owner__username",
+    )
 
-    def total_amenities(self, room):
-        print(room.amenities.all())
-        return room.amenities.count()
+    search_help_text = "name, ^price, =owner__username"
 
 
 @admin.register(Amenity)
