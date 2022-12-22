@@ -1,7 +1,24 @@
 from django.urls import path
-from . import views
+from . import views, models
 
 urlpatterns = [
-    path("", views.categories),
-    path("<int:pk>", views.category),
+    path(
+        "",
+        views.CategoryViewset.as_view(
+            {
+                "get": "list",
+                "post": "create",
+            }
+        ),
+    ),
+    path(
+        "<int:pk>",
+        views.CategoryViewset.as_view(
+            {
+                "get": "retrieve",
+                "put": "partial_update",
+                "delete": "destroy",
+            }
+        ),
+    ),
 ]

@@ -9,7 +9,7 @@
 [2_Django]
 
     패키지 설치 및 관리를 위해 poetry를 사용한다.(=pip) pip보다 관계관리에 편리하다.
-    poetry를 설치한다. (https://python-poetry.org/docs)
+    poetry를 설치한다. <https://python-poetry.org/docs>
     $ curl -sSL https://install.python-poetry.org | python3 -
     그리고 터미널을 죽인 후에 터미널을 다시 열고 poetry를 실행시킨다. (vscode에선 쓰래기통 아이콘을 클릭해서 kill terminal 할 수 있다.)
 
@@ -89,7 +89,7 @@
     model을 구현할때 djanog의 models.Model을 overriding한다.
         CharField : 최대길이값이 필수 (max_length)
         PositiveIntegerField : 양수인 정수값만 받음
-        다른 설정 방법 확인은 https://docs.djangoproject.com/en/4.1/ref/models/fields/
+        다른 설정 방법 확인은 <https://docs.djangoproject.com/en/4.1/ref/models/fields/>
         primarykey, unique, verbose_name
 
     Django 는 커스텀 데이터에 대한 관리 패널을 자동으로 생성해준다. admin.py에 해당 앱 관리에 추가해준다.
@@ -141,7 +141,7 @@
     리스트에 추가된 variable 내에서 조회가 이뤄진다.
     기본 설정으로는 검색값의 string 이 포함된 전체 컬럼을 조회해온다. 조회될 값을 찾는 방법을 설정할 수 있다.
         [variable]__startswith : 검색값으로 시작하는 값을 조회
-        그외의 설정방법은 https://docs.djangoproject.com/en/4.1/ref/contrib/admin/#django.contrib.admin.ModelAdmin.search_fields
+        그외의 설정방법은 <https://docs.djangoproject.com/en/4.1/ref/contrib/admin/#django.contrib.admin.ModelAdmin.search_fields>
         exclude, fields, list_display_links, list_per_page, list_editable, read_only ....
 
 ## 5. Users App
@@ -149,7 +149,7 @@
 #### [2_Django]
 
     Django에는 기본 user관리를 위한 데이터테이블과 admin판넬이 제공된다. 하지만 user 데이터 변경을 위해서는 Django의 user클래스를 inherit하여 overriding을 할 필요가 있다.
-    https://docs.djangoproject.com/en/4.1/topics/auth/customizing/#substituting-a-custom-user-model
+    <https://docs.djangoproject.com/en/4.1/topics/auth/customizing/#substituting-a-custom-user-model>
     데이터 작업이 어느정도 이뤄지고 나서 users app을 변경할려면 작업이 매우 복잡해진다. 프로젝트가 완료되고 런칭되어서 데이터가 쌓이기전에 변경작업을 진행하자.
     ! Django application 을 시작하는 처음부터 user model을 교체하자. 무조건 교체하자. 교체할게 하나도 없더라도 inherit만 구현해놓자 !
 
@@ -202,7 +202,7 @@
         fields: model의 field가 보이는 순서를 설정.
         users>admin.py 참조
         UserAdmin의 permission과 Important dates을 복사해와 CustomUserAdmin>fieldsets에 붙여넣기하자.
-        더보기. https://docs.djangoproject.com/en/4.1/ref/contrib/admin/#modeladmin-options
+        더보기. <https://docs.djangoproject.com/en/4.1/ref/contrib/admin/#modeladmin-options>
 
     유저 커스텀이 완료되면 room model에서 user Foreignkey를 등록한다. on_delete는 필수값으로 설정한다.
         on_delete = models.SET_NULL: 외래키가 삭제되면 연결되어있는 컬럼은 Null로 적용된다.
@@ -230,7 +230,7 @@
         gender = models.CharField(
             choice=GenderChoices.choices,
         )
-    더보기. https://docs.djangoproject.com/en/4.1/ref/models/fields/#choices
+    더보기. <https://docs.djangoproject.com/en/4.1/ref/models/fields/#choices>
 
 
     rooms app을 설치한다.(startapp -> settings설치)
@@ -243,7 +243,7 @@
 
     만들어진 날짜와 수정된 날짜를 추가해준다.
         created = models.DateTimeField(auto_now_add=True)
-        # https://docs.djangoproject.com/en/4.1/ref/models/fields/#datetimefield
+        # <https://docs.djangoproject.com/en/4.1/ref/models/fields/#datetimefield>
     생성된 날짜와 수정된 날짜는 많은 app에서 사용될 것이다. 모두가 사용가능한 공통코드를 담을 common app을 생성하자.
     common app을 생성 및 설치한다. common model은 데이터베이스에 추가하지 않을 model이다. 다른 model에서 재사용한다.
     common model은 abstract model로 만든다. abstract로 생성하면 django가 데이터베이스에 해당 앱 데이터를 생성하지 않는다.
@@ -273,7 +273,7 @@
 #### [1_python]
 
     문자열 메서드 title()을 사용하면 앞글자를 대문자로 표기해준다.
-    # https://zetawiki.com/wiki/%ED%8C%8C%EC%9D%B4%EC%8D%AC_title()
+    # <https://zetawiki.com/wiki/%ED%8C%8C%EC%9D%B4%EC%8D%AC_title()>
     category __str__ return 부분에 kind 명을 대문자로 title()로 적용했다.
 
 #### [2_Django]
@@ -313,10 +313,10 @@
 
     ORM = Object Relationship Mapping. SQL 문을 사용하지 않고 엔티티를 객체로 표현할 수 있다. objects 는 데이터베이스 관리자이다.
     # ORM 의 정의
-    https://hanamon.kr/orm%EC%9D%B4%EB%9E%80-nodejs-lib-sequelize-%EC%86%8C%EA%B0%9C/
+    <https://hanamon.kr/orm%EC%9D%B4%EB%9E%80-nodejs-lib-sequelize-%EC%86%8C%EA%B0%9C/>
 
     # Django making Query
-    https://docs.djangoproject.com/en/4.1/topics/db/queries/
+    <https://docs.djangoproject.com/en/4.1/topics/db/queries/>
         데이터 모델을 생성한 후 데이터베이스에 코드로 어떻게 접근할지 확인해보자.
 
     console로 명령어를 사용하요 확인할 수 있다. django>settings와 함께 python을 실행한다. shell 외에 python을 실행하면 Django를 포함하지 않는다.
@@ -349,7 +349,7 @@
 
     obects는 Manager라 불린다. Manager는 데이터베이스와 소통할 수 있는 Interface 이다.
     # ORM 이란 무엇인가
-    https://docs.djangoproject.com/en/4.1/topics/db/managers/
+    <https://docs.djangoproject.com/en/4.1/topics/db/managers/>
     model을 생성하면 Manager도 같이 생성된다. Manager도 수정적용 가능하다.
 
     여러객체 조회하기
@@ -372,8 +372,8 @@
     filter를 사용할 때 조건을 붙일 수 있다. field에 언더바 두개를 사용하여 조건값을 붙이거나 외부 모델 필드를 사용한다. lookup 이라 한다.
         >>> Room.objects.filter(price__gte=15)  # 15보다 크거나 같은 값
         # lookup 종류
-        https://velog.io/@may_soouu/Django-%EB%A9%94%EC%86%8C%EB%93%9C-%EC%A0%95%EB%A6%AC
-        https://docs.djangoproject.com/en/4.1/ref/models/querysets/#field-lookups
+        <https://velog.io/@may_soouu/Django-%EB%A9%94%EC%86%8C%EB%93%9C-%EC%A0%95%EB%A6%AC>
+        <https://docs.djangoproject.com/en/4.1/ref/models/querysets/#field-lookups>
 
     console에서 데이터를 생성 및 대입하여 저장이 가능하며 삭제도 가능하다.
         create(): 데이터가 없는 빈 데이터 row가 생성된다.
@@ -463,7 +463,7 @@
     __exact 대신에 컬럼앞에 =를 붙이는 것과 같은 의미를 갖는다.
         "price__exact" == "=price"
     # search field
-    https://docs.djangoproject.com/en/4.1/ref/contrib/admin/#django.contrib.admin.ModelAdmin.search_fields
+    <https://docs.djangoproject.com/en/4.1/ref/contrib/admin/#django.contrib.admin.ModelAdmin.search_fields>
 
     foriegnKey 값을 검색할 수 있다. LookUp에 ForiegnKey 의 컬럼을 넣을 수 있다.
         "owner__username",
@@ -501,7 +501,7 @@
             def queryset():
 
         # simpleListFilter
-        https://docs.djangoproject.com/en/4.1/ref/contrib/admin/filters/#using-a-simplelistfilter
+        <https://docs.djangoproject.com/en/4.1/ref/contrib/admin/filters/#using-a-simplelistfilter>
     title, parameter_name, lookups(), queryset() 를 필수로 구현해야한다.
 
     parameter_name 은 url에 표기될 key일 뿐 데이터를 가져오는데는 관여하지 않는 것 같다.
@@ -612,7 +612,7 @@
     template만으로 다이나믹한 페이지를 표현하지 못한다. 하지만 대체로 많은 프로젝트는 장고의 템플릿 기능만 사용해도 가능하다.
     추후에 템플릿 만으로 프로젝트를 완성해보자.
     # templates
-    https://docs.djangoproject.com/en/4.1/topics/templates/
+    <https://docs.djangoproject.com/en/4.1/topics/templates/>
 
 ## 10. Django Rest Framework
 
@@ -624,7 +624,7 @@
         react는 사용자에게 url을 받아서 데이터를 요구하면 Django App은 해당 데이터를 찾아주며 react는 url로 이동하며 화면을 표현한다.
 
     우선 Rest framework 를 설치한다.
-    https://www.django-rest-framework.org/#installation
+    <https://www.django-rest-framework.org/#installation>
     poetry를 사용하기 때문에 pip대신에 poetry 명령어로 설치한다. pip i -> poetry add
     $ poetry add djangorestframework
     config>settings 에 추가해 주자. THIRD_PARTY_APPS[] 를 추가해서 앱을 설치한다. INSTALL_APPS 에 THIRD_PARTY_APPS 를 추가한다.
@@ -647,7 +647,7 @@
 
     Django의 serializer을 사용해보자.
     # Django의 serializer 대신에 rest_framework의 serializer를 사용한다. 참고용으로만 보자.
-    https://docs.djangoproject.com/en/4.1/topics/serialization/#djangojsonencoder
+    <https://docs.djangoproject.com/en/4.1/topics/serialization/#djangojsonencoder>
         from django.core import serializers
 
         ...
@@ -661,7 +661,7 @@
     Django는 serializer는 매법 데이터를 보낼때마다 데이터변형이 필요하며 전송데이터 조작이 복잡하다.
     Django의 serializer를 대신헤 rest_framework의 serializer를 사용한다.
     # rest_framework의 request, response
-    https://www.django-rest-framework.org/tutorial/2-requests-and-responses/
+    <https://www.django-rest-framework.org/tutorial/2-requests-and-responses/>
         from rest_framework.decorators import api_view
         from rest_framework.pagination import Response
 
@@ -752,7 +752,7 @@
 
 #### [2_Django, 5_Rest]
 
-    create() 함수에 return 을 구현 해준다.
+    serializer>create() 함수에 return 을 구현 해준다.
         create(self, validated_data)  # 해당 create()는 serializer의 create 이다.
             return Category.objects.create(**validated_data)  # 해당 create()는 objects의 query create 이다.
 
@@ -803,15 +803,18 @@
             try:
                 category = Category.objects.get(pk=pk)
                 print(category)
+            extact:
+                ...
             if ... :
                 print(cateogry)  # 오류가 발생하지 않으며 사용이 가능. 뭐지???
 
 #### [5_Rest]
 
-    update()를 구현한다. 기본 python문법으로 표현하면
-        if validated_data["name"]:
-            instance.name = validated_data['name']
-        ...  # 각 객체마다 계속 if문을 넣어줘야한다. 코드가 길어진다.
+    serializer>update()를 구현한다. 기본 python문법으로 표현하면
+        def update(self, instance, validated_data):
+            if validated_data["name"]:
+                instance.name = validated_data['name']
+            ...  # 각 객체마다 계속 if문을 넣어줘야한다. 코드가 길어진다.
     Dictionary에 있는 .get() 를 이용하여 리스트 객체를 넣어주자.
         instance.name = validated_data.get("name", instance.name)  # 두번째 인수는 찾는 값이 없을 경우 default 값이다.
         ...  # 이것도 각 객체마다 계속 추가해줘야한다.
@@ -828,5 +831,72 @@
     페이지에 delete버튼이 생성된다. 버튼을 클릭하며 재확인 창이 뜨며 rest_framework가 데이터를 한번더 보호해주며 확인 클릭시 삭제를 진행할 수 있디.
 
 
-    지금까지 작성한 url은 admin한 페이지의 일부처럼 보일 수 있어서 변경을 진행한다. 확실히 API url은 걸로 인지되도록 변경한다.
+    지금까지 작성한 url은 admin한 페이지의 일부처럼 보일 수 있어서 변경을 진행한다. 확실히 API url 로 인지되도록 변경한다.
     config>url에 admin을 제외한 urls는 앞에 'api/<버젼>/' 을 붙인다.
+        path("api/v2/categories/", include("categories.urls")),
+        ...
+
+    @api_view() 를 사용하여 함수를 구현하는 대신에 클래스를 사용하여 구현할 수 있다. categories()를 대신하여 Categories 클래스를 구현한다.
+    # api 가이드
+    <https://www.django-rest-framework.org/api-guide/views/>
+    - views -
+        from rest_framework.views import APIView
+
+        class Categories(APIView):
+
+            def get(self, request):  # if문 대신에 함수를 사용해주면 된다.
+                ...
+
+            def post(self, request):  # 추가해준 함수명만 프로토콜 허용에 추가된다. (지금 구성에서는 Allow: GET, POST, HEAD, OPTIONS). 그러므로 함수명은 프로토콜명과 같게 사용한다.
+                ...
+    - urls -
+        path("", views.Categories.as_view())  # as_view() 를 호출해야 프로토콜마다 get,post 함수를 실행시켜 준다.
+
+    CategoryDetail 클래스(<- category() )도 위와 같이 구현을 한다. category()에는 pk값을 갖는 category를 찾는 중복된 코드가 존재한다.
+    rest framework의 관습(convention)을 사용하여 중복되는 코드를 실행하는 함수를 구현한다.
+    # detail views 구성
+    <https://www.django-rest-framework.org/tutorial/3-class-based-views/>
+        def get_object(self, pk):
+            ...
+            return category
+
+        get, put, delete(self, request, pk):
+            category -> self.get_object(pk) 변경
+    한개의 객체를 가져올때(Detail) pk를 사용하여 값을 가져올때 사용된다.
+
+    model의 기본 모형을 갖고 serializer를 생성할 수 있다.
+        class CategorySerializer(serializers.ModelSerializer):  # Serializer -> ModelSerializer
+    클래스를 Meta 클래스를 이용하여 정의한다.
+        class Meta:
+            model = Category
+            fields = "__all__"  # fields <> exclude
+    이 세줄로 기존 serializer의 구현을 대체할 수 있다. create() 와 update()도 생성해준다.
+
+    rest framework 의 viewset을 가져와서 views를 쉽게 구성할 수 있다.
+    # viewsets 구성 및 urls 구성방법
+    <https://www.django-rest-framework.org/api-guide/viewsets/>
+        from rest_framework.viewsets import ModelViewSet
+
+        class CategoryViewSet(ModelViewSet):
+
+            serializer_class = CategorySerializer  # 이 두가지는 필수로 적용해줘야한다.
+            queryset = Category.objects.all()
+    urls에 as_view()에 사용할 프로토콜을 추가해줘야 한다.
+        path("", "views.CategoryViewSet.as_view({
+            "get": "list",
+            "post": "create",
+        }))
+    detail 페이지를 위한 path 도 구성해준다.
+        path("<int:pk>", "views.CategoryViewSet.as_view({
+            "get: "retieve",  # pk를 이용한 detail search
+            "put": "partial_update",
+            "delete": "destroy",  # 세 프로토콜은 pk값을 받는다.
+        }))
+
+    viewset 은 웹페이지에 기본 데이터 변경 구성을 갖는 Row data 탭과 html form 탭을 제공해준다.
+
+    더많은 rest framework의 마법적이 기능들을 확인하고 싶다면 tutorial을 더 활용해보자.
+    <https://www.django-rest-framework.org/tutorial/quickstart/>
+    viewset을 사용하게 되면 자동으로 완성되는 부분이 많아져서 코드가 단축되지만 코드가 너무 추상적으로 변한다.
+    그리고 추가기능을 구현할 때 코드가 더 길어지게 되는 경우가 발샐할 수 있다. 그때에는 전체를 다시 구현을 할지 viewset에서 커스텀할지 결정해야한다.
+    대체로 apiview를 다시 작성하는 것이 더 편리하며 관리상에도 좋다.
