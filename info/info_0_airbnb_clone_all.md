@@ -724,7 +724,7 @@
     하지만 이렇게 데이터를 넣어주면 데이터 검증없이 바로 생성이된다. 이 방식은 사용하지 않는다.
     Serializer를 사용하면 브라우져에서 오는 json파일을 queryset으로도 변경해준다. serializer설정을 그대로 사용하면 된다.
     serializer에서 데이터 유효성검사를 한다. model에 있는 설정을 serializer에 그대로 사용해주면 된다.
-    json형식을 변형할때는 serializer() 안에 data값을 지정해주면 된다.
+    json형식을 변형할때는 serializer() 안에 값을 그냥 넣어주지 않으며 data값을 지정해주며 넣어줘야한다.
         serializer = CategorySerializer(data=request.data)
 
     querySet으로 변경한 데이터 유효성을 확인할 수 있다.
@@ -900,3 +900,12 @@
     viewset을 사용하게 되면 자동으로 완성되는 부분이 많아져서 코드가 단축되지만 코드가 너무 추상적으로 변한다.
     그리고 추가기능을 구현할 때 코드가 더 길어지게 되는 경우가 발샐할 수 있다. 그때에는 전체를 다시 구현을 할지 viewset에서 커스텀할지 결정해야한다.
     대체로 apiview를 다시 작성하는 것이 더 편리하며 관리상에도 좋다.
+
+## 11. Rest API
+
+#### [5_Rest]
+
+    API 생성을 시작한다. 보안에는 신경쓰지않으며 우선 기능 구현초점으로 진행한다.
+
+    Amenity 구조를 구현한다. ModelSerializer 를 사용하면 model에 적용되어있는 read only도 같이 적용된다.
+    views 는 APIView를 참조했다.
