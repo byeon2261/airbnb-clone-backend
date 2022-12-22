@@ -18,8 +18,8 @@ GET PUT DELETE /experiences/1
 GET /experiences/1/perks
 GET POST /experiences/1/bookings
 GET PUT DELETE /experiences/1/bookings/2
-GET POST /perks
-GET PUT DELETE /perks/1
+GET POST /perks [X]
+GET PUT DELETE /perks/1 [X]
 
 ### Medias
 

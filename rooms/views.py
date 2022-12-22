@@ -42,8 +42,8 @@ class AmenityDetail(APIView):
             partial=True,
         )
         if serializer.is_valid():
-            amenity = serializer.save()
-            serializer = AmenitySerializer(amenity)
+            updated_amenity = serializer.save()
+            serializer = AmenitySerializer(updated_amenity)
             return Response(serializer.data)
         else:
             return Response(serializer.errors)

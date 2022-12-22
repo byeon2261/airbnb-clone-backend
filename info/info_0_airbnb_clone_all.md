@@ -907,5 +907,7 @@
 
     API 생성을 시작한다. 보안에는 신경쓰지않으며 우선 기능 구현초점으로 진행한다.
 
-    Amenity 구조를 구현한다. ModelSerializer 를 사용하면 model에 적용되어있는 read only도 같이 적용된다.
+    rooms>Amenity 구조를 구현한다. ModelSerializer 를 사용하면 model에 적용되어있는 read only도 같이 적용된다.
     views 는 APIView를 참조했다.
+
+    같은 구조로 experiences>Perk를 구현했다.
