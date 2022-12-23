@@ -911,3 +911,25 @@
     views 는 APIView를 참조했다.
 
     같은 구조로 experiences>Perk를 구현했다.
+
+    앞서 만든 api는 기존에 [10. Django Rest Framework]에서 배웠던 방식을 사용하여 복습하는 겸 만들어 봤다.
+    이제 Rooms model부터 구조를 다 만들어본다. Authentication 과 relationship 을 새로 배워서 사용해본다.
+    room serializer도 ModelSerializer를 사용하며 view 데이터를 json으로 변형한다.
+
+    값을 일부만 가져오는 RoomListSerializer를 만든다.
+
+    개별 객체를 가져오는 RoomDetail api를 생성한다. (url: <int:pk>, view, serializer)
+    foriegn키를 가져오는 컬럼은 데이터를 표시할때 pk값을 표시한다.
+    foriegn키 값을 확장해서 전체값을 가져올 수 있다.
+    - serializer_Meta -
+        depth = 1
+    foriegn키의 값을 전부 전달해 준다. 데이터가 가져오는 양이 많아져 매우 느려지게 되며 사용자의 개인정보까지 보내져 보안에 문제가 발생한다.
+    RoomDetail에 표기할 user의 데이터만 가져올 serializer를 생성한다.
+    - users>serializers -
+        class TinyUserSerializer
+    rooms>serializers 에 depth=1 대신에 foriegn키 컬럼마다 serializer를 지정해주면 된다.
+        owner = TinyUserSerializer()  # Meta 클래스 안이 아닌 serializer 클래스안에 작성해주면 된다.
+        amenities = AmenitySerializer(many=True)  # 값이 여러개일경우 many를 활성화해준다.
+
+        class Meta:
+            ...  # depth는 삭제해 준다.
