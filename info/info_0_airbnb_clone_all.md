@@ -1004,3 +1004,5 @@
                 ...  # 내부 try-except문은 삭제한다.
     try-except문을 사용하면 transaction은 에러가 난 사실을 알지 못한다.
     transaction문을 try-except문으로 감싸준다.
+
+#### [5_Rest]

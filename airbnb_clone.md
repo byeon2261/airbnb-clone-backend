@@ -2,8 +2,8 @@
 
 ### Rooms
 
-GET POST /rooms
-GET PUT DELETE /rooms/1
+GET[X] POST[X] /rooms
+GET[X] PUT DELETE /rooms/1
 GET /rooms/1/amenities
 GET /rooms/1/reviews
 GET POST /rooms/1/booking
