@@ -933,3 +933,74 @@
 
         class Meta:
             ...  # depth는 삭제해 준다.
+
+
+    room의 post 기능을 구현해본다. foriegn키를 제외한 컬럼에 값을 넣을때는 오류가 발생하지 않는다.
+    하지만 foriegn키에 값을 넣을때는 입력오류가 발생한다.
+    # 11.6 Room Owner
+    <https://nomadcoders.co/airbnb-clone/lectures/3909>
+    owner는 사용자값을 request에서 받아서 입력하지 않는다. 사용자가 입력하는 유저값을 넣어서는 안된다. 우선 owner설정은 read_only를 넣어준다.
+        owner = TinyUserSerializer(read_only=True)
+
+    request objects 중에 request 를 보낸 사용자의 데이터를 갖고 있는것이 있다.
+        request.user
+    save() 에 컬럼 값을 기입할 수 있다.
+        serializer.save(owner=request.user)  # >>> 'owner': <SimpleLazyObject: <User: G.H.Byeon>>
+
+    request.user.is_authenticated 를 사용하면 사용자의 로그인여부를 알 수 있다. (로그인 일경우 = True)
+        def post(self, request):
+            if request.user.is_authemticated:
+                ...
+            else:
+                raise NotAuthenticated
+    post() 유효검사 후 로직 실행
+
+    save()>create() 가 실행될때 room의 model값중 foriegn키를 제외한 값이 전송이 된다. foriegn키를 찾아서 넣어줘야 한다.
+    category를 입력값을 받는지 확인 및 식별 후(식별? 단어가 생각이 안난다.) save()에 값을 넣어준다.
+        category_pk = request.data.get("category")
+        if not category_pk:
+            raise ParseError
+        try:
+            category = Category.objects.get(pk=category_pk)
+            if Category.CategoryKindChoice.EXPERIENCES:  # 카테고리가 경험일 경우 에러 발생.
+                raise ParseError("The category kind should be 'rooms'.")
+        except Category.DoesNotExist:
+            raise ParseError("Category is not found.")  # 오류 내용을 보내줄 수 있다.
+        ...
+            created_room = serializer.save(
+                owner=request.user,
+                category=category,
+            )
+
+    ManyToManyField 값인 Amenities를 가져와 보겠다.
+    Amenity 는 값을 보내지 않아도 에러를 발생하지 않도록 적용하겠다. room생성 후에도 나중에 항목들을 추가 가능하도록 적용한다.
+        created_room = serializer.save(...)  # save() 다음에 구현한다
+        amenities = request.data.get("amenity")
+        try:
+            for amenity_pk in amenities:
+                amenity = Amenity.objects.get(pk=amenity_pk)
+        except Amenity.DoesNotExist:
+            raise ParseError(f"Amenity with id {amenity_pk} is not found.")
+    ManyToManyFields 는 add(), remove() 를 사용하여 객체를 리스트에 추가, 제거를 하여 저장한다.
+        created_room.amenities.add(amenity)  # pk가 아닌 객체를 넣어준다.
+
+    유효성 검사에서 오류가 발생한다면 room을 삭제하여 재생성하도록 유도가 가능하다.
+        except Amenity.DoesNotExist:
+            created_room.delete()
+    이번 프로젝트에서는 amenity가 잘못되어도 room은 생성되도록 하였기때문에 삭제는 구현하지 않았다.
+
+#### [2_django]
+
+    Django에서는 쿼리가 실행되면 DB에 바로 적용이 된다.
+    하지만 transaction 을 사용하며, 많은 쿼리와 create()를 정의한 다음에 그중에 하나라도 실패하면 모든쿼리는 취소된다.
+    <https://docs.djangoproject.com/en/4.1/topics/db/transactions/>
+
+    transaction.atomic(): 내에 코드는 전체 실행이 되고나서 한번에 데이터 변경이 이뤄진다.
+        from django.db import transaction
+
+        ...
+            with transaction.atomic():
+                created_room = serializer.save(...)
+                ...  # 내부 try-except문은 삭제한다.
+    try-except문을 사용하면 transaction은 에러가 난 사실을 알지 못한다.
+    transaction문을 try-except문으로 감싸준다.
