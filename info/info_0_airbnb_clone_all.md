@@ -1006,3 +1006,18 @@
     transaction문을 try-except문으로 감싸준다.
 
 #### [5_Rest]
+
+    room_delete() 구현한다. 로그인 접속여부와 삭제자와 룸생성장가 같은지 확인한다.
+        if not request.user.is_authenticated:
+            raise NotAuthenticated
+        if request.user != room.owner:
+            raise PermissionDenied
+
+    room_put() 도 로그인 접속 여부와 삭제자 식별을 진행한며 저장 데이터 검증을 진행한다.
+    rooms_post와 달리 category_pk여부에 따라 category를 넣고 저장할지 그냥저장할지 정하며 Amenity저장하기 전에 clear해준다.
+        if category_pk:
+            room = serializer.save(category=category)
+        else:
+            room = serializer.save()
+        ...
+            room.amenities.clear()
