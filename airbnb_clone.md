@@ -5,11 +5,11 @@
 GET[X] POST[X] /rooms
 GET[X] PUT DELETE /rooms/1
 GET /rooms/1/amenities
-GET /rooms/1/reviews
-GET POST /rooms/1/booking
-GET PUT DELETE /rooms/1/booking/2
+GET /rooms/1/reviews [X]
 GET POST /amenities [X]
 GET PUT DELETE /amenities/1 [X]
+GET POST /rooms/1/booking
+GET PUT DELETE /rooms/1/booking/2
 
 ### Experiences
 
