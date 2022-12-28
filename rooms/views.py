@@ -73,13 +73,19 @@ class AmenityDetail(APIView):
 class Rooms(APIView):
     def get(self, request):
         all_room = Room.objects.all()
-        serializer = RoomListSerializer(all_room, many=True)
+        serializer = RoomListSerializer(
+            all_room,
+            many=True,
+            context={"request": request},
+        )
 
         return Response(serializer.data)
 
     def post(self, request):
         if request.user.is_authenticated:
-            serializer = RoomDetailSerializer(data=request.data)
+            serializer = RoomDetailSerializer(
+                data=request.data,
+            )
 
             if serializer.is_valid():
                 category_pk = request.data.get("category")
@@ -106,10 +112,13 @@ class Rooms(APIView):
                             amenity = Amenity.objects.get(pk=amenity_pk)
                             created_room.amenities.add(amenity)
 
-                        serializer = RoomDetailSerializer(created_room)
-
+                        serializer = RoomDetailSerializer(
+                            created_room,
+                            context={"request": request},
+                        )
                         return Response(serializer.data)
-                except Exception:
+                except Exception as e:
+                    print(e)
                     raise ParseError("Amenity is not found.")
             else:
                 return Response(serializer.errors)
@@ -127,7 +136,10 @@ class RoomDetail(APIView):
     def get(self, request, pk):
         room = self.get_object(pk)
 
-        serializer = RoomDetailSerializer(room)
+        serializer = RoomDetailSerializer(
+            room,
+            context={"request": request},
+        )
 
         return Response(serializer.data)
 
@@ -168,8 +180,11 @@ class RoomDetail(APIView):
                         for amenity_pk in amenities:
                             amenity = Amenity.objects.get(pk=amenity_pk)
                             room.amenities.add(amenity)
-
-                    return Response(RoomDetailSerializer(room).data)
+                    serializer = RoomDetailSerializer(
+                        room,
+                        context={"request": request},
+                    )
+                    return Response(serializer.data)
             except Exception:
                 raise ParseError("Amenity is not found.")
         else:

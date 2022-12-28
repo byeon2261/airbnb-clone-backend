@@ -1019,5 +1019,56 @@
             room = serializer.save(category=category)
         else:
             room = serializer.save()
+
         ...
             room.amenities.clear()
+
+    SerializerMethodField: 기존 model외의 값을 가져올 수 있다. 메서드 이름은 속성앞에 get_을 붙여야한다.
+        potato = serializers.SerializerMethodField()
+
+        get_potato(self, room):
+            return ...
+
+#### ! username of userModel's Serializer
+
+    username = CharField(help_text='150자 이하 문자, 숫자 그리고 @/./+/-/_만 가능합니다.', label='사용자 이름', max_length=150, validators=[<django.contrib.auth.validators.UnicodeUsernameValidator object>, <UniqueValidator(queryset=User.objects.all())>])
+
+#### [5_rest]
+
+    context를 사용하여 외부에 데이터를 보낼때 유용하다. serializer 호출 인수에 context=() 를 추가해 주면 된다.
+    - views -
+        RoomListSerializer(... , context=("hello": "bye bye"), )
+    - serializer -
+        def get_...(self, room):
+            print(self.context)
+    user의 데이터를 가져와 serializer에 보내어 해당 room의 owner인지 대조하는 로직을 작성한다.
+    - views -
+        RoomListSerializer(... , context={"request": request}, )
+    - serializer
+        is_owner = serializers.SerializerMethodField()
+        fields = (
+            ...
+            "is_owner",
+        )
+        def get_is_owner(self, room):
+            return room.owner == self.context["request"]  # True or False
+
+    GET과 PUT serializer가 분리되어 있지 않기 때문에 다른 프로토콜에서 에러가 발생할 수 있다. 확인 후 다른 프로토콜도 작업 진행.
+    데이터를 변활할때는 오류가 발생하지 않지만 Response로 데이터를 보낼때 context값을 보내지 않는다면 오류가 발생한다.
+        serializer = RoomDetailSerializer(
+            data=request.data,   # It's OK
+        )
+        created_room = serializer.save(
+            owner=request.user,
+            category=category,
+        )
+
+        serializer = RoomDetailSerializer(
+            created_room,
+            context={"request": request},   # You should be response the context.
+        )
+        return Response(serializer.data)
+
+    reviews 역참조자를 사용하여 roomDetail에서 불러온다.
+    역참조를 사용하여 데이터를 가져올때 review data가 매우 많을 수 있다. 페이지가 위험해질 수 있다.
+    데이터 양을 조절하기 위해서 pagination기능을 추가해야하며 1개의 room을 위한 review 전용 페이지를 생성한다.
