@@ -1168,4 +1168,12 @@ model을 생성하면 Manager도 같이 생성된다. Manager도 수정적용 �
 
 <https://docs.djangoproject.com/ko/4.1/ref/settings/#media-url>
 
-    파일을 호스팅하는 서비스에 파일을 넣은 다음, 장고에겐 URL을 제공하기로 한다.
+    파일을 호스팅하는 서비스에 파일을 넣은 다음, 장고에겐 URL을 제공하기로 한다. (아마존이나 구글 클라우드를 쓰는것이 더 편하다.)
+    Medias model클래스의 ImaageField, fileField 컬럼 속성을 변경한다.
+        file = models.URLField()
+    migration 진행 (오랜만이다.)
+
+    RoomPhoto post()를 구현한다.
+        사용자 인증
+        보내온 데이터 검증 및 저장
+        저장데이터 재전송
