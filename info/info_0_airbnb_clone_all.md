@@ -1190,3 +1190,14 @@ model을 생성하면 Manager도 같이 생성된다. Manager도 수정적용 �
         ...
             permission_classes = [IsAuthentucatedReadOnly]
     권한이 필요없느 GET만 있다면 권한이 없어도 된다.
+
+
+    room>RoomReviews POST 작업 진행.
+
+
+    wishlists 작업을 진행한다. wishlist는 사용자가 등록한 wishlist만을 본다. all() 대신에 filter()를 사용한다.
+        all_wishlists = Wishlist.objects.filter(user=request.user)
+    GET, POST 작업 진행.
+
+
+    wishlist 작업

@@ -11,6 +11,17 @@ GET PUT DELETE /rooms/amenities/1 [X]
 POST /rooms/1/photos [X]
 DELETE /rooms/1/photos/2 >>> /medias/photos/1 [X]
 
+### Wishlist
+
+GET POST /wishlists [X]
+GET PUT DELETE /wishlists/1
+is_liked
+
+### User
+
+GET PUT /me
+POST /user
+
 ### Experiences
 
 GET POST /experiences
