@@ -1136,3 +1136,36 @@ model을 생성하면 Manager도 같이 생성된다. Manager도 수정적용 �
 <https://docs.djangoproject.com/en/4.1/topics/db/queries/#limiting-querysets>
 
     pagination 기능을 이용하여 amenities 페이지도 구현.
+
+    page_size 셋팅값을 config>settings에 설정을 하고 가져와서 사용하는 것으로 설정한다.
+    - config>settings -
+        PAGE_SIZE = 3
+    - views -
+        page_size = 3 -> settings.PAGE_SIZE
+
+
+    파일 업로드 기능을 구현한다. Media>photo 파일을 upload하고 파일을 열면 Page not found Error가 발생한다.
+
+<https://docs.djangoproject.com/en/4.1/howto/static-files/#serving-files-uploaded-by-a-user-during-development>
+
+    장고에서 파일 업로드을 할경우 기본 root에 저장을 한다. config>setting에 업로드 path를 설정할 수 있다.
+    - config>settings -
+        MEDIA_ROOT = "upload"
+    파일 업로드시 upload 폴더가 생성되며 폴더내에 파일이 생성된다.
+
+    하지만 파일을 열경우 아직도 에러가 발생한다. 업로드된 파일을 열수 있는 url을 설정해 줘야한다.
+    - config>settings -
+        MEDIA_URL = "user-uploads/"  # MEDIA_URL setting must end with a slash
+    파일을 열때 MEDIA_URL로 이동하여 파일을 찾는다. Django에게 user-uploads를 노출시켜달라고 말해야한다.
+        from django.conf.urls.static import static
+        from django.conf import settings  # settings.py에 대한 프록시(==from config import settings)
+
+        urlpatterns = [
+            ...
+        ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    이제 파일이 정상적으로 열릴것이다. 하지만 이 구조는 서비스환경에서는 권장되지 않는다.
+    신뢰하지 않는 유저에게 업로드되는 컨텐츠를 수락하는 경우에 위험해질 수 있다. 업로드 되는 파일들이 소스가 있는 피시에 다운로드가 직접되는 거다.
+
+<https://docs.djangoproject.com/ko/4.1/ref/settings/#media-url>
+
+    파일을 호스팅하는 서비스에 파일을 넣은 다음, 장고에겐 URL을 제공하기로 한다.

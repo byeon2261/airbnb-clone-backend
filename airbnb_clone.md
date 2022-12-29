@@ -3,13 +3,13 @@
 ### Rooms
 
 GET[X] POST[X] /rooms
-GET[X] PUT DELETE /rooms/1
-GET /rooms/1/amenities
+GET[X] PUT DELETE /rooms/1 [X]
+GET /rooms/1/amenities [X]
 GET /rooms/1/reviews [X]
-GET POST /amenities [X]
-GET PUT DELETE /amenities/1 [X]
-GET POST /rooms/1/booking
-GET PUT DELETE /rooms/1/booking/2
+GET POST /rooms/amenities [X]
+GET PUT DELETE /rooms/amenities/1 [X]
+POST /rooms/1/photos
+DELETE /rooms/1/photos/2
 
 ### Experiences
 
