@@ -1177,3 +1177,16 @@ model을 생성하면 Manager도 같이 생성된다. Manager도 수정적용 �
         사용자 인증
         보내온 데이터 검증 및 저장
         저장데이터 재전송
+
+
+    APIView의 permissions 프로퍼티를 변경하여 유저 검증을 할 수 있다.
+        from rest_framework.permissions import IsAuthenticated
+
+        ...
+            permission_classes = [IsAuthenticated]
+    GET은 모든 사람이 호출 가능한 프로토콜이다. 권한이 필요없는 프로토콜이 포함되어 있다면 readonly도 같이 부여한다.
+        from rest_framework.permissions import IsAuthenticatedOrReadOnly
+
+        ...
+            permission_classes = [IsAuthentucatedReadOnly]
+    권한이 필요없느 GET만 있다면 권한이 없어도 된다.
