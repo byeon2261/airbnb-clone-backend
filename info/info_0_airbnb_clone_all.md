@@ -1234,3 +1234,8 @@ model을 생성하면 Manager도 같이 생성된다. Manager도 수정적용 �
             else:
                 wishlist.rooms.add(room)
             return Response(status=HTTP_200_OK)
+
+Many-To-Many 관계 데이터
+<https://docs.djangoproject.com/en/4.1/topics/db/examples/many_to_many/>
+
+    rooms>serializers에 이미 좋아요 표시한 방을 볼 수 있도록 구현하겠다.
