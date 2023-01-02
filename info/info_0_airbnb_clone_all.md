@@ -12,8 +12,9 @@
     poetry를 설치한다.
 
 <https://python-poetry.org/docs>
-$ curl -sSL https://install.python-poetry.org | python3 -
-그리고 터미널을 죽인 후에 터미널을 다시 열고 poetry를 실행시킨다. (vscode에선 쓰래기통 아이콘을 클릭해서 kill terminal 할 수 있다.)
+
+    $ curl -sSL https://install.python-poetry.org | python3 -
+    그리고 터미널을 죽인 후에 터미널을 다시 열고 poetry를 실행시킨다. (vscode에선 쓰래기통 아이콘을 클릭해서 kill terminal 할 수 있다.)
 
     가상환경(shell)을 생성하여 shell내에 django를 설치해준다. 컴퓨터 전역에 django를 설치하지 않기위해서다.
 
@@ -157,8 +158,9 @@ exclude, fields, list_display_links, list_per_page, list_editable, read_only ...
     Django에는 기본 user관리를 위한 데이터테이블과 admin판넬이 제공된다. 하지만 user 데이터 변경을 위해서는 Django의 user클래스를 inherit하여 overriding을 할 필요가 있다.
 
 <https://docs.djangoproject.com/en/4.1/topics/auth/customizing/#substituting-a-custom-user-model>
-데이터 작업이 어느정도 이뤄지고 나서 users app을 변경할려면 작업이 매우 복잡해진다. 프로젝트가 완료되고 런칭되어서 데이터가 쌓이기전에 변경작업을 진행하자.
-! Django application 을 시작하는 처음부터 user model을 교체하자. 무조건 교체하자. 교체할게 하나도 없더라도 inherit만 구현해놓자 !
+
+    데이터 작업이 어느정도 이뤄지고 나서 users app을 변경할려면 작업이 매우 복잡해진다. 프로젝트가 완료되고 런칭되어서 데이터가 쌓이기전에 변경작업을 진행하자.
+    ! Django application 을 시작하는 처음부터 user model을 교체하자. 무조건 교체하자. 교체할게 하나도 없더라도 inherit만 구현해놓자 !
 
 #### [1_python]
 
@@ -1195,9 +1197,40 @@ model을 생성하면 Manager도 같이 생성된다. Manager도 수정적용 �
     room>RoomReviews POST 작업 진행.
 
 
-    wishlists 작업을 진행한다. wishlist는 사용자가 등록한 wishlist만을 본다. all() 대신에 filter()를 사용한다.
-        all_wishlists = Wishlist.objects.filter(user=request.user)
+    wishlists 작업을 진행한다. wishlist는 사용자가 등록한 wishlist만을 본다. all() 대신에 filter()를 사용하며 권한도 자신만 가능하도록 한다.
+        permission_classes = [IsAuthenticated]
+
+        ...
+            all_wishlists = Wishlist.objects.filter(user=request.user)
     GET, POST 작업 진행.
 
 
-    wishlist 작업
+    wishlist 작업 진행. ("<int:pk>" ,WishlistDetail - GET,PUT,DELETE)
+    wishlists와 같이 본인만 접근이 가능. 추가로 user를 같이 넣어주면서 본인 wishlist만 가져오도록 적용한다.
+
+        def get_object(self, pk, user):
+            ...
+            return Wishlist.objects.get(pk=pk, user=user)
+
+        def get(...):
+    wishlistDetail 에서는 wishlist 명만 변경이 가능하도록 한다.
+
+    wishlistToggle에서는 list를 변경하는 기능을 구현한다. room을 좋아하는 버튼을 클릭할때마다 변경이 되도록 적용할 것이다.
+    room pk는 request 로 전달해도 되며 url로 전송도 가능하다. 둘 중 편한 방법으로 사용하면 되며 여기선 url로 받도록 적용한다.
+        def get_list(self, pk, user):
+            ...
+
+        def get_room(self, pk):
+            ...
+
+        def put(self, request, pk, room_pk):
+            wishlist = self.get_list(pk, request.user)
+            room = self.get_room(room_pk)
+
+            if wishlist.rooms.filter(pk=room.pk).exists():  # ManyToManyField 는 querySet으로 데이터를 가져오기때문에 all(),filter()가 사용가능하다.
+                                                            ## exclude()는 데이터 존재여부만 return한다.
+                # wishlist.rooms.delete()  # 리스트 추가 제거는 remove(), add()를 사용한다.
+                wishlist.rooms.remove(room)
+            else:
+                wishlist.rooms.add(room)
+            return Response(status=HTTP_200_OK)

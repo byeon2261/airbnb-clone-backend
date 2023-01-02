@@ -14,7 +14,8 @@ DELETE /rooms/1/photos/2 >>> /medias/photos/1 [X]
 ### Wishlist
 
 GET POST /wishlists [X]
-GET PUT DELETE /wishlists/1
+GET PUT DELETE /wishlists/1 [X]
+PUT /wishlists/1/rooms/2
 is_liked
 
 ### User
