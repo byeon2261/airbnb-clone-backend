@@ -1239,3 +1239,36 @@ Many-To-Many 관계 데이터
 <https://docs.djangoproject.com/en/4.1/topics/db/examples/many_to_many/>
 
     rooms>serializers에 이미 좋아요 표시한 방을 볼 수 있도록 구현하겠다.
+        is_liked = serializers.SerializerMethodField()
+
+        def get_is_liked(self, room):
+            request = self.context["request"]
+            return Wishlist.objects.filter(
+                user=request.user,
+                rooms__pk=room.pk,  # model 객체의 컬럼을 검색하는 기능으로 '__컬럼명' 식으로 사용한다
+            ).exists()
+
+
+    방에 예약된 현황을 확인하는 페이지를 구현한다. (rooms/1/bookings)
+    bookings>serializers 를 생성한다. 모든사람이 볼 수 있는 것(Public)과 방 주인만 볼 수 있는(Private) serializer를 생성해준다.
+
+    예약된 현황을 오늘 이후의 값만 가져오도록 적용한다. python의 datetime 대신에 파이썬의 timezone을 사용한다.
+        from django.utils import timezone
+    config>settings 에 timezone 셋팅이 있다. 서버의 로컬타임 등 셋팅값이 포함되어 있다.
+        TIME_ZONE = "Asia/Seoul"
+        USE_TZ = True
+    시간을 출력해본다.
+        now = timezone(now)
+        print(now())  # >>>: 2023-01-02 07:06:20.674650+00:00
+                             [02/Jan/2023 16:06:20] "GET /api/v2/rooms/3/bookings HTTP/1.1" 200 7171  # 해당Text은 통신 프로토콜이다. django의 localtime이 출력된다.
+    한국시간으로 출력이 되지 않는다. settings에 설정된 한국시간으로 표기할 수 있다.
+        now = timezone.localtime
+        print(now())  # >>>: 2023-01-02 16:10:46.105665+09:00
+                             [02/Jan/2023 16:10:46] "GET /api/v2/rooms/3/bookings HTTP/1.1" 200 7171
+    해당 데이터를 필터에 추가하여 오늘 이후의 예약현황을 가져오도록 하자.
+        now = timezone.localtime().date()  # date(): 날짜만 가져온다.
+
+        Bookings.objects.filter(
+            ... ,
+            check_in__gt=now,  # __gt: look up. line.391 참조
+        )

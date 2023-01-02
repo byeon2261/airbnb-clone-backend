@@ -1,6 +1,7 @@
-from django.shortcuts import render
 from django.http.response import HttpResponse
+from rest_framework.views import APIView
 
-# Create your views here.
-def say_hello(request):
-    return HttpResponse("Hello world!")
+
+class Bookings(APIView):
+    def get(self, request):
+        pass

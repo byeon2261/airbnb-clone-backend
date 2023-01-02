@@ -10,6 +10,7 @@ GET POST /rooms/amenities [X]
 GET PUT DELETE /rooms/amenities/1 [X]
 POST /rooms/1/photos [X]
 DELETE /rooms/1/photos/2 >>> /medias/photos/1 [X]
+GET[X] POST /rooms/1/bookings
 
 ### Wishlist
 
