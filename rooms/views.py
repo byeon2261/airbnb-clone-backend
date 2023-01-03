@@ -14,7 +14,7 @@ from rest_framework.exceptions import (
 from .models import Amenity, Room
 from .serializers import AmenitySerializer, RoomListSerializer, RoomDetailSerializer
 from bookings.models import Booking
-from bookings.serializers import PublicBookingSerializer
+from bookings.serializers import PublicBookingSerializer, CreateRoomBookingSerializer
 from categories.models import Category
 from medias.serializers import PhotoSerializer
 from reviews.serializers import ReviewSerializer
@@ -338,4 +338,16 @@ class RoomBookings(APIView):
         return Response(serializer.data)
 
     def post(self, request, pk):
-        pass
+        room = self.get_object(pk)
+        serializer = CreateRoomBookingSerializer(data=request.data)
+
+        if serializer.is_valid():
+            saved_booking = serializer.save(
+                kind=Booking.BookingKindChoice.ROOM,
+                user=request.user,
+                room=room,
+            )
+            serializer = PublicBookingSerializer(saved_booking)
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)

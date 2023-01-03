@@ -1252,7 +1252,7 @@ Many-To-Many 관계 데이터
     방에 예약된 현황을 확인하는 페이지를 구현한다. (rooms/1/bookings)
     bookings>serializers 를 생성한다. 모든사람이 볼 수 있는 것(Public)과 방 주인만 볼 수 있는(Private) serializer를 생성해준다.
 
-    예약된 현황을 오늘 이후의 값만 가져오도록 적용한다. python의 datetime 대신에 파이썬의 timezone을 사용한다.
+    예약된 현황을 오늘 이후의 값만 가져오도록 적용한다. python의 datetime 대신에 Django의 timezone을 사용한다.
         from django.utils import timezone
     config>settings 에 timezone 셋팅이 있다. 서버의 로컬타임 등 셋팅값이 포함되어 있다.
         TIME_ZONE = "Asia/Seoul"
@@ -1272,3 +1272,43 @@ Many-To-Many 관계 데이터
             ... ,
             check_in__gt=now,  # __gt: look up. line.391 참조
         )
+
+    예약 기능을 구현한다. (rooms/1/bookings)
+    bookings 모델에 check_in, check_out 은 필수값이 아니다.(이건 모델 설계의 실수이다).
+    해당 값을 데이터를 받을때 필수값으로 하기위해선 serializerd에서 재정의가 필요하다.
+        class CreateRoomBookingSerializer(...):
+            check_in = serializers.DataField()
+
+    serializer에서 데이터 검증 기능을 추가할 수 있다. 검증할 컬럼앞에 validate_ 를 붙여 함수를 구현한다.
+    현재 날짜보다 이후의 날짜로 예약을 할 수 있도록 검증한다.
+        def calidate_check_in(self, value):  # serializer호출할 때 해당 컬럼값을 이 함수에서 2번째 매개변수로 받는다.
+            now = timezone.localtime().date()
+            if now > value:
+                raise serializers.ValidationError("Can't book in the past!")
+            return value
+
+    validate()를 통해 전체 데이터 검증도 가능하다.
+        def validate(self, data):
+            print(data)  # >>>: OrderedDict([('check_in', datetime.date(2023, 1, 25)), ('check_out', datetime.date(2023, 1, 31)), ('guests', 5)])
+    체크인 날짜 이후에 체크아웃 날짜만이 가능하도록 기능을 추가한다.
+        def validate(self, data):
+            if data["check_in"] >= data["check_out"]:
+                raise serializers.ValidationError(
+                    "check out should be later than check in."
+                )
+            return data
+
+    booking기간에 이미 booking이 있는지 체크 로직을 작성할 것이다. 우선 objects filter의 구현이다.
+        Booking.objects.filter(
+            check_in__gte=data["check_in"],
+            check_out__lte=data["check_out"],
+        ).exist()
+    위 코드는 해당 범위 내 booking이 되어 있다면 잡아낼 것이다. 하지만 해당 범위에 벗어난 booking은 filter하지 못한다.
+    만약 1일부터 7일까지 예약을 할때 이미 1일 부터 15일까지의 예약이 있다면 저 필터에 잡히지 않는다.
+        Booking.objects.filter(
+            check_in__lt=data["check_out"],  # 날짜 데이터는 늦은 날짜가 더 작다고 인식한다. == 체크인 보다 늦은 데이터["체크아웃"]
+            check_out__gt=data["check_in"],  # 체크 인 뒤에 있는 booking이 체크인을 하면 안된다는 거다 내가 체크아웃하기전에.
+        ).exist()
+    예약할 booking check_in은 check_out을 서로 체크하면 날짜를 잡아낼 수 있다.
+
+    view에서는 serializer.is_valid()를 사용하여 저장하는 기능을 구현하면 된다. user,room,kind 를 넣어준다.
