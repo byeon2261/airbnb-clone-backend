@@ -1313,7 +1313,7 @@ Many-To-Many 관계 데이터
 
     view에서는 serializer.is_valid()를 사용하여 저장하는 기능을 구현하면 된다. user,room,kind 를 넣어준다.
 
-## Users API
+## 12. Users API
 
 #### [5_rest]
 
@@ -1393,3 +1393,29 @@ Many-To-Many 관계 데이터
             def post(self, request):
                 logout(request)  # post 프로토콜의 request값만으로 logout이 가능하다.
                 ...
+
+## 13. Check Point (Code Challenge)
+
+    exerience 부분과 일부 user의 view, serializer부분을 추가해보자. react를 하고 나서 백엑드와 연결해야하는 부분에서 다시 작업을 해보자.
+
+## 14. GraphQL API
+
+    기초 개념을 배우고 나서 수강을 해야한다.
+
+GraphQL로 영화 API 만들기
+<https://nomadcoders.co/graphql-for-beginners/lobby>
+
+    GraphQL로 영화 API 만들기 완강 후 빠른 시일에 학습하자.
+
+## 15. Authenticated
+
+    브라우져에서 사용할때 Django의 authentication 기능은 매우 훌륭하다. 하지만 브라우져외의 안드로이드 IOS에서의 보안은 취약하다.
+    이번 섹션에서는 토큰, JWT(Json Web Token)같은 커스텀 인증을 구현해보겠다.
+
+    request.data는 쿠키를 이용해 데이터를 인식한다. 이 방법을 views를 변경하지 않으며 토큰과 JWT 방식으로 변경헤 해본다.
+        1. 멍청한 방법
+        2. 토큰 방식
+        3. JWT 방식
+    으로 테스트를 해보겠다.
+
+    postman을 설치한다. postman은 브라우져밖에서 API와 상호작용할때 사용된다.
