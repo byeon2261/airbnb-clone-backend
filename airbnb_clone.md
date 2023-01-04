@@ -21,8 +21,11 @@ is_liked [X]
 
 ### User
 
-GET PUT /me
-POST /user
+GET PUT /me [X]
+POST /users
+POST /users/log-in
+POST /users/change-password
+POST /users/github
 
 ### Experiences
 

@@ -1312,3 +1312,10 @@ Many-To-Many 관계 데이터
     예약할 booking check_in은 check_out을 서로 체크하면 날짜를 잡아낼 수 있다.
 
     view에서는 serializer.is_valid()를 사용하여 저장하는 기능을 구현하면 된다. user,room,kind 를 넣어준다.
+
+## Users API
+
+#### [5_rest]
+
+    Django앱에서 다루지 않은 user의 패스워드, 인증 기능들을 사용해볼 것이다.
+    user의 자기 자신의 데이터를 확인 및 수정기능을 구현한다.
