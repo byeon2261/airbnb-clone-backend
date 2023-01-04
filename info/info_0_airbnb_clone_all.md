@@ -1319,3 +1319,17 @@ Many-To-Many 관계 데이터
 
     Django앱에서 다루지 않은 user의 패스워드, 인증 기능들을 사용해볼 것이다.
     user의 자기 자신의 데이터를 확인 및 수정기능을 구현한다.
+
+
+    user 회원가입 창을 구현한다. user의 패스워드를 받아서 해쉬값을 저장한다. row password를 저장해서는 안된다.
+    - users>views -
+        def post(self, request):
+            password = request.data.get('password')
+            if not password:
+                raise ParseError()
+            ...
+            if serializer.is_valid():
+                saved_user = serializer.save()
+                saved_user.set_password(password)  # set_password(): 해쉬값으로 password값을 넣어준다.
+                saved_user.save()
+    추후에 비밀번호 인증기능을 추가할 수 있다.
