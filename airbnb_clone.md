@@ -21,10 +21,11 @@ is_liked [X]
 
 ### User
 
-GET PUT /me [X]
-POST /users
+GET PUT /users/me [X]
+POST /users [X]
+GET /users/@username [X]
+PUT /users/change-password
 POST /users/log-in
-POST /users/change-password
 POST /users/github
 
 ### Experiences
@@ -42,8 +43,6 @@ GET PUT DELETE /perks/1 [X]
 POST /medias
 DELETE /medias/1
 DELETE /medias/photos/1 [X]
-
-### Users
 
 ### Categories
 

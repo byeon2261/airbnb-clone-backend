@@ -1333,3 +1333,30 @@ Many-To-Many 관계 데이터
                 saved_user.set_password(password)  # set_password(): 해쉬값으로 password값을 넣어준다.
                 saved_user.save()
     추후에 비밀번호 인증기능을 추가할 수 있다.
+
+#### ! url을 등록할때 변수를 받는 url은 같은레벨에 있는 url보다 밑에 위치를 시켜야한다.
+
+        path("<str:username>", views.PublicUser.as_view()),
+        path("me", views.Me.as_view()),
+    url Me에 접근을 하여도 상단 <str:username> 로 판단하여 PublicUser로 접속된다.
+    같은 레벨에 있는 url에서 최하단에 위치하다록 한다.
+    ? 그럼 url에 포함된 username은 생성되지 못하도록 막아야 하나?. (이미 존재하는 username입니다. 이런식으로)
+    그래서 이번 프로젝트에서는 인스타그램과 같이 username앞에 @를 붙여서 관리하도록 하겠다.
+        path("@<str:username>", views.PublicUser.as_view()),
+
+#### [5_Rest]
+
+    타유저에게 보여줄 유저정보창을 구현한다.
+
+    !! 코드챌린지 !!  더 커다란 user serializer를 만들어보자. user의 방 보유량 및 여행간 횟수 등등..
+
+
+    user password 변경을 구현한다. 기존 패스워드와 새 패스워드를 받아서 값을 변경한다.
+        def put(self, request):
+            user = request.user
+            old_password = request.data.get("old_password")
+            new_password = request.data.get("new_password")
+
+            if user.check_password(old_password):  # check_password(): 해쉬값으로 비교하여 True,False를 반환한다.
+                user.set_password(new_password)  # 꼭 hash값으로 넣어야한다.
+                user.save()
