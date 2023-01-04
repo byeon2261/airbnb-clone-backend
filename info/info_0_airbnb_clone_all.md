@@ -1336,6 +1336,7 @@ Many-To-Many 관계 데이터
 
 #### ! url을 등록할때 변수를 받는 url은 같은레벨에 있는 url보다 밑에 위치를 시켜야한다.
 
+    - users>urls -
         path("<str:username>", views.PublicUser.as_view()),
         path("me", views.Me.as_view()),
     url Me에 접근을 하여도 상단 <str:username> 로 판단하여 PublicUser로 접속된다.
@@ -1352,6 +1353,7 @@ Many-To-Many 관계 데이터
 
 
     user password 변경을 구현한다. 기존 패스워드와 새 패스워드를 받아서 값을 변경한다.
+    - users>views -
         def put(self, request):
             user = request.user
             old_password = request.data.get("old_password")
@@ -1360,3 +1362,34 @@ Many-To-Many 관계 데이터
             if user.check_password(old_password):  # check_password(): 해쉬값으로 비교하여 True,False를 반환한다.
                 user.set_password(new_password)  # 꼭 hash값으로 넣어야한다.
                 user.save()
+
+
+    user의 login, logout 기능을 구현한다.
+    login에 django에서 지원하는 함수를 사용한다.
+        from django.contrib.auth import authenticate, login
+
+        class LogIn(APIView):
+            def post(self, request):
+                username = request.data.get("username")
+                password = request.data.get("password")
+                ...
+
+                user = authenticate(  # return user object
+                    request,
+                    username=username,  # 비교 요소
+                    password=password,
+                )
+                if user:
+                    login(request, user)  # 검증된 user 데이터로 로그인을 해준다.
+                    ...
+
+    logout도 django 함수를 이용하여 섹시하게(?) 기능구현이 가능하다.
+        from django.contrib.auth import ... , logout
+
+        class LogOut(APIView):
+
+            permission_classes = [IsAuthenticated]
+
+            def post(self, request):
+                logout(request)  # post 프로토콜의 request값만으로 logout이 가능하다.
+                ...

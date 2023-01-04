@@ -24,11 +24,13 @@ is_liked [X]
 GET PUT /users/me [X]
 POST /users [X]
 GET /users/@username [X]
-PUT /users/change-password
-POST /users/log-in
+GET /users/@username/reviews # codechallenge
+PUT /users/change-password [X]
+POST /users/log-in [X]
+POST /users/log-out [X]
 POST /users/github
 
-### Experiences
+### Experiences # codechallenge
 
 GET POST /experiences
 GET PUT DELETE /experiences/1
