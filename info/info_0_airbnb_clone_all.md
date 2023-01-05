@@ -1419,3 +1419,37 @@ GraphQL로 영화 API 만들기
     으로 테스트를 해보겠다.
 
     postman을 설치한다. postman은 브라우져밖에서 API와 상호작용할때 사용된다.
+
+
+    config>settings 에 Django_rest_framework의 default 인증방법을 명시하겠다.
+        REST_FRAMEWORK = {
+            'DEFAULT_AUTHENTICATION_CLASSES': [  # rest framework가 user를 찾는 방법들이 들어있다.
+                'rest_framework.authentication.SessionAuthentication',  # 기본으로 이 한개가 들어있다.
+            ]
+        }
+    입력하고 user창에 가도 이전과 같이 작동한다.
+
+    rest_framework.authentication클래스에서 views로 request.user에 user데이터를 검증후 넣어준다.
+
+    config내에 authentications.py를 생성해준다.
+    첫번째로 안좋은 방법으로 검증하는 법을 구현해본다. 검증이 되면 user데이터를 반환하며 아닐경우 None을 반환한다.
+        from rest_framework.authentication import BaseAuthentication
+
+        class TruthMeBroAuthentication(BaseAuthentication):
+            def authenticate(self, request):  # request에 쿠키와 헤더가 들어있다. user정보는 없다.
+                print(request.headers)
+                return None
+    postman에서 GET http://127.0.0.1:8000/api/v2/users/me send한 데이터이다.
+        print(request.headers)  # >>>: {'Content-Length': '', 'Content-Type': 'text/plain', 'User-Agent':
+                'PostmanRuntime/7.29.2', 'Accept': '*/*', 'Postman-Token': '16c510b9-ba75-4a00-9de7-69be9c84a95b',
+                'Host': '127.0.0.1:8000', 'Accept-Encoding': 'gzip, deflate, br', 'Connection': 'keep-alive'}
+    postman에서 header에 데이터를 담아 보내본다. ("Trust-Me": "gh") Trust-Me 키가 있을경우 value값에 해당하는 유저가 있는지 찾아본다.
+        username = request.headers.get("Trust-Me")
+        if not username:
+            return None
+        try:
+            user = User.objects.get(username=username)
+            return (user, None)  # user데이터와 None을 같이 보내는 것이 규정이다.
+        except User.DoesNotExist:
+            raise AuthenticationFailed
+    postman에서 ("Trust-Me": "gh") 헤더에 담아 보내면 user정보를 받을 수 있다.

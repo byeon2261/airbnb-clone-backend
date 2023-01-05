@@ -148,3 +148,10 @@ MEDIA_ROOT = "upload"
 MEDIA_URL = "user-uploads/"
 
 PAGE_SIZE = 3
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "config.authentications.TruthMeBroAuthentication",
+    ]
+}
