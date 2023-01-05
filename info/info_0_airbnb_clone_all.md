@@ -1523,7 +1523,7 @@ GraphQL로 영화 API 만들기
         from config import settings
 
         if user:
-            token = jwt.encode(
+            token = jwt.encode(  # encode(): token화 한다.
                 {"pk": user.pk},
                 settings.SECRET_KEY,  # 비밀키로 서명. 나만 갖고 있는 유일한 키다.
                 algorithm="HS256",  # 업계 표준 변경알고리즘
@@ -1534,3 +1534,36 @@ GraphQL로 영화 API 만들기
 
     jwt-login url로 BODY - username,password를 POST 보내주면 새로운 토큰을 보내준다.
     토큰 길이가 훨씬길다. (참조 = 15.4 JWT Econde_1)
+
+    JWT 토큰을 복호화하는 기능을 구현한다.
+    config>Authentication 에 새 class를 만든다.
+        class JWTAuthentication(BaseAuthentication):
+            def authenticate(self, request):
+                print(request.headers)
+                return None
+    해당 클래스를 config>settings 의 DEFAULT_AUTHENTICATION_CLASSES에 추가해준다.
+    postman에서 이전에 받은 토큰을 이용해 users/me에 접속해본다.('jwt': [토큰값]) return이 none이기때문에 접속은 되지 않는다.
+        print(request.headers)  # >>>: {'Content-Length': '47', 'Content-Type': 'application/json', 'jwt':
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwayI6Mn0.pOJaHhPoahf0n-L1VUyc9SI3dMQjjZcN09Vi6wzT2Es', 'User-Agent':
+        'PostmanRuntime/7.29.2', 'Accept': '*/*', 'Postman-Token': '45865079-28ed-4102-9c4b-0946d4adbef5', 'Host':
+        '127.0.0.1:8000', 'Accept-Encoding': 'gzip, deflate, br', 'Connection': 'keep-alive'}
+    jwt 토큰값을 보낼때에는 value에 'token [토큰값]'형식이 아닌 그냥 토큰값을 보내면 된다.
+    jwt복호화 기능을 구현한다.
+        def authenticate(self, request):
+            token = request.headers.get("jwt")
+            decoded = jwt.decode(  # decode(): token을 복호화한다. encode()와 같게 넣어주면된다.
+                token,
+                settings.SECRET_KEY,
+                algorithms="HS256",
+            )
+            print(decoded)  # >>>: {'pk': 2}
+            return None
+    postman에서 users/me로 토큰값과 함께 접근하면 user데이터가 출력된다.(decoded)
+    pk로 user데이터를 찾아서 리턴해준다.
+        pk = decoded.get("pk")
+        if not pk:
+            raise AuthenticationFailed("Invalid Token.")
+        try:
+            user = User.objects.get(pk=pk)
+            return (user, None)  # user데이터와 None을 같이 보내줘야한다.
+        ...
