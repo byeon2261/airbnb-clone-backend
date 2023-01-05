@@ -1495,3 +1495,42 @@ GraphQL로 영화 API 만들기
     users.me 화면에 토큰전송 규칙으로 get 프로토콜을 보내면 내 user데이터를 받을 수 있다. (참조 = 15.3_Token_Authentication_2)
     그리고 admin에 token페이지를 가면 token이 등록되어 있다. 자동으로 데이터베이스에 넣어준것이다.
     해당 토큰을 삭제하면 더이상 그 토큰값으로 로그인이 되지 않는다. 토큰을 만료시킬 수 있는 것이다.!
+
+
+    JWT(Json Web Token)을 구현해본다. JWT은 데이터베이스 공간을 사용하지 않는다.
+    JWT를 사용하기 위해서 pyjwt를 설치해준다.
+    $ poetry add pyjwt  # >>>: Installing pyjwt (2.6.0)
+
+    users>urls에 url을 추가한다.
+        path("jwt-login", views.JWTLogIn.as_view()),
+
+    users>view에 클래스를 추가해준다. 기본 유저 검증 로직을 추가한다.
+        class JWTLogIn(APIView):
+            def post(self, request):
+                username = request.data.get("username")
+                password = request.data.get("password")
+                if not username or not password:
+                    raise ParseError
+
+                user = authenticate(
+                    request,
+                    username=username,
+                    password=password,
+                )
+    유저가 토큰에 사인하는 기능을 추가한다. 토큰은 암호화되어 있지만 내부데이터를 볼 수 있기때문에 중요한 정보는 넣지 않기로 한다.
+    유저pk만 넣도록 구현해본다.
+        import jwt
+        from config import settings
+
+        if user:
+            token = jwt.encode(
+                {"pk": user.pk},
+                settings.SECRET_KEY,  # 비밀키로 서명. 나만 갖고 있는 유일한 키다.
+                algorithm="HS256",  # 업계 표준 변경알고리즘
+            )
+            return Response({"token": token})
+        else:
+            return Response({"error": "Wrong password"})
+
+    jwt-login url로 BODY - username,password를 POST 보내주면 새로운 토큰을 보내준다.
+    토큰 길이가 훨씬길다. (참조 = 15.4 JWT Econde_1)
