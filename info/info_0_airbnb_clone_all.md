@@ -1453,3 +1453,45 @@ GraphQL로 영화 API 만들기
         except User.DoesNotExist:
             raise AuthenticationFailed
     postman에서 ("Trust-Me": "gh") 헤더에 담아 보내면 user정보를 받을 수 있다.
+
+    위방식은 누구인지 말만하면 해당 user로 검증이 되어서 사용이 가능하다. 물론 이방식을 쓰면 안된다.
+
+    BasicAuthentication은 이전에 사용하던 로그인창이다.
+    기본 브라우져에서 제공하던 로그인방식인데 login화면으로 이동하면 조그만창이 뜨면서 username과 password를 입력할 폼이 있다.
+
+    token인식 방식을 구현해보겠다. token인증방식은 config>settings에 app추가로 구현가능하다. THIRD_PARTY_APPS에 추가하겠다.
+        THIRD_PARTY_APPS = [
+            ... ,
+            "rest_framework.authtoken",
+        ]
+    이걸 추가하는걸로 admin페이지에서 token 모델을 볼 수 있다. 즉, 데이터베이스에 새로운 모델을 추가해줘야한다.
+    INSERT_APPS에 추가될때 자동으로 makemigration 된다. migrate만 진행하면 된다.
+    $ python manage.py migrate
+    >>>: Running migrations:
+           Applying authtoken.0001_initial... OK
+           Applying authtoken.0002_auto_20160226_1747... OK
+           Applying authtoken.0003_tokenproxy... OK
+    token인증방식을 DEFAULT_AUTHENTICATION_CLASSES에 추가해준다.
+        REST_FRAMEWORK = {
+            "DEFAULT_AUTHENTICATION_CLASSES": [
+                ... ,
+                "rest_framework.authentication.TokenAuthentication",
+            ]
+        }
+    token login방식을 사용할 url을 추가한다.
+    - users>views -
+        from rest_framework.authtoken.views import obtain_auth_token
+
+        ...
+            path("token-login", obtain_auth_token),
+    obtain_auth_token views는 username, password를 보내면 token을 반환한다.
+    postman으로 해당 url로 전송을 하며 body부분에 username과 password를 POST로 전송한다.
+    token을 받는다. (참조 = 15.3_Token_Authentication_1.png)
+    해당 토큰을 user한테 주며 데이터베이스에 저장하는 시스템으로 구성되어있다.
+
+    토큰을 보내는 규칙이 있다. headers에 넣어주며 key - authorization에 토큰값을 넣어준다.
+        authorization  -  Token [토큰값]
+    이렇게 전송하는 것이 규칙이다.
+    users.me 화면에 토큰전송 규칙으로 get 프로토콜을 보내면 내 user데이터를 받을 수 있다. (참조 = 15.3_Token_Authentication_2)
+    그리고 admin에 token페이지를 가면 token이 등록되어 있다. 자동으로 데이터베이스에 넣어준것이다.
+    해당 토큰을 삭제하면 더이상 그 토큰값으로 로그인이 되지 않는다. 토큰을 만료시킬 수 있는 것이다.!
