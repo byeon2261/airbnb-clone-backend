@@ -1615,6 +1615,7 @@ GraphQL로 영화 API 만들기
 
     그동안 코드를 작성하고 수동으로 테스트를 진행했지만 자동으로 테스트를 해주는 코드를 작성한다.
     테스트에 필요한 규칙을 넣어놓기때문에 테스트 안정성이 높아진다.
+    테스트 코드를 작성하기 앞서 해당 app의 views를 참조하여 에러가 발생할 부분을 체크하여 리스트화하자.
 
     rooms>tests 에서 작성한다. Django의 TestCase 대신 rest framework를 사용한다.
         from rest_framework.test import APITestCase
@@ -1699,3 +1700,62 @@ GraphQL로 영화 API 만들기
                 data[0]["description"],
                 self.DESC,
             )
+
+
+    데이터 생성 test를 진행한다.
+        response = self.client.post(
+            self.AMENITIES_URL,
+            data={
+                "name": "New Amenity",
+                "description": "New Amenity desc.",
+            },
+        )
+        self.assertEqual(
+            response.status_code,
+            200,
+            "Create Failed.",
+        )
+    이때 response에는 방금 생성된 데이터만 들어있다.
+    생성된 데이터를 검증한다.
+
+    기존 views로직을 확인하면 serializer에서 오류가 발생하면 serializer오류 내역을 보내 준다.
+    하지만 http프로토콜은 200을 전송하면서 정상신호로 받는다.
+    해당부분을 테스트해본다.
+        response = self.client.post(self.AMENITIES_URL)  # 데이터 생성에 amenity의 name은 필수값이다. serializer에 에러가 발생한다
+        print(response)
+        print(response.json())
+    $ python manage.py test
+    >>>: Found 2 test(s).
+        Creating test database for alias 'default'...
+        System check identified no issues (0 silenced).
+        .<Response status_code=200, "application/json">
+        {'name': ['이 필드는 필수 항목입니다.']}
+        .
+        ----------------------------------------------------------------------
+        Ran 2 tests in 0.004s
+
+        OK
+        Destroying test database for alias 'default'...
+    serializer에서 에러가 발생해도 http프로토콜은 200을 받는다.
+
+    모든 app의 views 파일을 변경해줘야한다.
+    - 모든 앱>views >  serializer 에러 전송부분 -
+        else:
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+    해당 프로토콜에 오류가 발생하는지 확인한다.
+    - rooms>tests -
+        response = self.client.post(self.AMENITIES_URL)
+        self.assertEqual(
+            response.status_code,  # >>>: 400
+            200,
+            "Post name is 필수",
+        )
+    에러가 발생한다. 데이터 검증을 추가한다.
+        data = response.json()
+        print(data)  # >>>: {'name': ['이 필드는 필수 항목입니다.']}
+        # assertIn(member: Any, container: Iterable | Container, msg: Any = ...)
+        self.assertIn("name", data)  # 값이 있다면 True
+    오류메세지를 받기때문에 테스트에 오류가 발생하지 않는다.
+
+    정상적인 데이터와 오류데이터를 테스트해보았다.
