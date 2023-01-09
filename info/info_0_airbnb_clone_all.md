@@ -1618,6 +1618,7 @@ GraphQL로 영화 API 만들기
 
     rooms>tests 에서 작성한다. Django의 TestCase 대신 rest framework를 사용한다.
         from rest_framework.test import APITestCase
+    테스트하고자 하는 대상을 test_를 붙여서 함수선언을 해줘야 실행이된다.
 
         class TestAmenities(APITestCase):
 
@@ -1656,4 +1657,45 @@ GraphQL로 영화 API 만들기
         Destroying test database for alias 'default'...
     값을 비교하기위해 자주 사용한다.
 
-    self.client를 사용하여 url을 request할 수 있으며 client.login()으로 로그인도 할 수 있다.
+
+    self.client를 사용하여 url을 request할 수 있다. (client.login()으로 로그인도 할 수 있다.)
+        class TestAmenities(APITestCase):
+            def test_all_amenities(self):
+                response = self.client.get("/api/v2/rooms/amenities/")
+                print(response)  # >>>: <Response status_code=200, "application/json">
+                print(response.json()) # >>>: []  # rooms/amenities에 값이 있어도 빈 list를 받는다.
+    테스트를 할 때 console text를 보면 새 데이터베이스를 생성한다고 한다. 기존에 있는 데이터를 가져오지 않는다.
+        data = response.json()
+
+        self.assertEqual(
+            response.status_code,
+            200,
+            "Response status code isn't 200.",
+        )
+        self.assertIsInstance(data, list)  # 데이터가 list의 instance인지 확인
+    접속확인과 반환된 데이터 형식 테스트를 진행하였다.
+
+    setUp()를 구현한다. setUp은 해당 클래스 내에 테스트 함수들보다 먼저 실행이 된다.
+        NAME = "Amenity test"  # 재사용을 위해 전역변수로 생성
+        DESC = "Amenity Des"
+
+        def setUp(self):
+            models.Amenity.objects.create(
+                name=self.NAME,
+                description=self.DESC,
+            )
+    들어온 데이터 검증 테스트.
+        def test_all_amenities(self):
+            ...
+            self.assertEqual(
+                len(data),  # 데이터 개수
+                1,
+            )
+            self.assertEqual(
+                data[0]["name"],
+                self.NAME,
+            )
+            self.assertEqual(
+                data[0]["description"],
+                self.DESC,
+            )
