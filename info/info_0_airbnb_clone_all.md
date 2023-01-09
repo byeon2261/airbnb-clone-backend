@@ -1567,3 +1567,44 @@ GraphQL로 영화 API 만들기
             user = User.objects.get(pk=pk)
             return (user, None)  # user데이터와 None을 같이 보내줘야한다.
         ...
+
+
+    비밀키를 settings파일에서 다른 파일로 옮기며 파일을 안보여주도록 적용한다.
+    .env파일을 생성하여 secret key를 옮겨 준다.
+        SECRET_KEY="django-insecure-..."
+    .env파일을 작성할때 = 사이에 공백이 없어야한다!! ( [...]="..." ) 공백이 있으면 인식이 안됨
+        SECRET_KEY = "..."  # <- X. 인식안됨
+    해당파일을 gitignore에 추가하여 git에 올라가지 않도록 한다. (근데 이미 올렸다.)
+    보안상으로는 공개하면 안되지만 연습용이기때문에 그대로 작업을 진행하겠다.
+
+    .env를 읽는 django-environ 패키지를 설치한다.
+
+<https://django-environ.readthedocs.io/en/latest/>
+
+    $ poetry add django-environ
+    config>settings 에 os와 environ을 import한다.
+        import os
+        import environ
+
+        env = environ.Env()
+
+        BASE_DIR = Path(__file__).resolve().parent.parent  # 기본으로 작성되어 있다.
+
+        print(BASE_DIR)  # >>>: /Users/ghbyeon22/Documents/Develop/airbnb-clone/airbnb-clone-backend
+
+        # environ.Env.read_env(f"{BASE_DIR}/.env")  # os.path.join()와 같은 결과값을 갖는다.
+        environ.Env.read_env(os.path.join(BASE_DIR, ".env"))  # 읽을 파일로 추가
+        print(os.path.join(BASE_DIR, ".env"))
+        # >>>: /Users/ghbyeon22/Documents/Develop/airbnb-clone/airbnb-clone-backend/.env
+
+        SECRET_KEY = env("SECRET_KEY")
+
+        print(env("SECRET_KEY"))  # >>>: django-insecure-...
+    .env에 변수를 추가하여 불러올때 변수명을 인수로 보내주면된다.
+
+    다른 토큰인증 방법을 사용하고 싶다면 rest-framework사이트에서 확인 가능하다. django-rest-knox 를 추천(니꼬)
+
+<https://www.django-rest-framework.org/api-guide/authentication/#third-party-packages>
+
+    해당 프로젝트는 인증기능이 어떻게 작동되는지 확인하기위해 세부적으로 많이 코드를 작성했다.
+    다음부터 인증기능을 구현할때는 simple JWT를 사용하도록 한다.
