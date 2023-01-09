@@ -1608,3 +1608,52 @@ GraphQL로 영화 API 만들기
 
     해당 프로젝트는 인증기능이 어떻게 작동되는지 확인하기위해 세부적으로 많이 코드를 작성했다.
     다음부터 인증기능을 구현할때는 simple JWT를 사용하도록 한다.
+
+## 16. API Testing
+
+#### [5_Rest]
+
+    그동안 코드를 작성하고 수동으로 테스트를 진행했지만 자동으로 테스트를 해주는 코드를 작성한다.
+    테스트에 필요한 규칙을 넣어놓기때문에 테스트 안정성이 높아진다.
+
+    rooms>tests 에서 작성한다. Django의 TestCase 대신 rest framework를 사용한다.
+        from rest_framework.test import APITestCase
+
+        class TestAmenities(APITestCase):
+
+            def test_two_plus_two(self):
+                self.assertEqual(first: Any, second: Any, msg: Any = ...)  # assert는 체크한다는 뜻이다.
+                     # first, second를 체크하여 틀릴경우 msg가 출력됨.
+    test명령어를 사용하여 테스트를 한다.
+    $ python manage.py test
+    >>>: Found 1 test(s).
+        Creating test database for alias 'default'...
+        System check identified no issues (0 silenced).
+        .
+        ----------------------------------------------------------------------
+        Ran 1 test in 0.000s
+
+        OK
+        Destroying test database for alias 'default'...
+    전체 앱에 테스트를 찾아서 실행해준다.
+    대조값 두개를 틀리게 할경우 에러메세지다.
+        Found 1 test(s).
+        Creating test database for alias 'default'...
+        System check identified no issues (0 silenced).
+        F
+        ======================================================================
+        FAIL: test_two_plus_two (rooms.tests.TestAmenities)
+        ----------------------------------------------------------------------
+        Traceback (most recent call last):
+        File "/Users/ghbyeon22/Documents/Develop/airbnb-clone/airbnb-clone-backend/rooms/tests.py", line 6, in test_two_plus_two
+            self.assertEqual(2 + 2, 5, "The math is Wrong.")  # 내가 작성한 코드이다.
+        AssertionError: 4 != 5 : The math is Wrong.
+
+        ----------------------------------------------------------------------
+        Ran 1 test in 0.000s
+
+        FAILED (failures=1)
+        Destroying test database for alias 'default'...
+    값을 비교하기위해 자주 사용한다.
+
+    self.client를 사용하여 url을 request할 수 있으며 client.login()으로 로그인도 할 수 있다.
