@@ -1779,3 +1779,48 @@ GraphQL로 영화 API 만들기
     Amenity를 조회한 데이터는 queryset이 아닌 dictionary타입으로 데이터를 가져온다.
     get, delete를 구현한다. put기능은 코드 챌린지로 내가 작성해본다.
     지금까지는 views의 기능을 테스트해봤다. models의 데이터 제한에도 걸리는지 확인해볼 수 있다.
+
+
+    인증 테스트를 구현해본다.(views Rooms) 해당 페이지는 IsAuthenticatedOrReadOnly 권한을 요구한다.
+    인증이 안된 유저는 get 핸들러만 가능하며 post핸들러는 로그인한자만 가능하다.
+    로그인을 하지 않고 rooms 생성로직을 작성한다.
+        URL = "/api/v2/rooms/"
+
+        def test_create_room_not_login(self):
+            response = self.client.post(self.URL)
+
+            self.assertEqual(response.status_code, 401)
+    401(Unauthorized) 인증되지 않은 상태(로그인 X)를 반환한다.
+
+    아이디를 생성하여 로그인 후 방 생성까지 테스트해본다.
+        def test_create_room(self):
+            user = User.objects.create(
+                username="test",
+            )
+            user.set_password("123")
+            user.save()
+
+            self.client.login(
+                username="test",
+                password="123",
+            )
+
+            response = self.client.post(self.URL)
+            print(response.status_code)  # >>>: 400
+            print(response.json())
+            # >>>: {'price': ['이 필드는 필수 항목입니다.'], 'rooms': ['이 필드는 필수 항목입니다.'], ...}
+    필수값들을 넣지않아 room은 생성되지 않았지만 권한을 갖고 room생성 시도까지는 갈 수 있었다.
+
+    비밀번호 생성없이 강제 로그인 기능이 있다.
+        user = User.objects.create(
+            username="test",
+        )
+        self.client.force_login(
+            user,
+        )
+    단지 인증을 통과하기에는 이방식을 사용하는게 편리하다. 하지만 유저를 생성하는 url을 테스트한다면 사용기 어렵다.
+
+## ! test 다른 앱도 구현해보기
+
+    더 많은 assert기능들이 있으니 테스트를 구현하는데 여러가지를 시도해보자.
+    틈틈히 다양한 방식으로 테스트를 해보며 프로그램 구동방식도 생각해보자.
