@@ -1824,3 +1824,51 @@ GraphQL로 영화 API 만들기
 
     더 많은 assert기능들이 있으니 테스트를 구현하는데 여러가지를 시도해보자.
     틈틈히 다양한 방식으로 테스트를 해보며 프로그램 구동방식도 생각해보자.
+
+## 17 Front-End SetUp
+
+    드디어 프론트 엔드를 시작한다! create-react-app을 사용하며 chakra 라이브러리를 사용할 것이다.
+    스크립트는 타입스크립트를 사용한다.
+
+    우선 react를 설치한다.
+    $ npm create-react-app airbnb-clone-frontend --templete=typescript
+    # Happy hacking!
+
+
+    18부터는 airbnb-clone-frontend 내 info에서 작성이 된다.
+
+## 19 React Query
+
+#### [2_Django]
+
+    ...
+
+    React 서버가 몇명 URL을 fetch하는 것을 허용해야한다.
+    django-cors-headers를 설치해야한다. 서버에서 브라우져로 fetch할 수 있는 사람을 지정할 수 있다.
+
+<https://github.com/AdamChainz/django-cors-headers/>
+! 사이트 순서대로 설치하면 된다오!
+
+    $ poetry add django-cors-headers
+
+    corsheaders를 설치해준다.
+        INSTALLED_APPS = [
+            ...
+            "corsheaders",
+        ]
+    미들웨어에도 추가해준다.
+        MIDDLEWARE = [
+            ...,
+            "corsheaders.middleware.CorsMiddleware",
+            # "django.middleware.common.CommonMiddleware",  # 이건 추가를 안한다?
+        ]
+
+    이제 settings파일에서 Configuration에 있는 속성들을 사용가능하다. CORS_ALLOWED_ORIGINS을 적용한다.
+    - settings -
+        CORS_ALLOWED_ORIGINS= ["http://localhost:3000"]  # 주소의 마지막 '/'는 지워줘야한다.
+    react브라우져 검사창에서 CORS에러가 발생 안한다.
+
+    방 리뷰 점수가 없을경우 'No Review'를 뜨도록하였는데 줄바뀜으로 예쁘지 않아서 0으로 변경.
+    # #19.0 Manual Fetching_1 참조
+
+    ...
