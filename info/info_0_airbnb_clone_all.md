@@ -1872,3 +1872,32 @@ GraphQL로 영화 API 만들기
     # #19.0 Manual Fetching_1 참조
 
     ...
+
+## 19.4 Room Detail
+
+기족에 room데이터에 좋아요 버튼에서 유저데이터를 가져와 좋아요를 한 room객체인지 확인하는 로직이 있다.
+@rooms/serializers
+
+    class RoomDetailSerializer(...):
+        ...
+        def get_is_liked(self, room):
+            request = self.context["request"]
+            return Wishlist.objects.filter(
+                user=request.user,
+                rooms__pk=room.pk,
+            ).exists()
+
+로그인안한상태에서 roomDetail객체를 확인하면 오류가 발생한다. 로그인을 안한 상태에서는 false를 반환한다.
+
+    def get_is_liked(self, room):
+        request = self.context["request"]
+        if request.user.is_authenticated:
+            return Wishlist.objects.filter(
+                user=request.user,
+                rooms__pk=room.pk,
+            ).exists()
+        return False
+
+로그아웃한 상태에서도 room detail확인시 오류가 발생하지 않는다.
+
+...
