@@ -146,7 +146,6 @@ class RoomDetail(APIView):
             raise NotFound
 
     def get(self, request, pk):
-        time.sleep(1)
         room = self.get_object(pk)
 
         serializer = RoomDetailSerializer(
@@ -213,7 +212,7 @@ class RoomDetail(APIView):
 
 class RoomReviews(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_object(self, pk):
         try:
