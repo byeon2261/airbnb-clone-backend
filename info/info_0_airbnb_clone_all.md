@@ -1898,6 +1898,31 @@ GraphQL로 영화 API 만들기
             ).exists()
         return False
 
-로그아웃한 상태에서도 room detail확인시 오류가 발생하지 않는다.
+로그아웃한 상태에서도 room detail확인시 오류가 발생하지 않는다. -frontend 작업 계속
+
+...
+
+## 20 Authentication
+
+### 20.1 Credentials
+
+Django가 쓰는 url과 react가 쓰는 url이 다르기때문에 장고서버에서 react url로 쿠키가 전송되지 않는다. (도메인이 같지 않다.)
+react페이지를 도메인을 갖게 적용을 하면 데이터를 가져올 수 없다. Django에서는 fetch가 가능한 도메인을 적용해야한다.
+
+fetch가능한 도메인을 변경해준다.
+
+    CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:3000"]  # 포트는 리액트가 사용하는 3000으로 적용
+
+Django에 설정을 추가해주면 아직 로그인을 확인하지는 못하지만 cookie에 sessionId 데이터가 추가된다.
+
+...
+
+Django에서 react에서 보내는 credential을 받도록 적용해야한다.
+
+@config/settings.py
+
+    CORS_ALLOW_CREDENTIALS = True
+
+react페이지에서 로그인 확인이 가능하다.
 
 ...
