@@ -1926,3 +1926,26 @@ Django에서 react에서 보내는 credential을 받도록 적용해야한다.
 react페이지에서 로그인 확인이 가능하다.
 
 ...
+
+### 20.4 CSRF
+
+Django에 post가 가능한 url을 추가해줘야한다.
+
+    CSRF_TRUSTED_ORIGINS = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
+
+하지만 아직도 오류가 발생한다.
+
+...
+
+# ! react에서 유저인증 오류 발생 정리
+
+    처음 react페이지를 열었을 때 로그인 창이 떳던 이유는 Django에 settings의 설정때문이였다.
+    인증 클래스에 BasicAuthentication 기능이 추가되어 있어서 로그인창이 떴다.
+    해당 기능을 지우면 로그인창이 뜨지 않는다.(모든 오류의 원흉)
+
+Django 페이지에서도 login정보가 없을 때 계속 로그인창이 떴다.
+
+...
