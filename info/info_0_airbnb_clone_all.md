@@ -1949,3 +1949,23 @@ Django에 post가 가능한 url을 추가해줘야한다.
 Django 페이지에서도 login정보가 없을 때 계속 로그인창이 떴다.
 
 ...
+
+### 20.6 Github Code
+
+react에서 github login페이지를 구현하여 Django에 user code를 보내준다.
+보내주는 url이 아직 생성이 되어있지 않으므로 url을 생성해준다.
+
+@users/urls
+
+    ...
+    path("github", views.GithubLogin.as_view()),  # url은 react에서 code를 보내주는 url을 사용해야한다.
+
+@users/views
+
+    class GithubLogIn(APIView):
+        def post(self, request):
+            code = request.data.get("code")
+            print(code)  # >>>: 15ac72cf76f174002643
+            return Response()
+
+react에서 보내준 데이터를 받게 된다.
