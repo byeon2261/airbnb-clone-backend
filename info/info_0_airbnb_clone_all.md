@@ -1969,3 +1969,59 @@ react에서 github login페이지를 구현하여 Django에 user code를 보내�
             return Response()
 
 react에서 보내준 데이터를 받게 된다.
+
+### 20.7 Access Token
+
+해당 토큰을 github API의 Access token과 교환해줘야한다.
+<https://docs.github.com/en/developers/apps/building-oauth-apps/authorizing-oauth-apps>
+github api로 post요청을 보내야한다. requests를 설치하여 전송기능을 구현한다.
+
+    $ poetry add requests
+
+@users/views
+
+    import requests
+
+    ...
+        access_token = requests.post(f"https://github.com/login/oauth/access_token
+            ?code={code}
+            &client_id=f61c955f466d92d1cac9  # github login app을 생성한 페이지에 데이터가 있다.
+            &client_secret=")
+
+[github login 생성한 app 정보]<https://github.com/settings/applications/2101837>
+client secret정보가 아직생성이 안되었다. 상단의 app정보 페이지에서 client secret정보를 생성 후 .env파일에 추가를 해준다.
+추가 후 settings에 추가하여 views에서 가져다 사용한다.
+
+@config/settings
+
+    GH_SECRET = env("GH_SECRET")
+
+@users/views
+
+    ...
+        request.post("...&client_secret={settings.GH_SECRET}")
+
+완료 후 로그인을 시도하면 토큰 데이터를 보내준다.
+
+    // scope는 react app에서 github 앱에 추가로 요구한 데이터이다.
+    >>>: {'access_token': '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', 'token_type': 'bearer',
+         'scope': 'read:user,user:email'}
+
+해당 access_token으로 user데이터를 가져온다.
+
+    access_token = requests.post(...)
+    access_token = access_token.json().get("access_token")
+    user_data = requests.get(
+        "https://api.github.com/user",
+        headers={
+            "Authorization": f"Bearer {access_token}",
+            "Accept": "application/json",
+        },
+    )
+    print("user_data >>>>>: ", user_data.json())
+
+    user_data >>>>>: {'login': 'byeon2261', 'id': 114720002, 'node_id': 'U_kgDOBtZ9Ag', 'avatar_url': 'https://avatars.githubusercontent.com/u/114720002?v=4', 'gravatar_id': '', 'url': 'https://api.github.com/users/byeon2261', 'html_url': 'https://github.com/byeon2261', 'followers_url': 'https://api.github.com/users/byeon2261/followers', 'following_url': 'https://api.github.com/users/byeon2261/following{/other_user}', 'gists_url': 'https://api.github.com/users/byeon2261/gists{/gist_id}', 'starred_url': 'https://api.github.com/users/byeon2261/starred{/owner}{/repo}', 'subscriptions_url': 'https://api.github.com/users/byeon2261/subscriptions', 'organizations_url': 'https://api.github.com/users/byeon2261/orgs', 'repos_url': 'https://api.github.com/users/byeon2261/repos', 'events_url': 'https://api.github.com/users/byeon2261/events{/privacy}', 'received_events_url': 'https://api.github.com/users/byeon2261/received_events', 'type': 'User', 'site_admin': False, 'name': None, 'company': None, 'blog': '', 'location': None, 'email': 'ghbyeon2261@gmail.com', 'hireable': None, 'bio': None, 'twitter_username': None, 'public_repos': 13, 'public_gists': 0, 'followers': 0, 'following': 0, 'created_at': '2022-09-30T04:57:01Z', 'updated_at': '2023-02-03T05:55:16Z', 'private_gists': 0, 'total_private_repos': 0, 'owned_private_repos': 0, 'disk_usage': 50855, 'collaborators': 0, 'two_factor_authentication': False, 'plan': {'name': 'free', 'space': 976562499, 'collaborators': 0, 'private_repos': 10000}}
+
+private정보는 아직 가져오지 못했다. email이 예이다.
+
+    email: null
