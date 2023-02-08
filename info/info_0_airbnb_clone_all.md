@@ -2025,3 +2025,82 @@ client secret정보가 아직생성이 안되었다. 상단의 app정보 페이�
 private정보는 아직 가져오지 못했다. email이 예이다.
 
     email: null
+
+### 20.8 Email
+
+github api에서 email을 가져오기 위해서는 githun user/email에 post요청을 해야한다.
+
+<https://docs.github.com/ko/rest/users/emails?apiVersion=2022-11-28#add-an-email-address-for-the-authenticated-user>
+
+    user_emails = requests.get(
+        "https://api.github.com/user/emails",
+        ...
+    )
+    user_emails = user_emails.json()
+    print(user_emails)
+
+    >>>: [{'email': 'ghbyeon2261@gmail.com', 'primary': True, 'verified': True, 'visibility': 'public'}, {'email': '114720002+byeon2261@users.noreply.github.com', 'primary': False, 'verified': True, 'visibility': None}]
+
+post요청이 두번가면서 두번째에는 bad requests오류가 발생한다.
+react는 develop모드에서 screen을 두번 렌더링한다. 메모리 누수나 버그를 잡기 위해서 그런거다.
+
+react에서 develop모드를 삭제한다...
+
+email데이터로 로그인 로직을 구현한다.
+email이 가져올때 값이 없을 경우 회원가입을 할려는 경우이며 email데이터가 있을경우 로그인하는 로직으로 구현하면 된다.
+
+@users/views
+
+    # 유저가 있는지 체크
+        # 유저 확인
+        # 유저 로그인
+        return Response(status=200)
+    # 유저가 없다면
+        # 유저 회원가입
+            # 유저 데이터
+        # 유저 사용불가능한 패스워드 함수  # 유저가 쇼셜 로그인으로만 로그인이 가능함.
+        # 유저 저장
+        # 유저 로그인
+        return Response(status=200)
+
+django에 있는 유저 model의 함수들이다.
+<https://docs.djangoproject.com/en/4.1/ref/contrib/auth/#methods>
+
+github login post()내 전체에 try를 씌워서 오류 발생시 bad request를 보내준다.
+
+이제 react에서 status code와 response를 받아오록 적용한다...
+
+# ! user데이터를 가져오는데 오류 체크가 제대로 이뤄지지 않음.
+
+    try:
+        try:
+            user = User.objects.get(email=user_emails[0]["email"])
+            ...
+        except User.DoesNotExist:
+            ...
+            return Response(status=...200)
+    except Exception:
+        return Response(status=...400)
+
+    유저 데이터가 없으면 User.DoesNotExist로 빠지는것이 아니라 Exception로직으로 빠짐. (status code 400반환)
+    니꼬 강의에는 User.DostNotExist로 빠지는 것으로 보임. 아이디가 생성되며 로그인이 성공됨. (status code 200)
+
+    !!! Exeption as e:
+        print(e) 코드로 에러배용을 확인
+
+        >>>: get() returned more than one User -- it returned 2!
+    유저정보중에 ghbyeon2261@gmail.com를 갖은 유저 정보가 2개이다.
+    두 유저 이메일정보를 github email과 다르게 적용.
+
+# ! github user데이터에 name이 없는 경우 user create에 오류가 발생함. 해당 오류 해결 로직을 구현해보자.
+
+1.  임의의 유저 이름을 넣어준다.
+2.  아이디를 name으로 넣어준다.
+
+        username을 name으로 넣어주도록 적용하기로 했다.
+
+        if user_data.get("name") == None:
+            user_data["name"] = user_data.get("login")
+
+완성이 되면 github 로그인시 github에 등록된 email을 사용하는 user가 없다면 유저를 생성하여 로그인한다.
+유저 정보가 있다면 로그인한다.
