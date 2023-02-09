@@ -2086,7 +2086,7 @@ github login post()내 전체에 try를 씌워서 오류 발생시 bad request�
     니꼬 강의에는 User.DostNotExist로 빠지는 것으로 보임. 아이디가 생성되며 로그인이 성공됨. (status code 200)
 
     !!! Exeption as e:
-        print(e) 코드로 에러배용을 확인
+        print(e) 코드로 에러내용을 확인
 
         >>>: get() returned more than one User -- it returned 2!
     유저정보중에 ghbyeon2261@gmail.com를 갖은 유저 정보가 2개이다.
@@ -2104,3 +2104,98 @@ github login post()내 전체에 try를 씌워서 오류 발생시 bad request�
 
 완성이 되면 github 로그인시 github에 등록된 email을 사용하는 user가 없다면 유저를 생성하여 로그인한다.
 유저 정보가 있다면 로그인한다.
+
+### 20.10 Kakao Talk App Auth
+
+...kakao 로그인 frontend 작업
+
+### 20.11 Kakao Log In
+
+이제 back-end 작업을 진행한다.
+
+kakao app server에서 요구하는 데이터를 보내주어 token을 받는다.
+
+<https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-token-sample>
+
+        code = request.data.get("code")
+        access_token = requests.post(
+            "https://kauth.kakao.com/oauth/token",
+            headers={"content Type": "application/x-www-form-urlencoded"},
+            data={
+                "grant_type": "authorization_code",
+                "client_id": "f4fdce8bfd733f3368f97c47a87266b6",
+                "redirect_uri": "http://127.0.0.1:3000/api/v2/social/kakao",
+                "code": code,
+            },
+        )
+        print(access_token.json())
+
+        >>>: {'access_token': 'LAdY0wVbrBFmL_Tby9QzOLP78T_MgPlJzKmwr992CisNIAAAAYY07Wkl', 'token_type': 'bearer', 'refresh_token': 'P0uIshWtKnAIhQrkHW2-ly7klrptNRIKJvSVW9vVCisNIAAAAYY07Wkk', 'expires_in': 21599, 'scope': 'account_email profile_image profile_nickname', 'refresh_token_expires_in': 5183999}
+
+유저 데이터를 토큰을 통해 가져온다.
+
+    print(user_data.json())
+
+    >>>:
+    {
+        'id': 2657773776,
+        'connected_at': '2023-02-09T06:42:03Z',
+        'properties': {
+            'nickname': '건형',
+            'profile_image': 'http://k.kakaocdn.net/dn/chZnlT/btrXa1IANGX/YQKhi2C2Etw0mQgn7IV3jk/img_640x640.jpg',
+            'thumbnail_image': 'http://k.kakaocdn.net/dn/chZnlT/btrXa1IANGX/YQKhi2C2Etw0mQgn7IV3jk/img_110x110.jpg'
+        },
+        'kakao_account': {
+            'profile_nickname_needs_agreement': False,
+            'profile_image_needs_agreement': False,
+            'profile': {
+                'nickname': '건형',
+                'thumbnail_image_url': 'http://k.kakaocdn.net/dn/chZnlT/btrXa1IANGX/YQKhi2C2Etw0mQgn7IV3jk/img_110x110.jpg',
+                'profile_image_url': 'http://k.kakaocdn.net/dn/chZnlT/btrXa1IANGX/YQKhi2C2Etw0mQgn7IV3jk/img_640x640.jpg',
+                'is_default_image': False
+            },
+            'has_email': True,
+            'email_needs_agreement': False,
+            'is_email_valid': True,
+            'is_email_verified': True,
+            'email': 'abc930113@naver.com'
+        }
+    }
+
+kakao_account에 있는 email로 유저 데이터를 찾는다.(깃허브 로그인과 동일하다)
+
+            kakao_account = user_data.json().get("kakao_account")
+            profile = kakao_account.get("profile")
+            try:
+                user = User.objects.get(email=kakao_account.get("email"))
+                login(request, user)
+                return Response(status=status.HTTP_200_OK)
+            except User.DoesNotExist:
+                print(1)
+                user = User.objects.create(
+                    username=user_data.get("id"),
+                    name=profile.get("nickname"),
+                    avatar=profile.get("thumbnail_image_url"),
+                    email=kakao_account.get("email"),
+                )
+                user.set_unusable_password()
+                login(request, user)
+                return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            print("KakaoLogIn POST() Error >>>: ", e)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+# ! User Create Error
+
+    유저 생성 부분에서 에러발생한 것으로 추측.
+
+    >>>: 1
+         KakaoLogIn POST() Error >>>:  'Response' object has no attribute 'get'
+
+    !! user_data는 response 데이터임으로 status 데이터가 있다.
+    print(user_data)
+
+    >>>: <Response [200]>
+
+    username=user_data.get("id") -> user_data.json().get("id")
+    변경하여 해결

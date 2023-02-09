@@ -177,3 +177,48 @@ class GithubLogIn(APIView):
         except Exception as e:
             print("GithubLogIn POST() Error >>>: ", e)
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class KakaoLogIn(APIView):
+    def post(self, request):
+        try:
+            code = request.data.get("code")
+            access_token = requests.post(
+                "https://kauth.kakao.com/oauth/token",
+                headers={"content Type": "application/x-www-form-urlencoded"},
+                data={
+                    "grant_type": "authorization_code",
+                    "client_id": "f4fdce8bfd733f3368f97c47a87266b6",
+                    "redirect_uri": "http://127.0.0.1:3000/api/v2/social/kakao",
+                    "code": code,
+                },
+            )
+            access_token = access_token.json().get("access_token")
+            user_data = requests.get(
+                "https://kapi.kakao.com/v2/user/me",
+                headers={
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "Authorization": f"Bearer {access_token}",
+                },
+            )
+            kakao_account = user_data.json().get("kakao_account")
+            profile = kakao_account.get("profile")
+            try:
+                print(kakao_account.get("email"))
+                user = User.objects.get(email=kakao_account.get("email"))
+                login(request, user)
+                print(1)
+                return Response(status=status.HTTP_200_OK)
+            except User.DoesNotExist:
+                user = User.objects.create(
+                    username=user_data.json().get("id"),
+                    name=profile.get("nickname"),
+                    avatar=profile.get("profile_image_url"),
+                    email=kakao_account.get("email"),
+                )
+                user.set_unusable_password()
+                login(request, user)
+                return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            print("KakaoLogIn POST() Error >>>: ", e)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
