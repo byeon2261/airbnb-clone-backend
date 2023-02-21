@@ -96,9 +96,15 @@ class LogIn(APIView):
         )
         if user:
             login(request, user)
-            return Response({"ok": "welcome!"})
+            return Response(
+                {"ok": "welcome!"},
+                status=status.HTTP_200_OK,
+            )
         else:
-            return Response({"error": "Wrong Password."})
+            return Response(
+                {"error": "Wrong Password."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 
 class LogOut(APIView):

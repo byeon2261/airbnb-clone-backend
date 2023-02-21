@@ -2199,3 +2199,32 @@ kakao_account에 있는 email로 유저 데이터를 찾는다.(깃허브 로그
 
     username=user_data.get("id") -> user_data.json().get("id")
     변경하여 해결
+
+### 20.12 Log In Form
+
+front-end login form작업 진행...
+
+### 20.15 Recap
+
+...
+
+# ! frontend에서 login성공 여부 인식 오류
+
+frontend에서 login오류기능을 구현하는데 login정보가 틀려도 login성공을 표시가된다. (로그인은 되지 않는다.)
+return에 status를 같이 보내주면서 login성공여부를 front에서 인식이 가능해진다.
+
+@users/views - class LogIn
+
+    if user:
+        login(request, user)
+        return Response(
+            {"ok": "welcome!"},
+            status=status.HTTP_200_OK,  # 해당 부분 추가
+        )
+    else:
+        return Response(
+            {"error": "Wrong Password."},
+            status=status.HTTP_400_BAD_REQUEST,  # 해당 부분 추가
+        )
+
+front-end에서는 response.data를 받지 않아도 로그인 성공여부를 알 수 있게 된다.
