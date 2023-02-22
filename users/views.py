@@ -55,6 +55,7 @@ class Users(APIView):
                 user.set_password(password)
                 user.save()
                 login(request, user)
+                print("User Created. name: f{name}")
                 return Response(status=status.HTTP_200_OK)
         except Exception as e:
             print(e)

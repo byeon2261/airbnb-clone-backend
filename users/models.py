@@ -13,7 +13,7 @@ class User(AbstractUser):
 
     class CurrencyChoices(models.TextChoices):
         WON = ("won", "Won")
-        USD = ("use", "Dollar")
+        USD = ("usd", "Dollar")
 
     first_name = models.CharField(
         max_length=150,

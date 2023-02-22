@@ -2228,3 +2228,8 @@ return에 status를 같이 보내주면서 login성공여부를 front에서 인�
         )
 
 front-end에서는 response.data를 받지 않아도 로그인 성공여부를 알 수 있게 된다.
+
+### 20.16 Code Challenge
+
+... Sign Up부분을 작업하다가 views부분을 일부 수정진행하였다. 강의에선 serializer부분을 수정하면서 view부분은 수정을 진행하지 않은 것으로 보임.
+user models 오타 수정.
