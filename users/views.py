@@ -37,20 +37,28 @@ class Me(APIView):
 
 class Users(APIView):
     def post(self, request):
-        password = request.data.get("password")
-        if not password:
-            raise ParseError("You should be insult password.")
-
-        serializer = PrivateUserSerializer(data=request.data)
-
-        if serializer.is_valid():
-            saved_user = serializer.save()
-            saved_user.set_password(password)
-            saved_user.save()
-            serializer = PrivateUserSerializer(saved_user)
-            return Response(serializer.data)
-        else:
-            return Response(serializer.errors)
+        try:
+            name = request.data.get("name")
+            email = request.data.get("email")
+            username = request.data.get("username")
+            password = request.data.get("password")
+            try:
+                user = User.objects.get(email=email)
+                print("user is does")
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            except User.DoesNotExist:
+                user = User.objects.create(
+                    name=name,
+                    email=email,
+                    username=username,
+                )
+                user.set_password(password)
+                user.save()
+                login(request, user)
+                return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class PublicUser(APIView):
