@@ -42,8 +42,11 @@ class Users(APIView):
             email = request.data.get("email")
             username = request.data.get("username")
             password = request.data.get("password")
+            gender = request.data.get("gender")
+            language = request.data.get("language")
+            currency = request.data.get("currency")
             try:
-                user = User.objects.get(email=email)
+                User.objects.get(email=email)
                 print("user is does")
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             except User.DoesNotExist:
@@ -51,6 +54,9 @@ class Users(APIView):
                     name=name,
                     email=email,
                     username=username,
+                    gender=gender,
+                    language=language,
+                    currency=currency,
                 )
                 user.set_password(password)
                 user.save()
