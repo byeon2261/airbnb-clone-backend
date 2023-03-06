@@ -228,7 +228,6 @@ class KakaoLogIn(APIView):
                 print(kakao_account.get("email"))
                 user = User.objects.get(email=kakao_account.get("email"))
                 login(request, user)
-                print(1)
                 return Response(status=status.HTTP_200_OK)
             except User.DoesNotExist:
                 user = User.objects.create(

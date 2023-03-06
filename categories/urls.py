@@ -21,4 +21,12 @@ urlpatterns = [
             }
         ),
     ),
+    path(
+        "rooms/",
+        views.CategoryRoomViewset.as_view(
+            {
+                "get": "list",
+            }
+        ),
+    ),
 ]

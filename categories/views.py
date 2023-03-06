@@ -7,3 +7,8 @@ class CategoryViewset(ModelViewSet):
 
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
+
+
+class CategoryRoomViewset(ModelViewSet):
+    serializer_class = CategorySerializer
+    queryset = Category.objects.filter(kind=Category.CategoryKindChoice.ROOMS)
