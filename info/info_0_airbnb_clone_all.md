@@ -2233,3 +2233,12 @@ front-end에서는 response.data를 받지 않아도 로그인 성공여부를 �
 
 ... Sign Up부분을 작업하다가 views부분을 일부 수정진행하였다. 강의에선 serializer부분을 수정하면서 view부분은 수정을 진행하지 않은 것으로 보임.
 user models 오타 수정.
+
+### 21.2 Dynamic Form
+
+...frontend에서 방을 등록하는 화면을 구현중이다. 방 categories만 가져오는 쿼리가 필요하다.(experience제외)
+
+Category의 Room 리스트를 가져오는 views를 추가한다. 해당 view에 접근하는 url도 추가해준다.
+일부 serializer에 가져오는 데이터에 pk를 추가해준다.
+
+이제 frontend에서 데이터를 가져오는 작업을 진행한다...
