@@ -2242,3 +2242,14 @@ Category의 Room 리스트를 가져오는 views를 추가한다. 해당 view에
 일부 serializer에 가져오는 데이터에 pk를 추가해준다.
 
 이제 frontend에서 데이터를 가져오는 작업을 진행한다...
+
+### 21.4 Bugfix
+
+...일부 오류를 수정한다. is_liked
+Response로 데이터를 보낼때 context값을 보내지 않아 발생한 오류이다.
+
+    def get_is_liked(self, room):
+        # 값이 없을 경우 null을 반환한다.
+        self.context["request"] -> self.context.get("request")
+        if request:  # 값이 있을경우 로직이 진행되도록 변경
+            ...
