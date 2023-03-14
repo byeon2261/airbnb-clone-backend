@@ -2253,3 +2253,28 @@ Response로 데이터를 보낼때 context값을 보내지 않아 발생한 오�
         self.context["request"] -> self.context.get("request")
         if request:  # 값이 있을경우 로직이 진행되도록 변경
             ...
+
+### 21.6 One Time Upload
+
+...cloudflare를 이용한 데이터 전송의 테스트로직을 작성한다.
+
+월 5달러를 내면 Image업로드기능을 사용할 수 있다.
+해당 기능을 결제하여 설정을 하면 토큰을 제공해준다.
+
+<https://dash.cloudflare.com/profile/api-tokens>
+
+**해당 기능구현은 나중에 진행하도록 한다**
+
+기존에 해오던 로직으로 파일 전송테스트 로직을 작성할 수 있다.
+
+[backend]
+
+- 토큰을 .env에 등록한다.
+- 해당 토큰 및 요청사항을 post로 이용하여 cloudflare URL에 전송한다.
+- 받은 값을 response로 돌려준다.
+
+[frontend]
+
+- api에 backend에 등록한 url로 post요청을 보낸다.
+- 보낼때 file데이터를 useMutation훅으로 보내준다.
+- 받은 값을 console.log로 찍는다.
