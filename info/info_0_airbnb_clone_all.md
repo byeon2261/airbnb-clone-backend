@@ -2278,3 +2278,32 @@ Response로 데이터를 보낼때 context값을 보내지 않아 발생한 오�
 - api에 backend에 등록한 url로 post요청을 보낸다.
 - 보낼때 file데이터를 useMutation훅으로 보내준다.
 - 받은 값을 console.log로 찍는다.
+
+### 22.1 Booking Dates
+
+...
+room booking 체크를 위한 로직을 생성한다.
+url을 생성하여 함수를 생성한다.
+기존 booking validate하는 CreateRoomBookingSerializer기능을 가져와서 변경한다.
+
+```python
+...
+def get(self, request, pk):
+    ...
+    check_in = request.query_params.get("check_in")
+    ...
+    exists = Booking.objects.filter(
+        room=room,
+        check_in__lte=check_out,  # check_in에 check_out값을 대입한다.
+        check_out__gte=check_in,  # ''
+    ).exists()
+    if exists:
+        return Response({"ok": False})
+    return Response({"ok": True})
+```
+
+테스트시 해당 url에 파람을 같이 보내줘서 값을 확인한다.
+
+    .../check?check_in=2023-01-01&check_out=2023-01-15
+
+frontend애서 해당 url을 불러오는 api를 구현한다...
