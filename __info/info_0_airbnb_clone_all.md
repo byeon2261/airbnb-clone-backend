@@ -81,7 +81,7 @@ user 패널은 리스트 컬럼명과 filter기능이 기본 구현되어있다.
 
 라이브러리는 코드에서 해당 라이브러리를 request하여 사용하지만 프레임워크는 프레임워크에서 내 코드를 찾아서 실행한다. 프레임워크가 요구하는 위치에 코드가 있어야 실행이 된다.
 
-app 내에 시간은 세계시간(UTC)기준으로 표기된다. config>settings.py 변경해준다.
+app 내에 시간은 세계시간(UTC)기준으로 표기된다. @config/settings.py 변경해준다.
 
     TIME_ZONE = "UTC"
     >>>TIME_ZONE = "Asia/Seoul"
@@ -91,7 +91,7 @@ app 내에 시간은 세계시간(UTC)기준으로 표기된다. config>settings
     LANGUAGE_CODE = "en-us"
     >>>LANGUAGE_CODE = "ko-kr"
 
-config>url.py 은 url path, 실행될 app을 구현한다.
+@config/url.py 은 url path, 실행될 app을 구현한다.
 settings.py, urls.py 파일명과 구현된 variable은 프레임워크 요건에 충족시켜야 실행된다.
 
 장고 app 은 어플리케이션의 로직과 데이터를 합쳐서 캡슐화한다.
@@ -107,7 +107,7 @@ house 엡을 생성한다.
 
 각 파일에는 구현해야할 코드가 무엇인지 주석이 있다.
 
-config>settings.py 에 INSTALLED_APPS 리스트에 앱을 추가하여 설치한다.
+@config/settings.py 에 INSTALLED_APPS 리스트에 앱을 추가하여 설치한다.
 
         "houses.apps.HousesConfig",
 
@@ -122,7 +122,7 @@ model을 구현할때 djanog의 models.Model을 overriding한다.
 다른 설정 방법 확인은 <https://docs.djangoproject.com/en/4.1/ref/models/fields/>
 primarykey, unique, verbose_name
 
-Django 는 커스텀 데이터에 대한 관리 패널을 자동으로 생성해준다. admin.py에 해당 앱 관리에 추가해준다.
+Django 는 커스텀 데이터에 대한 관리 패널을 자동으로 생성해준다. @houses/admin.py에 해당 앱 관리에 추가해준다.
 
 ```py
 from .models import House
@@ -151,7 +151,7 @@ pass로 overriding 하면 구현된 model을 전부 넣어준다.
 
 서버를 실행하여 앱 admin패널에서 데이터 검색, 추가, 수정, 삭제가 가능하다. django는 데이터 저장 및 수정에서 데이터 유효검사를 해준다.
 
-settings.py 에 INSTALLED_APPS 을 SYSTEM_APPS와 CUSTOM_APPS로 분류 적용한다.
+@config/settings.py 에 INSTALLED_APPS 을 SYSTEM_APPS와 CUSTOM_APPS로 분류 적용한다.
 
 ```py
 INSTALLED_APPS = SYSTEM_APPS + CUSTOM_APPS
@@ -161,7 +161,7 @@ Django 에서 INSTALLED_APPS 를 찾는다.
 
 #### [1_python]
 
-models.py에 \_\_str\_\_을 구현하여 해당 app 데이터를 불러올때 표시할 값을 정한다.
+@houses/models.py에 \_\_str\_\_을 구현하여 해당 app 데이터를 불러올때 표시할 값을 정한다.
 
 ```py
 def __str__(self):
@@ -170,7 +170,7 @@ def __str__(self):
 
 #### [2_Django]
 
-admin.py에 admin패널 리스트 컬럼과 필터를 적용할 수 있다. string으로 리스트에 추가한다.
+@admin.py에 admin패널 리스트 컬럼과 필터를 적용할 수 있다. string으로 리스트에 추가한다.
 
 ```py
 list_display = [
@@ -205,14 +205,20 @@ exclude, fields, list_display_links, list_per_page, list_editable, read_only ...
 
 #### [2_Django]
 
-Django에는 기본 user관리를 위한 데이터테이블과 admin판넬이 제공된다. 하지만 user 데이터 변경을 위해서는 Django의 user클래스를 inherit하여 overriding을 할 필요가 있다.
+Django에는 기본 user관리를 위한 데이터테이블과 admin판넬이 제공된다.
+하지만 user 데이터 변경을 위해서는 Django의 user클래스를 inherit하여 overriding을 할 필요가 있다.
 
-# Djaong는 기본 베이스의 user모델을 제공한다.
+# user 모델을 구현해놓자.
 
-하지만 user 모델을 변경하기 위해서는 Django을 상속하여 새로 user모델을 생성하여 구현해야한다. Djaog는 기본 베이스의 user모델을 사용하더라도 user모델을 생성 후 프로젝트를 진행하길 권장한다. <https://docs.djangoproject.com/en/4.1/topics/auth/customizing/#substituting-a-custom-user-model>
+Djaong는 기본 베이스의 user모델을 제공한다. 하지만 user 모델을 변경하기 위해서는 Django을 상속하여 새로 user모델을 생성하여 구현해야한다.
+Djaog는 기본 베이스의 user모델을 사용하더라도 user모델을 생성 후 프로젝트를 진행하길 권장한다.
+<https://docs.djangoproject.com/en/4.1/topics/auth/customizing/#substituting-a-custom-user-model>
 
-데이터 작업이 어느정도 이뤄지고 나서 users app을 변경할려면 작업이 매우 복잡해진다. 프로젝트가 완료되고 런칭되어서 데이터가 쌓이기전에 변경작업을 진행하자.
+데이터 작업이 어느정도 이뤄지고 나서 users app을 변경할려면 작업이 매우 복잡해진다.
+프로젝트가 완료되고 런칭되어서 데이터가 쌓이기전에 변경작업을 진행하자.
 ! Django application 을 시작하는 처음부터 user model을 교체하자. 무조건 교체하자. 교체할게 하나도 없더라도 inherit만 구현해놓자 !
+
+---
 
 #### [1_python]
 
@@ -238,7 +244,8 @@ Users 앱을 생성 프로세스 진행힌다(startapp -> settings설치 -> migr
 from django.contrib.auth.models import AbstractUser
 ```
 
-프로젝트 시스템에 Django의 User를 상속받아 구현하여 사용할 것을 알려줘야한다. config>settings.py에 설정값을 넣어준다. 상단 User Document에 내용이 있다.
+프로젝트 시스템에 Django의 User를 상속받아 구현하여 사용할 것을 알려줘야한다. @config/settings.py에 설정값을 넣어준다.
+상단 User Document에 내용이 있다.
 
 ```py
 #AUTH
@@ -247,7 +254,7 @@ AUTH_USER_MODEL = "[myapp='users'].[MyUser='User']"
 
 migration시 오류가 발생한다.
 
-        >>> Migration admin.0001_initial is applied before its dependency users.0001_initial on database 'default'.
+    >>> Migration admin.0001_initial is applied before its dependency users.0001_initial on database 'default'.
 
 기존에 Django User에 생성된 user가 있어서 Django User를 상속받은 user app을 구현할 수가 없다.
 ! 기존의 db를 삭제 후 다시 migrate를 진행해야한다. db를 삭제하며 migrations폴더 내의 파일중 00XX_XXXX.py파일도 삭제한다. 그외 파일은 삭제하지 않는다.
@@ -255,11 +262,13 @@ migration시 오류가 발생한다.
 
 user admin페이지 구현도 Django userAdmin을 상속받아서 하면된다.
 
+@users/admin.py
+
 ```py
 from django.contrib.auth.admin import UserAdmin
 ```
 
-User model을 커스텀한다. 기존에 Django Useradmin에 first_name과 last_name을 수정불가하도록 커스텀하였다.
+@users/model.py을 커스텀한다. 기존에 Django Useradmin에 first_name과 last_name을 수정불가하도록 커스텀하였다.
 
 ```py
 editable=False,
@@ -277,11 +286,12 @@ editable=False,
 default값을 정의해주든가 null값을 허용하면 된다. default값을 정의해준다.
 migration을 진행한다.
 
-User admin페이지에서 User정보 입력페이지에 들어가면 오류가 발생한다.
+@users/admin.py페이지에서 User정보 입력페이지에 들어가면 오류가 발생한다.
 
     'first_name' cannot be specified for User model form as it is a non-editable field. Check fields/fieldsets/exclude attributes of class CustomUserAdmin.
 
-User model에서 first_name과 last_name을 수정 불가하도록 적용했으나 Django Useradmin페이지에서는 수정하도록 설정되어 있어서 오류가 발생하였다.
+@users/model.py에서 first_name과 last_name을 수정 불가하도록 적용했으나
+Django Useradmin페이지에서는 수정하도록 설정되어 있어서 오류가 발생하였다.
 UserAdmin을 상속받은 클래스를 커스텀한다.
 
     fieldsets: model의 field가 보이는 순서를 설정. 일종의 섹션안에 field를 넣어서 그 섹션에 제목을 붙일 수 있다. 리스트나 튜플로 구성되어야한다.
@@ -291,7 +301,7 @@ UserAdmin을 상속받은 클래스를 커스텀한다.
 
 더보기. <https://docs.djangoproject.com/en/4.1/ref/contrib/admin/#modeladmin-options>
 
-유저 커스텀이 완료되면 room model에서 user Foreignkey를 등록한다. on_delete는 필수값으로 설정한다.
+유저 커스텀이 완료되면 @rooms/models.py에서 user Foreignkey를 등록한다. on_delete는 필수값으로 설정한다.
 
 ```py
 on_delete = models.SET_NULL  # 외래키가 삭제되면 연결되어있는 컬럼은 Null로 적용된다.
@@ -313,6 +323,8 @@ pillow를 설치한다.
     $ poetry add pillow
 
 db에는 text값을 넣어주면서 선택지를 고르는 field를 구현할 수 있다.
+
+@users/models.py
 
 ```py
 class GenderChoices(models.TextChoices):
@@ -347,11 +359,13 @@ created = models.DateTimeField(auto_now_add=True)
 생성된 날짜와 수정된 날짜는 많은 app에서 사용될 것이다. 모두가 사용가능한 공통코드를 담을 common app을 생성하자.
 common app을 생성 및 설치한다. common model은 데이터베이스에 추가하지 않을 model이다. 다른 model에서 재사용한다.
 common model은 abstract model로 만든다. abstract로 생성하면 django가 데이터베이스에 해당 앱 데이터를 생성하지 않는다.
-common은 절대 데이터베이스를 만들지 않는다. common model class에 추가해준다.
+common은 절대 데이터베이스를 만들지 않는다. CommonModel class 내에 추가해준다.
 
 ```py
-class Meta:
-    abstract = True
+class CommonModel(models.Model):
+    ...
+    class Meta:
+        abstract = True
 ```
 
 그리고 commonModel을 사용할 model은 commonModel을 inherit 한다.
@@ -390,12 +404,14 @@ category \_\_str\_\_ return 부분에 kind 명을 대문자로 title()로 적용
 review app 생성 및 설치를 한다.
 최대값을 설정할 수 있다.
 
+@reviews/models.py
+
 ```py
 from django.core.validators import MaxValueValidator
-
-rating = models.PositiveIntegerField(
-    validators=[MaxValueValidator(5)],
-)
+...
+    rating = models.PositiveIntegerField(
+        validators=[MaxValueValidator(5)],
+    )
 ```
 
 migrate 진행
@@ -406,13 +422,13 @@ migrate 진행
 
 bookings app 생성 및 설치. migrate 진행
 
-medias app 생성 및 설치. model> Photo, Video 구현.
+medias app 생성 및 설치. models에 Photo, Video 클래스 구현.
 
 Direct Messages app 생성 및 설치. model> ChattingRoom, Message 구현
-apps.py>config 에 verbose_name 추가
+apps.py/config 에 verbose_name 추가
 
 ```py
-verbose_name = "Direct Messages"
+verbose_name = "Direct Messages"  # 대표로 표기되는 텍스트
 ```
 
 model, admin 구현은 마무리되었다.
@@ -421,123 +437,149 @@ model, admin 구현은 마무리되었다.
 
 #### [2_Django]
 
-    ORM = Object Relationship Mapping. SQL 문을 사용하지 않고 엔티티를 객체로 표현할 수 있다. objects 는 데이터베이스 관리자이다.
-    # ORM 의 정의
+ORM = Object Relationship Mapping. SQL 문을 사용하지 않고 엔티티를 객체로 표현할 수 있다. objects 는 데이터베이스 관리자이다.
+ORM 의 정의 <https://hanamon.kr/orm%EC%9D%B4%EB%9E%80-nodejs-lib-sequelize-%EC%86%8C%EA%B0%9C/>
 
-<https://hanamon.kr/orm%EC%9D%B4%EB%9E%80-nodejs-lib-sequelize-%EC%86%8C%EA%B0%9C/>
+Django making Query. <https://docs.djangoproject.com/en/4.1/topics/db/queries/>
 
-    # Django making Query
-
-<https://docs.djangoproject.com/en/4.1/topics/db/queries/>
 데이터 모델을 생성한 후 데이터베이스에 코드로 어떻게 접근할지 확인해보자.
 
-    console로 명령어를 사용하요 확인할 수 있다. django>settings와 함께 python을 실행한다. shell 외에 python을 실행하면 Django를 포함하지 않는다.
+console로 명령어를 사용해서 확인할 수 있다.
+django>settings와 함께 python을 실행한다.
+shell 외에 python을 실행하면 Django를 포함하지 않는다.
+
     $ python manage.py shell
 
-    model을 갖고 있기때문에 python에서 가져올 수 있다.
+python 명령어를 console에서 실행이 가능하다. model을 갖고 있기때문에 python에서 가져올 수 있다.
+
     >>> from rooms.models import Room
 
-    django가 model을 생성할때 기본 제공하는 database objects가 있으며 여러 method를 갖고 있다.
-        all()
-        get([key]="[value]") # get()은 복수의 값을 가져올 수 없습니다. 복수의 값은 filter()를 사용
-        save()
+django가 model을 생성할때 기본 제공하는 database objects가 있으며 여러 method를 갖고 있다.
 
-        >>> Room.objects.get(pk=1).amenities.all().get(name="Wi-Fi").description
+```py
+    all()
+    get(f{key}="f{value}") # get()은 복수의 값을 가져올 수 없습니다. 복수의 값은 filter()를 사용
+    save()
+```
 
-        >>> r1 = Room.objects.get(pk=1)
-        >>> r1
-        <Room: beautiful Tent>
-        >>> amenities = r1.amenities.all()
-        >>> amenities
-        <QuerySet [<Amenity: Wi-Fi>, <Amenity: swimming pool>]>
-        >>> amenities.get(name="Wi-Fi").description
-        '무선 인터넷'
+    >>> Room.objects.get(pk=1).amenities.all().get(name="Wi-Fi").description
+
+    >>> r1 = Room.objects.get(pk=1)
+    >>> r1
+    <Room: beautiful Tent>
+    >>> amenities = r1.amenities.all()
+    >>> amenities
+    <QuerySet [<Amenity: Wi-Fi>, <Amenity: swimming pool>]>
+    >>> amenities.get(name="Wi-Fi").description
+    '무선 인터넷'
 
 #### [1_python]
 
-    변수 정의 및 대입 한 다음 Django save()로 저장 가능.
+변수 정의 및 대입 한 다음 Django save()로 저장 가능.
 
 #### [2_Django]
 
-    obects는 Manager라 불린다. Manager는 데이터베이스와 소통할 수 있는 Interface 이다.
-    # ORM 이란 무엇인가
+obects는 Manager라 불린다. Manager는 데이터베이스와 소통할 수 있는 Interface 이다.
 
-<https://docs.djangoproject.com/en/4.1/topics/db/managers/>
+ORM 이란 무엇인가. <https://docs.djangoproject.com/en/4.1/topics/db/managers/>
+
 model을 생성하면 Manager도 같이 생성된다. Manager도 수정적용 가능하다.
 
-    여러객체 조회하기
-        >>> for a in Room.objects.get(pk=1).amenities.all():
-        ...     print(a.name)
-        ...
-        Wi-Fi
-        swimming pool
+여러객체 조회하기
 
-    ? get()으로 가져오는 QuerySet에서는 var값으로 다시 가져올 수 가 있다.
-        >>> Room.objects.get(pk=1).name
-    하지만 filter()로 가져오면 오류가 발생한다.
-        >>> Room.objects.filter(pk=1).name
-        Traceback (most recent call last):
-            File "<console>", line 1, in <module>
-        AttributeError: 'QuerySet' object has no attribute 'name'
-    get은 데이터 하나를 갖고 오지만 filter는 queryset으로 묶음으로 가져온다. get은 데이터가 없다면 오류가 발생하지만 filter는 빈 querySet을 반환한다.
+    >>> for a in Room.objects.get(pk=1).amenities.all():  # Enter를 치면 계속 입력이 가능하다.
+    ...     print(a.name)
+    ...
+    Wi-Fi
+    swimming pool
 
+# ! get()으로 가져오는 QuerySet에서는 var값으로 다시 가져올 수 가 있다.
 
-    filter를 사용할 때 조건을 붙일 수 있다. field에 언더바 두개를 사용하여 조건값을 붙이거나 외부 모델 필드를 사용한다. lookup 이라 한다.
-        >>> Room.objects.filter(price__gte=15)  # 15보다 크거나 같은 값
-        # lookup 종류
+    >>> Room.objects.get(pk=1).name
 
-<https://velog.io/@may_soouu/Django-%EB%A9%94%EC%86%8C%EB%93%9C-%EC%A0%95%EB%A6%AC>
+하지만 filter()로 가져오면 오류가 발생한다.
+
+    >>> Room.objects.filter(pk=1).name
+    Traceback (most recent call last):
+        File "<console>", line 1, in <module>
+    AttributeError: 'QuerySet' object has no attribute 'name'
+
+! get은 데이터 하나를 갖고 오지만 filter는 queryset으로 묶음으로 가져온다.
+get은 데이터가 없다면 오류가 발생하지만 filter는 빈 querySet을 반환한다.
+
+filter를 사용할 때 조건을 붙일 수 있다. field에 언더바 두개를 사용하여 조건값을 붙이거나 외부 모델 필드를 사용한다. lookup 이라 한다.
+
+    >>> Room.objects.filter(price__gte=15)  # 15보다 크거나 같은 값
+
+lookup 종류. <https://velog.io/@may_soouu/Django-%EB%A9%94%EC%86%8C%EB%93%9C-%EC%A0%95%EB%A6%AC>
 <https://docs.djangoproject.com/en/4.1/ref/models/querysets/#field-lookups>
 
-    console에서 데이터를 생성 및 대입하여 저장이 가능하며 삭제도 가능하다.
-        create(): 데이터가 없는 빈 데이터 row가 생성된다.
-        create([key]="[value]"): 데이터를 넣어주면서 row를 생성한다.
-        get(...).delete(): 해당 데이터 삭제한다.
+console에서 데이터를 생성 및 대입하여 저장이 가능하며 삭제도 가능하다.
 
-    QuerySet은 매우 게을러서 요청한 값만 전달해 준다. 내부에 어떤 값이 있는지 알지 못한다.
-        get(...) -> <Room: beautiful Tent> # 이런식으로 <[model명]: [__str__]> 가져와서 전달한다.
-    query에 select from ... 로 데이터를 다 긁어와서 한세월 걸리는 일을 방지해준다.
+    create(): 데이터가 없는 빈 데이터 row가 생성된다.
+    create([key]="[value]"): 데이터를 넣어주면서 row를 생성한다.
+    get(...).delete(): 해당 데이터 삭제한다.
 
-    Room admin에서 Room마다 amenities를 몇개 갖고 있는지 표시한다.
-        1. amenities 를 계산한는 methon 를 model 에 추가한다.
-        2. admin에 method를 넣어준다. admin method에 두번째 매개변수에 model 값을 보내준다.
-    amenities 는 rooms 과 manyToMany관계이다. 그럼으로 querySet으로 데이터를 받아온다. filter().exclude().count() 사용가능하다.
-        room.amenities.count()
+QuerySet은 매우 게을러서 요청한 값만 전달해 준다. 내부에 어떤 값이 있는지 알지 못한다.
 
-    foriegn key를 역순으로 접근이 가능하다. 역순으로 접근을 filter를 사용할 때 lookup 과 컬럼명을 붙여서 사용가능하다.
-        Room.objects.filter(owner__username='admin')
-        Room.objects.filter(owner__username__startswith='ad')
+    get(...) -> <Room: beautiful Tent> # 이런식으로 <[model명]: [__str__]> 가져와서 전달한다.
 
-    dir() 을 사용하여 속성들을 확인하자
-        >>> dir(r1)
-        ['DoesNotExist', 'Meta', 'MultipleObjectsReturned', 'RoomKindChoice', '__class__', '__delattr__',
-        '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__',
-        '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__',
-        '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__setstate__', '__sizeof__',
-        '__str__', '__subclasshook__', '__weakref__', '_check_column_name_clashes', '_check_constraints',
-        '_check_default_pk', '_check_field_name_clashes', '_check_fields', '_check_id_field',
-        '_check_index_together', '_check_indexes', '_check_local_fields', '_check_long_column_names',
-        '_check_m2m_through_same_relationship', '_check_managers', '_check_model',
-        '_check_model_name_db_lookup_clashes', '_check_ordering',
-        '_check_property_name_related_field_accessor_clashes', '_check_single_primary_key', '_check_swappable',
-        '_check_unique_together', '_do_insert', '_do_update', '_get_FIELD_display', '_get_expr_references',
-        '_get_field_value_map', '_get_next_or_previous_by_FIELD', '_get_next_or_previous_in_order',
-        '_get_pk_val', '_get_unique_checks', '_meta', '_perform_date_checks', '_perform_unique_checks',
-        '_prepare_related_fields_for_save', '_save_parents', '_save_table', '_set_pk_val', '_state', 'address',
-        'amenities', 'booking_set', 'category', 'category_id', 'check', 'city', 'clean', 'clean_fields',
-        'country', 'created_at', 'date_error_message', 'delete', 'description', 'from_db', 'full_clean',
-        'get_constraints', 'get_deferred_fields', 'get_kind_display', 'get_next_by_created_at',
-        'get_next_by_updated_at', 'get_previous_by_created_at', 'get_previous_by_updated_at', 'id', 'kind',
-        'name', 'objects', 'owner', 'owner_id', 'pet_friendly', 'photo_set', 'pk', 'prepare_database_save',
-        'price', 'refresh_from_db', 'review_set', 'rooms', 'save', 'save_base', 'serializable_value', 'toilets',
-        'total_amenities', 'unique_error_message', 'updated_at', 'validate_constraints', 'validate_unique',
-        'wishlist_set']
-    목록에 속성중 ..._set 항목이 역참조(reverse accesser) model이다. booking_set. Booking 모델에서 Room 모델을 참조한 것이다.
-    모델명을 소문자로 가져온다음 _set을 붙여 생성한다.
+query에 select from ... 로 데이터를 다 긁어와서 한세월 걸리는 일을 방지해준다.
 
-    model 에 foriegn 지정한 칼럼에 related_name 값을 지정하여 _set 이름을 변경 할 수 있다. foreignKey, ManyToManyField 다 변경가능.
-        related_name="rooms"
-    [...]_set >>> [...]s 로 변경하였다.
+Room admin에서 Room마다 amenities를 몇개 갖고 있는지 표시한다.
+
+1. amenities 를 계산하는 methon 를 model 에 추가한다.
+2. admin에 method를 넣어준다. admin method에 두번째 매개변수에 model 값을 보내준다.
+
+amenities 는 rooms 과 manyToMany관계이다. 그럼으로 querySet으로 데이터를 받아온다. filter().exclude().count() 사용가능하다.
+
+```py
+room.amenities.count()
+```
+
+foriegn key를 역순으로 접근이 가능하다. 역순으로 접근을 filter를 사용할 때 lookup 과 컬럼명을 붙여서 사용가능하다.
+
+```py
+Room.objects.filter(owner__username='admin')
+Room.objects.filter(owner__username__startswith='ad')
+```
+
+dir() 을 사용하여 속성들을 확인하자
+
+    >>> dir(r1)
+    ['DoesNotExist', 'Meta', 'MultipleObjectsReturned', 'RoomKindChoice', '__class__', '__delattr__',
+    '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__',
+    '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__',
+    '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__setstate__', '__sizeof__',
+    '__str__', '__subclasshook__', '__weakref__', '_check_column_name_clashes', '_check_constraints',
+    '_check_default_pk', '_check_field_name_clashes', '_check_fields', '_check_id_field',
+    '_check_index_together', '_check_indexes', '_check_local_fields', '_check_long_column_names',
+    '_check_m2m_through_same_relationship', '_check_managers', '_check_model',
+    '_check_model_name_db_lookup_clashes', '_check_ordering',
+    '_check_property_name_related_field_accessor_clashes', '_check_single_primary_key', '_check_swappable',
+    '_check_unique_together', '_do_insert', '_do_update', '_get_FIELD_display', '_get_expr_references',
+    '_get_field_value_map', '_get_next_or_previous_by_FIELD', '_get_next_or_previous_in_order',
+    '_get_pk_val', '_get_unique_checks', '_meta', '_perform_date_checks', '_perform_unique_checks',
+    '_prepare_related_fields_for_save', '_save_parents', '_save_table', '_set_pk_val', '_state', 'address',
+    'amenities', 'booking_set', 'category', 'category_id', 'check', 'city', 'clean', 'clean_fields',
+    'country', 'created_at', 'date_error_message', 'delete', 'description', 'from_db', 'full_clean',
+    'get_constraints', 'get_deferred_fields', 'get_kind_display', 'get_next_by_created_at',
+    'get_next_by_updated_at', 'get_previous_by_created_at', 'get_previous_by_updated_at', 'id', 'kind',
+    'name', 'objects', 'owner', 'owner_id', 'pet_friendly', 'photo_set', 'pk', 'prepare_database_save',
+    'price', 'refresh_from_db', 'review_set', 'rooms', 'save', 'save_base', 'serializable_value', 'toilets',
+    'total_amenities', 'unique_error_message', 'updated_at', 'validate_constraints', 'validate_unique',
+    'wishlist_set']
+
+목록에 속성중 ...\_set 항목이 역참조(reverse accesser) model이다. booking_set. Booking 모델에서 Room 모델을 참조한 것이다.
+모델명을 소문자로 가져온다음 \_set을 붙여 생성한다.
+
+model 에 foriegn 지정한 칼럼에 related_name 값을 지정하여 \_set 이름을 변경 할 수 있다. foreignKey, ManyToManyField 다 변경가능.
+
+```py
+related_name="rooms"
+```
+
+[...]\_set >>> [...]s 로 변경하였다.
 
 ## 8. Power Admin
 
