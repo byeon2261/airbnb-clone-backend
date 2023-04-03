@@ -100,76 +100,103 @@ settings.py, urls.py 파일명과 구현된 variable은 프레임워크 요건�
 
 #### [2_Django]
 
-    house 엡을 생성한다.
+house 엡을 생성한다.
+
     $ python manage.py startapp houses
         [app]> migrations폴더, __init.py, admin.py, apps.py, models.py, tests.py, views.py 생성된다.
-    각 파일에는 구현해야할 코드가 무엇인지 주석이 있다.
 
-    config>settings.py 에 INSTALLED_APPS 리스트에 앱을 추가하여 설치한다.
+각 파일에는 구현해야할 코드가 무엇인지 주석이 있다.
+
+config>settings.py 에 INSTALLED_APPS 리스트에 앱을 추가하여 설치한다.
+
         "houses.apps.HousesConfig",
-    추가를 해주면 설치가 완료되며 django가 해당 app을 인지한다.
 
-    models.py엔 app 에 데이터형태를 구현한다. 구현된 형태를 migration 하면 django 는 database를 만들어준다.
-    model을 구현할때 djanog의 models.Model을 overriding한다.
-        CharField : 최대길이값이 필수 (max_length)
-        PositiveIntegerField : 양수인 정수값만 받음
-        다른 설정 방법 확인은
+추가를 해주면 설치가 완료되며 django가 해당 app을 인지한다.
 
-<https://docs.djangoproject.com/en/4.1/ref/models/fields/>
+models.py엔 app 에 데이터형태를 구현한다. 구현된 형태를 migration 하면 django 는 database를 만들어준다.
+model을 구현할때 djanog의 models.Model을 overriding한다.
+
+    CharField : 최대길이값이 필수 (max_length)
+    PositiveIntegerField : 양수인 정수값만 받음
+
+다른 설정 방법 확인은 <https://docs.djangoproject.com/en/4.1/ref/models/fields/>
 primarykey, unique, verbose_name
 
-    Django 는 커스텀 데이터에 대한 관리 패널을 자동으로 생성해준다. admin.py에 해당 앱 관리에 추가해준다.
-        from .models import House
+Django 는 커스텀 데이터에 대한 관리 패널을 자동으로 생성해준다. admin.py에 해당 앱 관리에 추가해준다.
 
-        @admin.register(House)  # admin(통제)할 앱을 넣어준다. 여러개 넣을 수 있다.
-        class HouseAdmin(admin.ModelAdmin):  # ModelAdmin 은 admin패널이다.
-            # admin 패널 화면 구현
-            pass
-    pass로 overriding 하면 구현된 model을 전부 넣어준다.
+```py
+from .models import House
 
-    해당 app을 데이터베이스에 알려줘야한다. 데이터베이스에 모델을 생성해준다.
+    @admin.register(House)  # admin(통제)할 앱을 넣어준다. 여러개 넣을 수 있다.
+    class HouseAdmin(admin.ModelAdmin):  # ModelAdmin 은 admin패널이다.
+        # admin 패널 화면 구현
+        pass
+```
+
+pass로 overriding 하면 구현된 model을 전부 넣어준다.
+
+해당 app을 데이터베이스에 알려줘야한다. 데이터베이스에 모델을 생성해준다.
+
     $ python manage.py makemigrations
         [app]>migrations 폴더에 새로운 db 모델을 설명하는 파일이 생성된다.
-    그리고 migrate를 실행하여 데이터베이스의 모양을 update한다.
-        __pycache__폴더에 변경된 데이터를 설명하는 파일이 생성된다.
 
-    # 도중에 `db.sqlite3`파일을 지워서 migrate해도 no such table이 뜬다면,
-    # $ python manage.py migrate --run-syncdb
+그리고 migrate를 실행하여 데이터베이스의 모양을 update한다.
+\_\_pycache\_\_폴더에 변경된 데이터를 설명하는 파일이 생성된다.
 
-    서버를 실행하여 앱 admin패널에서 데이터 검색, 추가, 수정, 삭제가 가능하다. django는 데이터 저장 및 수정에서 데이터 유효검사를 해준다.
+# 도중에 `db.sqlite3`파일을 지워서 migrate해도 no such table이 뜬다면,
 
-    settings.py 에 INSTALLED_APPS 을 SYSTEM_APPS와 CUSTOM_APPS로 분류 적용한다.
-        INSTALLED_APPS = SYSTEM_APPS + CUSTOM_APPS
-    Django 에서 INSTALLED_APPS 를 찾는다.
+    $ python manage.py migrate --run-syncdb
+
+서버를 실행하여 앱 admin패널에서 데이터 검색, 추가, 수정, 삭제가 가능하다. django는 데이터 저장 및 수정에서 데이터 유효검사를 해준다.
+
+settings.py 에 INSTALLED_APPS 을 SYSTEM_APPS와 CUSTOM_APPS로 분류 적용한다.
+
+```py
+INSTALLED_APPS = SYSTEM_APPS + CUSTOM_APPS
+```
+
+Django 에서 INSTALLED_APPS 를 찾는다.
 
 #### [1_python]
 
-    models.py에 __str__을 구현하여 해당 app 데이터를 불러올때 표시할 값을 정한다.
-        def __str__(self):
-            return self.name
+models.py에 \_\_str\_\_을 구현하여 해당 app 데이터를 불러올때 표시할 값을 정한다.
+
+```py
+def __str__(self):
+    return self.name
+```
 
 #### [2_Django]
 
-    admin.py에 admin패널 리스트 컬럼과 필터를 적용할 수 있다. string으로 리스트에 추가한다.
-        list_display = [
-            # 리스트에 표기할 컬럼(variable)
-        ]
-        list_filter = [
-            # 필터에 추가할 variable
-        ]
+admin.py에 admin패널 리스트 컬럼과 필터를 적용할 수 있다. string으로 리스트에 추가한다.
 
-    # 예전에 makemigrations 이 없을 때에는 db를 삭제하고 새로 생성했어야했다.
+```py
+list_display = [
+    # 리스트에 표기할 컬럼(variable)
+]
+list_filter = [
+    # 필터에 추가할 variable
+]
+```
 
-    admin패널에서 검색창을 구현할 수 있다. string으로 리스트에 추가한다.
-        search_fields = [
-            # 검색할 var
-        ]
-    리스트에 추가된 variable 내에서 조회가 이뤄진다.
-    기본 설정으로는 검색값의 string 이 포함된 전체 컬럼을 조회해온다. 조회될 값을 찾는 방법을 설정할 수 있다.
-        [variable]__startswith : 검색값으로 시작하는 값을 조회
-        그외의 설정방법은
+예전에 makemigrations 이 없을 때에는 db를 삭제하고 새로 생성했어야했다.
 
-<https://docs.djangoproject.com/en/4.1/ref/contrib/admin/#django.contrib.admin.ModelAdmin.search_fields>
+admin패널에서 검색창을 구현할 수 있다. string으로 리스트에 추가한다.
+
+```py
+search_fields = [
+    # 검색할 var
+]
+```
+
+리스트에 추가된 variable 내에서 조회가 이뤄진다.
+기본 설정으로는 검색값의 string 이 포함된 전체 컬럼을 조회해온다. 조회될 값을 찾는 방법을 설정할 수 있다.
+
+```py
+f{variable}__startswith  # 검색값으로 시작하는 값을 조회
+```
+
+그외의 설정방법은 <https://docs.djangoproject.com/en/4.1/ref/contrib/admin/#django.contrib.admin.ModelAdmin.search_fields>
 exclude, fields, list_display_links, list_per_page, list_editable, read_only ....
 
 ## 5. Users App
