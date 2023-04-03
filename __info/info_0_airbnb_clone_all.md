@@ -585,90 +585,131 @@ related_name="rooms"
 
 #### [2_Django]
 
-    Admin 페이지에서 데이터관리에 편리할 기능들을 더 추가할 것이다.
+Admin 페이지에서 데이터관리에 편리할 기능들을 더 추가할 것이다.
 
-    방 리뷰 별점 평균 값을 계산하는 함수를 room model에 구현. 역참조 reviews를 호출하여 계산한다.
-        def rating(self)
-            ...
-            else
-                for review in self.reviews.all():
-                    total_rating += review.rating
-            ...
-    해당 방식으로 ORM 을 작성하면 모든 컬럼을 불러와서 계산을 한다. rating 값만 가져오도록 최적화를 한다.
-        values(): 해당 컬럼값을 가져옴
-        for review in self.reviews.all().values("rating"):
-            print(review)
+방 리뷰 별점 평균 값을 계산하는 함수를 room model에 구현. 역참조 reviews를 호출하여 계산한다.
 
-        - 출력 값 -
-        {'rating': 2}
+```py
+def rating(self)
+    count = self.reviews.count()
+    if count == 0:
+        return "0"
+    else
+        for review in self.reviews.all():
+            total_rating += review.rating
+        return round(total_rating / count, 2)
+```
+
+해당 방식으로 ORM 을 작성하면 모든 컬럼을 불러와서 계산을 한다. rating 값만 가져오도록 최적화를 한다.
+
+    values(): 해당 컬럼값을 가져옴
+
+```py
+for review in self.reviews.all().values("rating"):
+    print(review)
+```
+
+    >>>: {'rating': 2}
         {'rating': 5}
         {'rating': 4}
         {'rating': 5}
-    {'컬럼명': value} 형식의 딕셔너리로 값을 가져온다. review.rating 부분을 수정해야 한다.
+
+{'컬럼명': value} 형식의 딕셔너리로 값을 가져온다. review.rating 부분을 수정해야 한다.
 
 #### [1_python]
 
-    dictionary 에 value값을 가져오는 식
-        review["rating"]
-    value 불러오는 부분을 수정해준다.
+dictionary 에 value값을 가져오는 식
+
+```py
+review["rating"]
+```
+
+value 불러오는 부분을 수정해준다.
 
 #### [2_Django]
 
-    검색창 기능을 room models에 구현한다. 기본 검색 컬럼은 검색어가 포함된 값들을 불러온다.(=__contains). price는 정확한 값으로 검색하도록 적용.
-        "price__exact",
-    __exact 대신에 컬럼앞에 =를 붙이는 것과 같은 의미를 갖는다.
-        "price__exact" == "=price"
-    # search field
+검색창 기능을 room models에 구현한다. 기본 검색 컬럼은 검색어가 포함된 값들을 불러온다.(=\_\_contains). price는 정확한 값으로 검색하도록 적용.
 
-<https://docs.djangoproject.com/en/4.1/ref/contrib/admin/#django.contrib.admin.ModelAdmin.search_fields>
+```py
+"price__exact",
+```
 
-    foriegnKey 값을 검색할 수 있다. LookUp에 ForiegnKey 의 컬럼을 넣을 수 있다.
-        "owner__username",
+\_\_exact 대신에 컬럼앞에 =를 붙이는 것과 같은 의미를 갖는다.
 
-    admin 화면에 action창의 기능을 추가한다. admins.py 에 @admin.action 을 추가한 다음 admin내 actions을 추가해준다.
-        @admin.action(descriptions="...")  # descriptions: action 창에 표기될 text
-        def reset_price(model_admin, request, queryset):
-            ...
+```py
+"price__exact" == "=price"
+```
 
-        class RoomAdmin(admin.ModelAdmin):
-            actions = (reset_price,)
+search field. <https://docs.djangoproject.com/en/4.1/ref/contrib/admin/#django.contrib.admin.ModelAdmin.search_fields>
 
-    request 와 dir(request) 값
-        request: <WSGIRequest: POST '/admin/rooms/room/?q=gh'>  # gh은 내 id 이다.
-        dir(request): ... 여러 method 와 컬럼. user컬럼이 있으며 해당 action을 실행한 user의 데이터가 있다.
-    user의 권한에 따라 해당 action 이 실행이 안되도록 막을 수 있다.
+foriegnKey 값을 검색할 수 있다. LookUp에 ForiegnKey 의 컬럼을 넣을 수 있다.
 
-    for문을 이용하여 reset_price 기능을 구현한다.
-        for room in rooms.all():
-            room.price = 0
-            room.save()
+    "owner__username",
 
-    reviews 필터를 추가 구현한다. foreignKey 를 사용하여 필터를 추가한다.
-        "user__is_host",
-    foreignKey의 foreignKey를 가져올 수 있다. foreignKey의 foreignKey의 foreignKey의 ...
-        "room__category",
+admin 화면에 action창의 기능을 추가한다. admins.py 에 @admin.action 을 추가한 다음 admin내 actions을 추가해준다.
 
-    Django 에는 필터 구현을 위한 클래스가 있다. 하지만 필터 구현을 위한 기본 기능은 충분하다.
-    특정 payload 값이 포함된 컬럼을 필터하는 클래스를 구현해본다.
-        class WordFilter(admin.simpleListFilter):
-            title= "..."
-            parameter_name = "..."
-            def lookups():
+```py
+@admin.action(descriptions="...")  # descriptions: action 창에 표기될 text
+def reset_price(model_admin, request, queryset):
+    ...
 
-            def queryset():
+class RoomAdmin(admin.ModelAdmin):
+    actions = (reset_price,)
+```
 
-        # simpleListFilter
+request 와 dir(request) 값
 
-<https://docs.djangoproject.com/en/4.1/ref/contrib/admin/filters/#using-a-simplelistfilter>
+    request: <WSGIRequest: POST '/admin/rooms/room/?q=gh'>  # gh은 내 id 이다.
+    dir(request): ... 여러 method 와 컬럼. user컬럼이 있으며 해당 action을 실행한 user의 데이터가 있다.
 
-    title, parameter_name, lookups(), queryset() 를 필수로 구현해야한다.
+user의 권한에 따라 해당 action 이 실행이 안되도록 막을 수 있다.
 
-    parameter_name 은 url에 표기될 key일 뿐 데이터를 가져오는데는 관여하지 않는 것 같다.
+for문을 이용하여 reset_price 기능을 구현한다.
 
-    딕셔너리 형식 데이터를 Python에서 데이터가져오는 방식이 아닌 Django에서 가능한 방식이 있다.
-        self.value() == self["key-name"]
+```py
+for room in rooms.all():
+    room.price = 0
+    room.save()
+```
 
-    !코드 챌린지. review rating 값이 3미만과 3이상의 값을 분류하는 filter를 만들어보자.
+reviews 필터를 추가 구현한다. foreignKey 를 사용하여 필터를 추가한다.
+
+```py
+"user__is_host",
+```
+
+foreignKey의 foreignKey를 가져올 수 있다. foreignKey의 foreignKey의 foreignKey의 ...
+
+```py
+"room__category",
+```
+
+Django 에는 필터 구현을 위한 클래스가 있다. 하지만 필터 구현을 위한 기본 기능은 충분하지만 구성해본다.
+특정 payload 값이 포함된 컬럼을 필터하는 클래스를 구현해본다.
+
+```py
+class WordFilter(admin.simpleListFilter):
+    title= "..."
+    parameter_name = "..."
+    def lookups():
+
+    def queryset():
+```
+
+simpleListFilter. <https://docs.djangoproject.com/en/4.1/ref/contrib/admin/filters/#using-a-simplelistfilter>
+
+title, parameter_name, lookups(), queryset() 를 필수로 구현해야한다.
+
+parameter_name 은 url에 표기될 key일 뿐 데이터를 가져오는데는 관여하지 않는 것 같다.
+
+딕셔너리 형식 데이터를 Python에서 데이터가져오는 방식이 아닌 Django에서 가능한 방식이 있다.
+
+```py
+self.value() == self["key-name"]
+```
+
+!코드 챌린지. review rating 값이 3미만과 3이상의 값을 분류하는 filter를 만들어보자.
+@reviews/admin.py > RatingFilter 참조
 
 ## 9. urls and views
 
