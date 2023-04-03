@@ -307,101 +307,115 @@ db.sqlite3를 시각화 하기위해서는 sqlite viewer 확장프로그램을 �
 
 #### [2_Django]
 
-    user model에 imagefield를 추가하면 서버에서 에러가 발생한다. pillow 프로그램이 있어야 ImageField를 사용할 수 있다.
-    pillow를 설치한다.
+user model에 imagefield를 추가하면 서버에서 에러가 발생한다. pillow 프로그램이 있어야 ImageField를 사용할 수 있다.
+pillow를 설치한다.
+
     $ poetry add pillow
 
-    db에는 text값을 넣어주면서 선택지를 고르는 field를 구현할 수 있다.
-        class GenderChoices(models.TextChoices):
-            {
-                "[VALUE]": ("[actual value]", "[human readable name]"),
-                ...,
-            }
+db에는 text값을 넣어주면서 선택지를 고르는 field를 구현할 수 있다.
 
-        gender = models.CharField(
-            choice=GenderChoices.choices,
-        )
-    더보기.
+```py
+class GenderChoices(models.TextChoices):
+    {
+        "[VALUE]": ("[actual value]", "[human readable name]"),
+        ...,
+    }
 
-<https://docs.djangoproject.com/en/4.1/ref/models/fields/#choices>
+gender = models.CharField(
+    choice=GenderChoices.choices,
+)
+```
 
-    rooms app을 설치한다.(startapp -> settings설치)
-    model,admin 구현 후 migrate 하기로 한다.
+더보기. <https://docs.djangoproject.com/en/4.1/ref/models/fields/#choices>
 
-    country와 city를 위한 package가 있다. 추후에 적용할 예정이다. TextChoices ?
+rooms app을 설치한다.(startapp -> settings설치)
+model,admin 구현 후 migrate 하기로 한다.
 
-    Room 모델을 구현후 amenity도 구현한다. rooms와 amenity는 many-to-many 관계를 갖는다.
-    many-to-many는 room에서 여러 Amenity를 등록할 수 있다. many-to-many는  Foriegn과 다르게 on_delete값이 필수가 아니다.
+country와 city를 위한 package가 있다. 추후에 적용할 예정이다. TextChoices ?
 
-    만들어진 날짜와 수정된 날짜를 추가해준다.
-        created = models.DateTimeField(auto_now_add=True)
+Room 모델을 구현후 amenity도 구현한다. rooms와 amenity는 many-to-many 관계를 갖는다.
+many-to-many는 room에서 여러 Amenity를 등록할 수 있다. many-to-many는 Foriegn과 다르게 on_delete값이 필수가 아니다.
+
+만들어진 날짜와 수정된 날짜를 추가해준다.
+
+```py
+created = models.DateTimeField(auto_now_add=True)
+```
 
 <https://docs.djangoproject.com/en/4.1/ref/models/fields/#datetimefield>
 
-    생성된 날짜와 수정된 날짜는 많은 app에서 사용될 것이다. 모두가 사용가능한 공통코드를 담을 common app을 생성하자.
-    common app을 생성 및 설치한다. common model은 데이터베이스에 추가하지 않을 model이다. 다른 model에서 재사용한다.
-    common model은 abstract model로 만든다. abstract로 생성하면 django가 데이터베이스에 해당 앱 데이터를 생성하지 않는다.
-    common은 절대 데이터베이스를 만들지 않는다. common model class에 추가해준다.
-        class Meta:
-            abstract = True
-    그리고 commonModel을 사용할 model은 commonModel을 inherit 한다.
+생성된 날짜와 수정된 날짜는 많은 app에서 사용될 것이다. 모두가 사용가능한 공통코드를 담을 common app을 생성하자.
+common app을 생성 및 설치한다. common model은 데이터베이스에 추가하지 않을 model이다. 다른 model에서 재사용한다.
+common model은 abstract model로 만든다. abstract로 생성하면 django가 데이터베이스에 해당 앱 데이터를 생성하지 않는다.
+common은 절대 데이터베이스를 만들지 않는다. common model class에 추가해준다.
 
-    Amenity 리스트에 표시되는 app이름이 Amenitys로 표기된다. Amenities 로 변경해준다.
-        class Meta:
-            verbose_name_plural = "Amenities"
+```py
+class Meta:
+    abstract = True
+```
 
-    컬럼 추가 및 수정 창(add,change)에서 bold로 표시된 컬럼은 필수값이다.
-    DateTimeField 컬럼을 filter에 추가하면 filter에 등록되어있는 값으로 filter하는 것이 아닌 현재날짜 기준으로 filter를 한다. (이번주, 이번해)
-    수정불가한 데이터를 add-change창에서 확인할 수 있다.
+그리고 commonModel을 사용할 model은 commonModel을 inherit 한다.
 
+Amenity 리스트에 표시되는 app이름이 Amenitys로 표기된다. Amenities 로 변경해준다.
 
-    experiences app을 생성 및 설치한다.
-    experience model과 experience model에서 사용할 perks model을 구현한다. 역시 many-to-many
+```py
+class Meta:
+    verbose_name_plural = "Amenities"
+```
 
-    django는 add-change하는 도중에 foriegn컬럼을 추가할 수 있다.
+컬럼 추가 및 수정 창(add,change)에서 bold로 표시된 컬럼은 필수값이다.
+DateTimeField 컬럼을 filter에 추가하면 filter에 등록되어있는 값으로 filter하는 것이 아닌 현재날짜 기준으로 filter를 한다. (이번주, 이번해)
+수정불가한 데이터를 add-change창에서 확인할 수 있다.
 
+experiences app을 생성 및 설치한다.
+experience model과 experience model에서 사용할 perks model을 구현한다. 역시 many-to-many
 
-    categories app을 생성 및 설치한다. category는 room과 experience에서 사용할 것이다.
-    model 구현 후 room과 Experience에 추가해준다. migrate진행.
+django는 add-change하는 도중에 foriegn컬럼을 추가할 수 있다.
+
+categories app을 생성 및 설치한다. category는 room과 experience에서 사용할 것이다.
+model 구현 후 room과 Experience에 추가해준다. migrate진행.
 
 #### [1_python]
 
-    문자열 메서드 title()을 사용하면 앞글자를 대문자로 표기해준다.
+문자열 메서드 title()을 사용하면 앞글자를 대문자로 표기해준다.
 
 <https://zetawiki.com/wiki/%ED%8C%8C%EC%9D%B4%EC%8D%AC_title()>
 
-    category __str__ return 부분에 kind 명을 대문자로 title()로 적용했다.
+category \_\_str\_\_ return 부분에 kind 명을 대문자로 title()로 적용했다.
 
-#### [2_Django]
+#### [2_Django
 
-    외래키를 사용하여 filter를 할 수 있다.
+외래키를 사용하여 filter를 할 수 있다.
 
+review app 생성 및 설치를 한다.
+최대값을 설정할 수 있다.
 
-    review app 생성 및 설치를 한다.
-    최대값을 설정할 수 있다.
-        from django.core.validators import MaxValueValidator
+```py
+from django.core.validators import MaxValueValidator
 
-        rating = models.PositiveIntegerField(
-            validators=[MaxValueValidator(5)],
-        )
-    migrate 진행
+rating = models.PositiveIntegerField(
+    validators=[MaxValueValidator(5)],
+)
+```
 
+migrate 진행
 
-    wishlists app 생성 및 설치.
-    wishlist는 admin에서 생성을 진행하지 않기때문에 blank=True는 제외했다.
-    migrate 진행
+wishlists app 생성 및 설치.
+wishlist는 admin에서 생성을 진행하지 않기때문에 blank=True는 제외했다.
+migrate 진행
 
+bookings app 생성 및 설치. migrate 진행
 
-    bookings app 생성 및 설치. migrate 진행
+medias app 생성 및 설치. model> Photo, Video 구현.
 
+Direct Messages app 생성 및 설치. model> ChattingRoom, Message 구현
+apps.py>config 에 verbose_name 추가
 
-    medias app 생성 및 설치. model> Photo, Video 구현.
+```py
+verbose_name = "Direct Messages"
+```
 
-    Direct Messages app 생성 및 설치. model> ChattingRoom, Message 구현
-    apps.py>config 에 verbose_name 추가
-        verbose_name = "Direct Messages"
-
-    model, admin 구현은 마무리되었다.
+model, admin 구현은 마무리되었다.
 
 ## 7 ORM
 
