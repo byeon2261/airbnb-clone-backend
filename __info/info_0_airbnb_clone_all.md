@@ -1,3 +1,37 @@
+# Airbnb clone
+
+## 목차
+
+- [chapter 0 ~ 3](#이동할-위치)
+- [4. Django Apps]()
+- [5. Users App]()
+- [6. Models and Admin]()
+- [7. ORM]()
+- [8. Power Admin]()
+- [9. urls and views]()
+- [10. Django Rest Framework]()
+- [11. Rest API]()
+- [12. Users API]()
+- [13. Check Point (Code Challenge)]()
+- [14. GraphQL API]()
+- [15. Authenticated]()
+- [16. API Testing]()
+- [17. Front-End SetUp]()
+- chapter 18은 front-end 작업만 진행
+- [19. React Query]()
+
+  > [20. Authentication]()
+  >
+  > > [20.1 Credentials]()
+  > > ...
+  > > [20.4 CSRF]()
+  > > ...
+  > > [20.6 Github Code]() > > [20.7 Access Token]() > > [20.8 Email]()
+  > > ...
+  > > [20.10 Kakao Talk App Auth]() > > [20.11 Kakao Log In]() > > [20.12 Log In Form]()
+  > > ...
+  > > [20.15 Recap]() > > [20.16 Code Challenge]() > [chapter 21]() > > [21.2 Dynamic Form]()
+
 [1_python]
 
 일부 운영체제에서는 호환성때문에 python명령어를 사용하면 python2로 접속이 된다. python2는 사용하면 안되며 python3를 사용해야 한다.
@@ -1285,375 +1319,552 @@ viewset을 사용하게 되면 자동으로 완성되는 부분이 많아져서 
 
 #### [5_Rest]
 
-    API 생성을 시작한다. 보안에는 신경쓰지않으며 우선 기능 구현초점으로 진행한다.
+API 생성을 시작한다. 보안에는 신경쓰지않으며 우선 기능 구현초점으로 진행한다.
 
-    rooms>Amenity 구조를 구현한다. ModelSerializer 를 사용하면 model에 적용되어있는 read only도 같이 적용된다.
-    views 는 APIView를 참조했다.
+rooms models에 Amenity 구조를 구현한다. ModelSerializer 를 사용하면 model에 적용되어있는 read only도 같이 적용된다.
+views 는 APIView를 참조했다.
 
-    같은 구조로 experiences>Perk를 구현했다.
+같은 구조로 experiences models에 Perk를 구현했다.
 
-    앞서 만든 api는 기존에 [10. Django Rest Framework]에서 배웠던 방식을 사용하여 복습하는 겸 만들어 봤다.
-    이제 Rooms model부터 구조를 다 만들어본다. Authentication 과 relationship 을 새로 배워서 사용해본다.
-    room serializer도 ModelSerializer를 사용하며 view 데이터를 json으로 변형한다.
+앞서 만든 api는 기존에 [10. Django Rest Framework]에서 배웠던 방식을 사용하여 복습하는 겸 만들어 봤다.
+이제 Rooms model부터 구조를 다 만들어본다. Authentication 과 relationship 을 새로 배워서 사용해본다.
+room serializer도 ModelSerializer를 사용하며 view 데이터를 json으로 변형한다.
 
-    값을 일부만 가져오는 RoomListSerializer를 만든다.
+값을 일부만 가져오는 RoomListSerializer를 만든다.
 
-    개별 객체를 가져오는 RoomDetail api를 생성한다. (url: <int:pk>, view, serializer)
-    foriegn키를 가져오는 컬럼은 데이터를 표시할때 pk값을 표시한다.
-    foriegn키 값을 확장해서 전체값을 가져올 수 있다.
-    - serializer_Meta -
-        depth = 1
-    foriegn키의 값을 전부 전달해 준다. 데이터가 가져오는 양이 많아져 매우 느려지게 되며 사용자의 개인정보까지 보내져 보안에 문제가 발생한다.
-    RoomDetail에 표기할 user의 데이터만 가져올 serializer를 생성한다.
-    - users>serializers -
-        class TinyUserSerializer
-    rooms>serializers 에 depth=1 대신에 foriegn키 컬럼마다 serializer를 지정해주면 된다.
-        owner = TinyUserSerializer()  # Meta 클래스 안이 아닌 serializer 클래스안에 작성해주면 된다.
-        amenities = AmenitySerializer(many=True)  # 값이 여러개일경우 many를 활성화해준다.
+개별 객체를 가져오는 RoomDetail api를 생성한다. (url: <int:pk>, view, serializer)
+foriegn키를 가져오는 컬럼은 데이터를 표시할때 pk값을 표시한다.
+foriegn키 값을 확장해서 전체값을 가져올 수 있다.
+@serializer.py - class Meta
 
-        class Meta:
-            ...  # depth는 삭제해 준다.
+```py
+depth = 1
+```
 
+foriegn키의 값을 전부 전달해 준다. 데이터가 가져오는 양이 많아져 매우 느려지게 되며 사용자의 개인정보까지 보내져 보안에 문제가 발생한다.
+RoomDetail에 표기할 user의 데이터만 가져올 serializer를 생성한다.
 
-    room의 post 기능을 구현해본다. foriegn키를 제외한 컬럼에 값을 넣을때는 오류가 발생하지 않는다.
-    하지만 foriegn키에 값을 넣을때는 입력오류가 발생한다.
-    # 11.6 Room Owner
+@users.serializers.py
+
+```py
+class TinyUserSerializer
+    ...
+```
+
+rooms>serializers 에 depth=1 대신에 foriegn키 컬럼마다 serializer를 지정해주면 된다.
+
+```py
+owner = TinyUserSerializer()  # Meta 클래스 안이 아닌 serializer 클래스안에 작성해주면 된다.
+amenities = AmenitySerializer(many=True)  # 값이 여러개일경우 many를 활성화해준다.
+
+class Meta:
+    ...  # depth는 삭제해 준다.
+```
+
+room의 post 기능을 구현해본다. foriegn키를 제외한 컬럼에 값을 넣을때는 오류가 발생하지 않는다.
+하지만 foriegn키에 값을 넣을때는 입력오류가 발생한다.
+
+### 11.6 Room Owner
 
 <https://nomadcoders.co/airbnb-clone/lectures/3909>
 
-    owner는 사용자값을 request에서 받아서 입력하지 않는다. 사용자가 입력하는 유저값을 넣어서는 안된다. 우선 owner설정은 read_only를 넣어준다.
-        owner = TinyUserSerializer(read_only=True)
+owner는 사용자값을 request에서 받아서 입력하지 않는다. 사용자가 입력하는 유저값을 넣어서는 안된다. 우선 owner설정은 read_only를 넣어준다.
 
-    request objects 중에 request 를 보낸 사용자의 데이터를 갖고 있는것이 있다.
-        request.user
-    save() 에 컬럼 값을 기입할 수 있다.
-        serializer.save(owner=request.user)  # >>> 'owner': <SimpleLazyObject: <User: G.H.Byeon>>
+```py
+owner = TinyUserSerializer(read_only=True)
+```
 
-    request.user.is_authenticated 를 사용하면 사용자의 로그인여부를 알 수 있다. (로그인 일경우 = True)
-        def post(self, request):
-            if request.user.is_authemticated:
-                ...
-            else:
-                raise NotAuthenticated
-    post() 유효검사 후 로직 실행
+request objects 중에 request 를 보낸 사용자의 데이터를 갖고 있는것이 있다.
 
-    save()>create() 가 실행될때 room의 model값중 foriegn키를 제외한 값이 전송이 된다. foriegn키를 찾아서 넣어줘야 한다.
-    category를 입력값을 받는지 확인 및 식별 후(식별? 단어가 생각이 안난다.) save()에 값을 넣어준다.
-        category_pk = request.data.get("category")
-        if not category_pk:
-            raise ParseError
-        try:
-            category = Category.objects.get(pk=category_pk)
-            if Category.CategoryKindChoice.EXPERIENCES:  # 카테고리가 경험일 경우 에러 발생.
-                raise ParseError("The category kind should be 'rooms'.")
-        except Category.DoesNotExist:
-            raise ParseError("Category is not found.")  # 오류 내용을 보내줄 수 있다.
+```py
+request.user
+```
+
+save() 에 컬럼 값을 기입할 수 있다.
+
+```py
+serializer.save(owner=request.user)  # >>> 'owner': <SimpleLazyObject: <User: G.H.Byeon>>
+```
+
+request.user.is_authenticated 를 사용하면 사용자의 로그인여부를 알 수 있다. (로그인 일경우 = True)
+
+```py
+def post(self, request):
+    if request.user.is_authemticated:
         ...
-            created_room = serializer.save(
-                owner=request.user,
-                category=category,
-            )
+    else:
+        raise NotAuthenticated
+```
 
-    ManyToManyField 값인 Amenities를 가져와 보겠다.
-    Amenity 는 값을 보내지 않아도 에러를 발생하지 않도록 적용하겠다. room생성 후에도 나중에 항목들을 추가 가능하도록 적용한다.
-        created_room = serializer.save(...)  # save() 다음에 구현한다
-        amenities = request.data.get("amenity")
-        try:
-            for amenity_pk in amenities:
-                amenity = Amenity.objects.get(pk=amenity_pk)
-        except Amenity.DoesNotExist:
-            raise ParseError(f"Amenity with id {amenity_pk} is not found.")
-    ManyToManyFields 는 add(), remove() 를 사용하여 객체를 리스트에 추가, 제거를 하여 저장한다.
-        created_room.amenities.add(amenity)  # pk가 아닌 객체를 넣어준다.
+post() 유효검사 후 로직 실행
 
-    유효성 검사에서 오류가 발생한다면 room을 삭제하여 재생성하도록 유도가 가능하다.
-        except Amenity.DoesNotExist:
-            created_room.delete()
-    이번 프로젝트에서는 amenity가 잘못되어도 room은 생성되도록 하였기때문에 삭제는 구현하지 않았다.
+save()>create() 가 실행될때 room의 model값중 foriegn키를 제외한 값이 전송이 된다. foriegn키를 찾아서 넣어줘야 한다.
+category를 입력값을 받는지 확인 및 식별 후(식별? 단어가 생각이 안난다.) save()에 값을 넣어준다.
+
+```py
+category_pk = request.data.get("category")
+if not category_pk:
+    raise ParseError
+try:
+    category = Category.objects.get(pk=category_pk)
+    if Category.CategoryKindChoice.EXPERIENCES:  # 카테고리가 경험일 경우 에러 발생.
+        raise ParseError("The category kind should be 'rooms'.")
+except Category.DoesNotExist:
+    raise ParseError("Category is not found.")  # 오류 내용을 보내줄 수 있다.
+...
+    created_room = serializer.save(
+        owner=request.user,
+        category=category,
+    )
+```
+
+ManyToManyField 값인 Amenities를 가져와 보겠다.
+Amenity 는 값을 보내지 않아도 에러를 발생하지 않도록 적용하겠다. room생성 후에도 나중에 항목들을 추가 가능하도록 적용한다.
+
+```py
+created_room = serializer.save(...)  # save() 다음에 구현한다
+amenities = request.data.get("amenity")
+try:
+    for amenity_pk in amenities:
+        amenity = Amenity.objects.get(pk=amenity_pk)
+except Amenity.DoesNotExist:
+    raise ParseError(f"Amenity with id {amenity_pk} is not found.")
+```
+
+ManyToManyFields 는 add(), remove() 를 사용하여 객체를 리스트에 추가, 제거를 하여 저장한다.
+
+```py
+created_room.amenities.add(amenity)  # pk가 아닌 객체를 넣어준다.
+```
+
+유효성 검사에서 오류가 발생한다면 room을 삭제하여 재생성하도록 유도가 가능하다.
+
+```py
+except Amenity.DoesNotExist:
+    created_room.delete()
+```
+
+이번 프로젝트에서는 amenity가 잘못되어도 room은 생성되도록 하였기때문에 삭제는 구현하지 않았다.
 
 #### [2_django]
 
-    Django에서는 쿼리가 실행되면 DB에 바로 적용이 된다.
-    하지만 transaction 을 사용하며, 많은 쿼리와 create()를 정의한 다음에 그중에 하나라도 실패하면 모든쿼리는 취소된다.
+Django에서는 쿼리가 실행되면 DB에 바로 적용이 된다.
+하지만 transaction 을 사용하면, 많은 쿼리와 create()를 정의한 다음에 그중에 하나라도 실패하면 모든쿼리는 취소된다.
 
-<https://docs.djangoproject.com/en/4.1/topics/db/transactions/>
+transaction. <https://docs.djangoproject.com/en/4.1/topics/db/transactions/>
 
-    transaction.atomic(): 내에 코드는 전체 실행이 되고나서 한번에 데이터 변경이 이뤄진다.
-        from django.db import transaction
+transaction.atomic(): 내에 코드는 전체 실행이 되고나서 한번에 데이터 변경이 이뤄진다.
 
-        ...
-            with transaction.atomic():
-                created_room = serializer.save(...)
-                ...  # 내부 try-except문은 삭제한다.
-    try-except문을 사용하면 transaction은 에러가 난 사실을 알지 못한다.
-    transaction문을 try-except문으로 감싸준다.
+```py
+from django.db import transaction
+
+...
+    with transaction.atomic():
+        created_room = serializer.save(...)
+        ...  # 내부 try-except문은 삭제한다.
+```
+
+try-except문을 사용하면 transaction은 에러가 난 사실을 알지 못한다.
+transaction문을 try-except문으로 감싸준다.
 
 #### [5_Rest]
 
-    room_delete() 구현한다. 로그인 접속여부와 삭제자와 룸생성장가 같은지 확인한다.
-        if not request.user.is_authenticated:
-            raise NotAuthenticated
-        if request.user != room.owner:
-            raise PermissionDenied
+room_delete() 구현한다. 로그인 접속여부와 삭제자와 룸생성장가 같은지 확인한다.
 
-    room_put() 도 로그인 접속 여부와 삭제자 식별을 진행한며 저장 데이터 검증을 진행한다.
-    rooms_post와 달리 category_pk여부에 따라 category를 넣고 저장할지 그냥저장할지 정하며 Amenity저장하기 전에 clear해준다.
-        if category_pk:
-            room = serializer.save(category=category)
-        else:
-            room = serializer.save()
+```py
+if not request.user.is_authenticated:
+    raise NotAuthenticated
+if request.user != room.owner:
+    raise PermissionDenied
+```
 
-        ...
-            room.amenities.clear()
+room_put() 도 로그인 접속 여부와 삭제자 식별을 진행한며 저장 데이터 검증을 진행한다.
+rooms_post와 달리 category_pk여부에 따라 category를 넣고 저장할지 그냥저장할지 정하며 Amenity저장하기 전에 clear해준다.
 
-    SerializerMethodField: 기존 model외의 값을 가져올 수 있다. 메서드 이름은 속성앞에 get_을 붙여야한다.
-        potato = serializers.SerializerMethodField()
+```py
+if category_pk:
+    room = serializer.save(category=category)
+else:
+    room = serializer.save()
 
-        get_potato(self, room):
-            return ...
+...
+    room.amenities.clear()
+```
+
+SerializerMethodField: 기존 model외의 값을 가져올 수 있다. 메서드 이름은 속성앞에 get\_을 붙여야한다.
+
+```py
+potato = serializers.SerializerMethodField()
+
+get_potato(self, room):
+    return ...
+```
 
 #### ! username of userModel's Serializer
 
-    username = CharField(help_text='150자 이하 문자, 숫자 그리고 @/./+/-/_만 가능합니다.', label='사용자 이름', max_length=150, validators=[<django.contrib.auth.validators.UnicodeUsernameValidator object>, <UniqueValidator(queryset=User.objects.all())>])
+```py
+username = CharField(help_text='150자 이하 문자, 숫자 그리고 @/./+/-/_만 가능합니다.',
+    label='사용자 이름',
+    max_length=150,
+    validators=[<django.contrib.auth.validators.UnicodeUsernameValidator object>,
+    <UniqueValidator(queryset=User.objects.all())>]
+)
+```
 
 #### [5_rest]
 
-    context를 사용하여 외부에 데이터를 보낼때 유용하다. serializer 호출 인수에 context=() 를 추가해 주면 된다.
-    - views -
-        RoomListSerializer(... , context=("hello": "bye bye"), )
-    - serializer -
-        def get_...(self, room):
-            print(self.context)
-    user의 데이터를 가져와 serializer에 보내어 해당 room의 owner인지 대조하는 로직을 작성한다.
-    - views -
-        RoomListSerializer(... , context={"request": request}, )
-    - serializer
-        is_owner = serializers.SerializerMethodField()
-        fields = (
-            ...
-            "is_owner",
-        )
-        def get_is_owner(self, room):
-            return room.owner == self.context["request"]  # True or False
+context를 사용하여 외부에 데이터를 보낼때 유용하다. serializer 호출 인수에 context=() 를 추가해 주면 된다.
 
-    GET과 PUT serializer가 분리되어 있지 않기 때문에 다른 프로토콜에서 에러가 발생할 수 있다. 확인 후 다른 프로토콜도 작업 진행.
-    데이터를 변활할때는 오류가 발생하지 않지만 Response로 데이터를 보낼때 context값을 보내지 않는다면 오류가 발생한다.
-        serializer = RoomDetailSerializer(
-            data=request.data,   # It's OK
-        )
-        created_room = serializer.save(
-            owner=request.user,
-            category=category,
-        )
+@views
 
-        serializer = RoomDetailSerializer(
-            created_room,
-            context={"request": request},   # You should be response the context.
-        )
-        return Response(serializer.data)
+```py
+RoomListSerializer(... , context=("hello": "bye bye"), )
+```
 
-    reviews 역참조자를 사용하여 roomDetail에서 불러온다.
-    역참조를 사용하여 데이터를 가져올때 review data가 매우 많을 수 있다. 페이지가 위험해질 수 있다.
+@serializer
 
-    데이터 양을 조절하기 위해서 pagination기능을 추가해야하며 1개의 room을 위한 review 전용 페이지를 생성한다.
-    페이지를 url parameter로 가져오기로 한다. parameter은 request에 담긴다.
-        url: http:// ... /reviews?page=4  # ?: query를 보내는 기호
-        print(request.query_params)  # >>>: <QueryDict: {'page': ['4']}>
-    페이지 param을 가져온다. 값이 없을 경우 default값을 가져올 수 있다.
-        page = request.query_params.get("page", 1)  # get("page", 1): page값이 없을 경우 1을 return, 해당값은 string타입이다.
-    url parameter값은 string type이기때문에 형변환 시켜줘야한다.
-        page = int(page)
-    페이지 값이 없거나 string값을 보내올 경우를 위해 try-except문을 사용한다.
-        try:
-            page = request.query_params.get("page", 1)
-            page = int(page)
-        except ValueError:
-            page = 1
+```py
+def get_...(self, room):
+    print(self.context)
+```
 
-    page param값으로 pagination기능을 구현한다.
-        page_size = 3
-        start = (page - 1) * page_size
-        end = start + page_size
+user의 데이터를 가져와 serializer에 보내어 해당 room의 owner인지 대조하는 로직을 작성한다.
 
-        reviews = room.reviews.all()[start:end]  # .all()[offset:limit]: 리스트에서 뽑듯이 all() 객체에서도 인덱스 구역을 정해 값을 가져올 수 있다.
+@views
+
+```py
+RoomListSerializer(... , context={"request": request}, )
+```
+
+@serializer
+
+```py
+is_owner = serializers.SerializerMethodField()
+fields = (
+    ...
+    "is_owner",
+)
+def get_is_owner(self, room):
+    return room.owner == self.context["request"]  # True or False
+```
+
+GET과 PUT serializer가 분리되어 있지 않기 때문에 다른 프로토콜에서 에러가 발생할 수 있다. 확인 후 다른 프로토콜도 작업 진행.
+데이터를 변활할때는 오류가 발생하지 않지만 Response로 데이터를 보낼때 context값을 보내지 않는다면 오류가 발생한다.
+
+```py
+serializer = RoomDetailSerializer(
+    data=request.data,   # It's OK
+)
+created_room = serializer.save(
+    owner=request.user,
+    category=category,
+)
+
+serializer = RoomDetailSerializer(
+    created_room,
+    context={"request": request},   # You should be response the context.
+)
+return Response(serializer.data)
+```
+
+reviews 역참조자를 사용하여 roomDetail에서 불러온다.
+역참조를 사용하여 데이터를 가져올때 review data가 매우 많을 수 있다. 페이지가 위험해질 수 있다.
+
+데이터 양을 조절하기 위해서 pagination기능을 추가해야하며 1개의 room을 위한 review 전용 페이지를 생성한다.
+페이지를 url parameter로 가져오기로 한다. parameter은 request에 담긴다.
+
+```py
+url: http:// ... /reviews?page=4  # ?: query를 보내는 기호
+print(request.query_params)  # >>>: <QueryDict: {'page': ['4']}>
+```
+
+페이지 param을 가져온다. 값이 없을 경우 default값을 가져올 수 있다.
+
+```py
+page = request.query_params.get("page", 1)  # get("page", 1): page값이 없을 경우 1을 return, 해당값은 string타입이다.
+```
+
+url parameter값은 string type이기때문에 형변환 시켜줘야한다.
+
+```py
+page = int(page)
+```
+
+페이지 값이 없거나 string값을 보내올 경우를 위해 try-except문을 사용한다.
+
+```py
+try:
+    page = request.query_params.get("page", 1)
+    page = int(page)
+except ValueError:
+    page = 1
+```
+
+page param값으로 pagination기능을 구현한다.
+
+```py
+page_size = 3
+start = (page - 1) * page_size
+end = start + page_size
+
+reviews = room.reviews.all()[start:end]  # .all()[offset:limit]: 리스트에서 뽑듯이 all() 객체에서도 인덱스 구역을 정해 값을 가져올 수 있다.
+```
 
 <https://docs.djangoproject.com/en/4.1/topics/db/queries/#limiting-querysets>
 
-    pagination 기능을 이용하여 amenities 페이지도 구현.
+pagination 기능을 이용하여 amenities 페이지도 구현.
 
-    page_size 셋팅값을 config>settings에 설정을 하고 가져와서 사용하는 것으로 설정한다.
-    - config>settings -
-        PAGE_SIZE = 3
-    - views -
-        page_size = 3 -> settings.PAGE_SIZE
+page_size 셋팅값을 config>settings에 설정을 하고 가져와서 사용하는 것으로 설정한다.
+@config.settings
 
+```py
+PAGE_SIZE = 3
+```
 
-    파일 업로드 기능을 구현한다. Media>photo 파일을 upload하고 파일을 열면 Page not found Error가 발생한다.
+@views
 
+```py
+page_size = settings.PAGE_SIZE  # <- 3
+```
+
+파일 업로드 기능을 구현한다. Media>photo 파일을 upload하고 파일을 열면 Page not found Error가 발생한다.
 <https://docs.djangoproject.com/en/4.1/howto/static-files/#serving-files-uploaded-by-a-user-during-development>
 
-    장고에서 파일 업로드을 할경우 기본 root에 저장을 한다. config>setting에 업로드 path를 설정할 수 있다.
-    - config>settings -
-        MEDIA_ROOT = "upload"
-    파일 업로드시 upload 폴더가 생성되며 폴더내에 파일이 생성된다.
+장고에서 파일 업로드을 할경우 기본 root에 저장을 한다. config>setting에 업로드 path를 설정할 수 있다.
+@config.settings
 
-    하지만 파일을 열경우 아직도 에러가 발생한다. 업로드된 파일을 열수 있는 url을 설정해 줘야한다.
-    - config>settings -
-        MEDIA_URL = "user-uploads/"  # MEDIA_URL setting must end with a slash
-    파일을 열때 MEDIA_URL로 이동하여 파일을 찾는다. Django에게 user-uploads를 노출시켜달라고 말해야한다.
-        from django.conf.urls.static import static
-        from django.conf import settings  # settings.py에 대한 프록시(==from config import settings)
+```py
+MEDIA_ROOT = "upload"
+```
 
-        urlpatterns = [
-            ...
-        ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    이제 파일이 정상적으로 열릴것이다. 하지만 이 구조는 서비스환경에서는 권장되지 않는다.
-    신뢰하지 않는 유저에게 업로드되는 컨텐츠를 수락하는 경우에 위험해질 수 있다. 업로드 되는 파일들이 소스가 있는 피시에 다운로드가 직접되는 거다.
+파일 업로드시 upload 폴더가 생성되며 폴더내에 파일이 생성된다.
 
+하지만 파일을 열경우 아직도 에러가 발생한다. 업로드된 파일을 열수 있는 url을 설정해 줘야한다.
+@config.settings
+
+```py
+MEDIA_URL = "user-uploads/"  # MEDIA_URL setting must end with a slash
+```
+
+파일을 열때 MEDIA_URL로 이동하여 파일을 찾는다. Django에게 user-uploads를 노출시켜달라고 말해야한다.
+
+```py
+from django.conf.urls.static import static
+from django.conf import settings  # settings.py에 대한 프록시(==from config import settings)
+
+urlpatterns = [
+    ...
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
+
+이제 파일이 정상적으로 열릴것이다. 하지만 이 구조는 서비스환경에서는 권장되지 않는다.
+신뢰하지 않는 유저에게 업로드되는 컨텐츠를 수락하는 경우에 위험해질 수 있다. 업로드 되는 파일들이 소스가 있는 피시에 다운로드가 직접되는 거다.
 <https://docs.djangoproject.com/ko/4.1/ref/settings/#media-url>
 
-    파일을 호스팅하는 서비스에 파일을 넣은 다음, 장고에겐 URL을 제공하기로 한다. (아마존이나 구글 클라우드를 쓰는것이 더 편하다.)
-    Medias model클래스의 ImaageField, fileField 컬럼 속성을 변경한다.
-        file = models.URLField()
-    migration 진행 (오랜만이다.)
+파일을 호스팅하는 서비스에 파일을 넣은 다음, 장고에겐 URL을 제공하기로 한다. (아마존이나 구글 클라우드를 쓰는것이 더 편하다.)
+Medias model클래스의 ImaageField, fileField 컬럼 속성을 변경한다.
 
-    RoomPhoto post()를 구현한다.
-        사용자 인증
-        보내온 데이터 검증 및 저장
-        저장데이터 재전송
+```py
+file = models.URLField()
+```
 
+migration 진행 (오랜만이다.)
 
-    APIView의 permissions 프로퍼티를 변경하여 유저 검증을 할 수 있다.
-        from rest_framework.permissions import IsAuthenticated
+RoomPhoto post()를 구현한다.
 
-        ...
-            permission_classes = [IsAuthenticated]
-    GET은 모든 사람이 호출 가능한 프로토콜이다. 권한이 필요없는 프로토콜이 포함되어 있다면 readonly도 같이 부여한다.
-        from rest_framework.permissions import IsAuthenticatedOrReadOnly
+- 사용자 인증
+- 보내온 데이터 검증 및 저장
+- 저장데이터 재전송
 
-        ...
-            permission_classes = [IsAuthentucatedReadOnly]
-    권한이 필요없느 GET만 있다면 권한이 없어도 된다.
+APIView의 permissions 프로퍼티를 변경하여 유저 검증을 할 수 있다.
 
+```py
+from rest_framework.permissions import IsAuthenticated
 
-    room>RoomReviews POST 작업 진행.
+...
+    permission_classes = [IsAuthenticated]
+```
 
+GET은 모든 사람이 호출 가능한 프로토콜이다. 권한이 필요없는 프로토콜이 포함되어 있다면 readonly도 같이 부여한다.
 
-    wishlists 작업을 진행한다. wishlist는 사용자가 등록한 wishlist만을 본다. all() 대신에 filter()를 사용하며 권한도 자신만 가능하도록 한다.
-        permission_classes = [IsAuthenticated]
+```py
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-        ...
-            all_wishlists = Wishlist.objects.filter(user=request.user)
-    GET, POST 작업 진행.
+...
+    permission_classes = [IsAuthentucatedReadOnly]
+```
 
+권한이 필요없느 GET만 있다면 권한이 없어도 된다.
 
-    wishlist 작업 진행. ("<int:pk>" ,WishlistDetail - GET,PUT,DELETE)
-    wishlists와 같이 본인만 접근이 가능. 추가로 user를 같이 넣어주면서 본인 wishlist만 가져오도록 적용한다.
+room>RoomReviews POST 작업 진행.
 
-        def get_object(self, pk, user):
-            ...
-            return Wishlist.objects.get(pk=pk, user=user)
+wishlists 작업을 진행한다. wishlist는 사용자가 등록한 wishlist만을 본다. all() 대신에 filter()를 사용하며 권한도 자신만 가능하도록 한다.
 
-        def get(...):
-    wishlistDetail 에서는 wishlist 명만 변경이 가능하도록 한다.
+```py
+permission_classes = [IsAuthenticated]
 
-    wishlistToggle에서는 list를 변경하는 기능을 구현한다. room을 좋아하는 버튼을 클릭할때마다 변경이 되도록 적용할 것이다.
-    room pk는 request 로 전달해도 되며 url로 전송도 가능하다. 둘 중 편한 방법으로 사용하면 되며 여기선 url로 받도록 적용한다.
-        def get_list(self, pk, user):
-            ...
+...
+    all_wishlists = Wishlist.objects.filter(user=request.user)
+```
 
-        def get_room(self, pk):
-            ...
+GET, POST 작업 진행.
 
-        def put(self, request, pk, room_pk):
-            wishlist = self.get_list(pk, request.user)
-            room = self.get_room(room_pk)
+wishlist 작업 진행. ("< int:pk>" ,WishlistDetail - GET,PUT,DELETE)
+wishlists와 같이 본인만 접근이 가능. 추가로 user를 같이 넣어주면서 본인 wishlist만 가져오도록 적용한다.
 
-            if wishlist.rooms.filter(pk=room.pk).exists():  # ManyToManyField 는 querySet으로 데이터를 가져오기때문에 all(),filter()가 사용가능하다.
-                                                            ## exclude()는 데이터 존재여부만 return한다.
-                # wishlist.rooms.delete()  # 리스트 추가 제거는 remove(), add()를 사용한다.
-                wishlist.rooms.remove(room)
-            else:
-                wishlist.rooms.add(room)
-            return Response(status=HTTP_200_OK)
+```py
+def get_object(self, pk, user):
+    ...
+    return Wishlist.objects.get(pk=pk, user=user)
+
+def get(...):
+```
+
+wishlistDetail 에서는 wishlist 명만 변경이 가능하도록 한다.
+
+wishlistToggle에서는 list를 변경하는 기능을 구현한다. room을 좋아하는 버튼을 클릭할때마다 변경이 되도록 적용할 것이다.
+room pk는 request 로 전달해도 되며 url로 전송도 가능하다. 둘 중 편한 방법으로 사용하면 되며 여기선 url로 받도록 적용한다.
+
+```py
+def get_list(self, pk, user):
+    ...
+
+def get_room(self, pk):
+    ...
+
+def put(self, request, pk, room_pk):
+    wishlist = self.get_list(pk, request.user)
+    room = self.get_room(room_pk)
+
+    if wishlist.rooms.filter(pk=room.pk).exists():  # ManyToManyField 는 querySet으로 데이터를 가져오기때문에 all(),filter()가 사용가능하다.
+                                                    ## exclude()는 데이터 존재여부만 return한다.
+        # wishlist.rooms.delete()  # 리스트 추가 제거는 remove(), add()를 사용한다.
+        wishlist.rooms.remove(room)
+    else:
+        wishlist.rooms.add(room)
+    return Response(status=HTTP_200_OK)
+```
 
 Many-To-Many 관계 데이터
 <https://docs.djangoproject.com/en/4.1/topics/db/examples/many_to_many/>
 
-    rooms>serializers에 이미 좋아요 표시한 방을 볼 수 있도록 구현하겠다.
-        is_liked = serializers.SerializerMethodField()
+rooms>serializers에 이미 좋아요 표시한 방을 볼 수 있도록 구현하겠다.
 
-        def get_is_liked(self, room):
-            request = self.context["request"]
-            return Wishlist.objects.filter(
-                user=request.user,
-                rooms__pk=room.pk,  # model 객체의 컬럼을 검색하는 기능으로 '__컬럼명' 식으로 사용한다
-            ).exists()
+```py
+is_liked = serializers.SerializerMethodField()
 
+def get_is_liked(self, room):
+    request = self.context["request"]
+    return Wishlist.objects.filter(
+        user=request.user,
+        rooms__pk=room.pk,  # model 객체의 컬럼을 검색하는 기능으로 '__컬럼명' 식으로 사용한다
+    ).exists()
+```
 
-    방에 예약된 현황을 확인하는 페이지를 구현한다. (rooms/1/bookings)
-    bookings>serializers 를 생성한다. 모든사람이 볼 수 있는 것(Public)과 방 주인만 볼 수 있는(Private) serializer를 생성해준다.
+방에 예약된 현황을 확인하는 페이지를 구현한다. (rooms/1/bookings)
+bookings.serializers 를 생성한다. 모든사람이 볼 수 있는 것(Public)과 방 주인만 볼 수 있는(Private) serializer를 생성해준다.
 
-    예약된 현황을 오늘 이후의 값만 가져오도록 적용한다. python의 datetime 대신에 Django의 timezone을 사용한다.
-        from django.utils import timezone
-    config>settings 에 timezone 셋팅이 있다. 서버의 로컬타임 등 셋팅값이 포함되어 있다.
-        TIME_ZONE = "Asia/Seoul"
-        USE_TZ = True
-    시간을 출력해본다.
-        now = timezone(now)
-        print(now())  # >>>: 2023-01-02 07:06:20.674650+00:00
-                             [02/Jan/2023 16:06:20] "GET /api/v2/rooms/3/bookings HTTP/1.1" 200 7171  # 해당Text은 통신 프로토콜이다. django의 localtime이 출력된다.
-    한국시간으로 출력이 되지 않는다. settings에 설정된 한국시간으로 표기할 수 있다.
-        now = timezone.localtime
-        print(now())  # >>>: 2023-01-02 16:10:46.105665+09:00
-                             [02/Jan/2023 16:10:46] "GET /api/v2/rooms/3/bookings HTTP/1.1" 200 7171
-    해당 데이터를 필터에 추가하여 오늘 이후의 예약현황을 가져오도록 하자.
-        now = timezone.localtime().date()  # date(): 날짜만 가져온다.
+예약된 현황을 오늘 이후의 값만 가져오도록 적용한다. python의 datetime 대신에 Django의 timezone을 사용한다.
 
-        Bookings.objects.filter(
-            ... ,
-            check_in__gt=now,  # __gt: look up. line.391 참조
+```py
+from django.utils import timezone
+```
+
+config>settings 에 timezone 셋팅이 있다. 서버의 로컬타임 등 셋팅값이 포함되어 있다.
+
+```py
+TIME_ZONE = "Asia/Seoul"
+USE_TZ = True
+```
+
+시간을 출력해본다.
+
+```py
+now = timezone(now)
+print(now())
+# >>>: 2023-01-02 07:06:20.674650+00:00 [02/Jan/2023 16:06:20] "GET /api/v2/rooms/3/bookings HTTP/1.1" 200 7171
+# # 해당Text은 통신 프로토콜이다. django의 localtime이 출력된다.
+```
+
+한국시간으로 출력이 되지 않는다. settings에 설정된 한국시간으로 표기할 수 있다.
+
+```py
+now = timezone.localtime
+print(now())
+# >>>: 2023-01-02 16:10:46.105665+09:00 [02/Jan/2023 16:10:46] "GET /api/v2/rooms/3/bookings HTTP/1.1" 200 7171
+```
+
+해당 데이터를 필터에 추가하여 오늘 이후의 예약현황을 가져오도록 하자.
+
+```py
+now = timezone.localtime().date()  # date(): 날짜만 가져온다.
+
+Bookings.objects.filter(
+    ... ,
+    check_in__gt=now,  # __gt: look up. line.391 참조
+)
+```
+
+예약 기능을 구현한다. (rooms/1/bookings)
+bookings 모델에 check_in, check_out 은 필수값이 아니다.(이건 모델 설계의 실수이다).
+해당 값을 데이터를 받을때 필수값으로 하기위해선 serializerd에서 재정의가 필요하다.
+
+```py
+class CreateRoomBookingSerializer(...):
+    check_in = serializers.DataField()
+```
+
+serializer에서 데이터 검증 기능을 추가할 수 있다. 검증할 컬럼앞에 validate\_ 를 붙여 함수를 구현한다.
+현재 날짜보다 이후의 날짜로 예약을 할 수 있도록 검증한다.
+
+```py
+def calidate_check_in(self, value):  # serializer호출할 때 해당 컬럼값을 이 함수에서 2번째 매개변수로 받는다.
+    now = timezone.localtime().date()
+    if now > value:
+        raise serializers.ValidationError("Can't book in the past!")
+    return value
+```
+
+validate()를 통해 전체 데이터 검증도 가능하다.
+
+```py
+def validate(self, data):
+    print(data)  # >>>: OrderedDict([('check_in', datetime.date(2023, 1, 25)), ('check_out', datetime.date(2023, 1, 31)), ('guests', 5)])
+```
+
+체크인 날짜 이후에 체크아웃 날짜만이 가능하도록 기능을 추가한다.
+
+```py
+def validate(self, data):
+    if data["check_in"] >= data["check_out"]:
+        raise serializers.ValidationError(
+            "check out should be later than check in."
         )
+    return data
+```
 
-    예약 기능을 구현한다. (rooms/1/bookings)
-    bookings 모델에 check_in, check_out 은 필수값이 아니다.(이건 모델 설계의 실수이다).
-    해당 값을 데이터를 받을때 필수값으로 하기위해선 serializerd에서 재정의가 필요하다.
-        class CreateRoomBookingSerializer(...):
-            check_in = serializers.DataField()
+booking기간에 이미 booking이 있는지 체크 로직을 작성할 것이다. 우선 objects filter의 구현이다.
 
-    serializer에서 데이터 검증 기능을 추가할 수 있다. 검증할 컬럼앞에 validate_ 를 붙여 함수를 구현한다.
-    현재 날짜보다 이후의 날짜로 예약을 할 수 있도록 검증한다.
-        def calidate_check_in(self, value):  # serializer호출할 때 해당 컬럼값을 이 함수에서 2번째 매개변수로 받는다.
-            now = timezone.localtime().date()
-            if now > value:
-                raise serializers.ValidationError("Can't book in the past!")
-            return value
+```py
+Booking.objects.filter(
+    check_in__gte=data["check_in"],
+    check_out__lte=data["check_out"],
+).exist()
+```
 
-    validate()를 통해 전체 데이터 검증도 가능하다.
-        def validate(self, data):
-            print(data)  # >>>: OrderedDict([('check_in', datetime.date(2023, 1, 25)), ('check_out', datetime.date(2023, 1, 31)), ('guests', 5)])
-    체크인 날짜 이후에 체크아웃 날짜만이 가능하도록 기능을 추가한다.
-        def validate(self, data):
-            if data["check_in"] >= data["check_out"]:
-                raise serializers.ValidationError(
-                    "check out should be later than check in."
-                )
-            return data
+위 코드는 해당 범위 내 booking이 되어 있다면 잡아낼 것이다. 하지만 해당 범위에 벗어난 booking은 filter하지 못한다.
+만약 1일부터 7일까지 예약을 할때 이미 1일 부터 15일까지의 예약이 있다면 저 필터에 잡히지 않는다.
 
-    booking기간에 이미 booking이 있는지 체크 로직을 작성할 것이다. 우선 objects filter의 구현이다.
-        Booking.objects.filter(
-            check_in__gte=data["check_in"],
-            check_out__lte=data["check_out"],
-        ).exist()
-    위 코드는 해당 범위 내 booking이 되어 있다면 잡아낼 것이다. 하지만 해당 범위에 벗어난 booking은 filter하지 못한다.
-    만약 1일부터 7일까지 예약을 할때 이미 1일 부터 15일까지의 예약이 있다면 저 필터에 잡히지 않는다.
-        Booking.objects.filter(
-            check_in__lt=data["check_out"],  # 날짜 데이터는 늦은 날짜가 더 작다고 인식한다. == 체크인 보다 늦은 데이터["체크아웃"]
-            check_out__gt=data["check_in"],  # 체크 인 뒤에 있는 booking이 체크인을 하면 안된다는 거다 내가 체크아웃하기전에.
-        ).exist()
-    예약할 booking check_in은 check_out을 서로 체크하면 날짜를 잡아낼 수 있다.
+```py
+Booking.objects.filter(
+    check_in__lt=data["check_out"],  # 날짜 데이터는 늦은 날짜가 더 작다고 인식한다. == 체크인 보다 늦은 데이터["체크아웃"]
+    check_out__gt=data["check_in"],  # 체크 인 뒤에 있는 booking이 체크인을 하면 안된다는 거다 내가 체크아웃하기전에.
+).exist()
+```
 
-    view에서는 serializer.is_valid()를 사용하여 저장하는 기능을 구현하면 된다. user,room,kind 를 넣어준다.
+예약할 booking check_in은 check_out을 서로 체크하면 날짜를 잡아낼 수 있다.
+
+view에서는 serializer.is_valid()를 사용하여 저장하는 기능을 구현하면 된다. user,room,kind 를 넣어준다.
 
 ## 12. Users API
 
