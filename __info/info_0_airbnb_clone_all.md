@@ -866,302 +866,420 @@ templates <https://docs.djangoproject.com/en/4.1/topics/templates/>
 
 #### [5_Rest]
 
-    장고 Rest 프레임워크는 장고로 API를 아주 쉽게 만들 수 있는 패키지이다. 많은 shortcut를 제공해준다.
-    회사에서 장고를 사용한다면 Rest프레임워크를 사용할 것이다. 산업표준으로 될정도로 전부 rest framework를 사용한다.
-    Django서버에서 json파일을 react UI에게 보내준다. 실제로 URL로 직접 이동하지 않는다. 그저 데이터를 전달해준다.
-        react는 사용자에게 url을 받아서 데이터를 요구하면 Django App은 해당 데이터를 찾아주며 react는 url로 이동하며 화면을 표현한다.
+장고 Rest 프레임워크는 장고로 API를 아주 쉽게 만들 수 있는 패키지이다. 많은 shortcut를 제공해준다.
+회사에서 장고를 사용한다면 Rest프레임워크를 사용할 것이다. 산업표준으로 될정도로 전부 rest framework를 사용한다.
+Django서버에서 json파일을 react UI에게 보내준다. 실제로 URL로 직접 이동하지 않는다. 그저 데이터를 전달해준다.
 
-    우선 Rest framework 를 설치한다.
+> react는 사용자에게 url을 받아서 데이터를 요구하면 Django App은 해당 데이터를 찾아주며 react는 url로 이동하며 화면을 표현한다.
 
-<https://www.django-rest-framework.org/#installation>
+우선 Rest framework 를 설치한다.
 
-    poetry를 사용하기 때문에 pip대신에 poetry 명령어로 설치한다. pip i -> poetry add
+Rest framework. <https://www.django-rest-framework.org/#installation>
+
+poetry를 사용하기 때문에 pip대신에 poetry 명령어로 설치한다. pip i -> poetry add
+
     $ poetry add djangorestframework
-    config>settings 에 추가해 주자. THIRD_PARTY_APPS[] 를 추가해서 앱을 설치한다. INSTALL_APPS 에 THIRD_PARTY_APPS 를 추가한다.
+
+@config/settings.py 에 추가해 주자. THIRD_PARTY_APPS[] 를 추가해서 앱을 설치한다. INSTALL_APPS 에 THIRD_PARTY_APPS 를 추가한다.
 
 #### [2_Django]
 
-    categoris>urls 파일을 생성하고 url에서 view를 호출하는 기본 코드를 작성한다.
-    view를 작성한다. 기존 템블릿을 사용하지 않고 json을 보내준다. django의 JsonResponse 를 사용해보자.
-        from django.http import JsonResponse
+@categories/urls.py 파일을 생성하고 url에서 view를 호출하는 기본 코드를 작성한다.
+view를 작성한다. 기존 템블릿을 사용하지 않고 json을 보내준다. django의 JsonResponse 를 사용해보자.
 
-        def categories(request):
-            categories = Category.objects.all()
-            return JsonResponse(
-                {
-                    "ok": True,
-                    "data": categories,  # 해당 데이터를 읽을 때 오류가 발생한다.
-                }
-            )
-    queryset을 JsonResponse()로 보내게 되면 형식오류로 에러가 발생한다. 브라우져는 querySet을 읽을 수 없다. querySet을 JSon으로 변형해야 한다.
+```py
+from django.http import JsonResponse
 
-    Django의 serializer을 사용해보자.
-    # Django의 serializer 대신에 rest_framework의 serializer를 사용한다. 참고용으로만 보자.
+def categories(request):
+    categories = Category.objects.all()
+    return JsonResponse(
+        {
+            "ok": True,
+            "data": categories,  # 해당 데이터를 읽을 때 오류가 발생한다.
+        }
+    )
+```
 
+queryset을 JsonResponse()로 보내게 되면 형식오류로 에러가 발생한다. 브라우져는 querySet을 읽을 수 없다. querySet을 JSon으로 변형해야 한다.
+
+Django의 serializer을 사용해보자.
+
+Django의 serializer 대신에 rest_framework의 serializer를 사용한다. 참고용으로만 보자.
 <https://docs.djangoproject.com/en/4.1/topics/serialization/#djangojsonencoder>
 
-        from django.core import serializers
+```py
+from django.core import serializers
 
+...
+    return JsonResponse(
         ...
-            return JsonResponse(
-                ...
-                "data": serializers.serialize("json", categories),
-            )
+        "data": serializers.serialize("json", categories),
+    )
+```
 
 #### [5_Rest]
 
-    Django는 serializer는 매법 데이터를 보낼때마다 데이터변형이 필요하며 전송데이터 조작이 복잡하다.
-    Django의 serializer를 대신헤 rest_framework의 serializer를 사용한다.
-    # rest_framework의 request, response
+Django는 serializer는 매법 데이터를 보낼때마다 데이터변형이 필요하며 전송데이터 조작이 복잡하다.
+Django의 serializer를 대신헤 rest_framework의 serializer를 사용한다.
 
+rest_framework의 request, response.
 <https://www.django-rest-framework.org/tutorial/2-requests-and-responses/>
 
-        from rest_framework.decorators import api_view
-        from rest_framework.pagination import Response
+```py
+from rest_framework.decorators import api_view
+from rest_framework.pagination import Response
 
-        @api_view()  # 관리자가 데이터를 확인 및 수정할 수 있는 view를 생성해준다.
-        def categories(request):
+@api_view()  # 관리자가 데이터를 확인 및 수정할 수 있는 view를 생성해준다.
+def categories(request):
 
-            return Response(
-                "ok": True
-            )
-    이전 운명하신 프로젝트에서 계속 봐오던 아름다운 JSon페이지가 나왔다. api화면과 json화면 중 골라서 볼 수 있다.
-    model명, CRUD호출, 통신 상태 등 데이터를 확인 할 수 있다.
+    return Response(
+        "ok": True
+    )
+```
 
-    데이터 변형을 하기위해 model내에 serializers.py를 생성한다. 앞으로 데이터를 변형할때 규칙을 정의 할 것이다.
-    - serializers -
-        from rest_framework import serializers
+이전 운명하신 프로젝트에서 계속 봐오던 아름다운 JSon페이지가 나왔다. api화면과 json화면 중 골라서 볼 수 있다.
+model명, CRUD호출, 통신 상태 등 데이터를 확인 할 수 있다.
 
-        class CategorySerializer(serializers.Serializer):
-            name = serializers.CharField(required=True)  # model의 데이터타입을 알려준다. 변수명은 model명과 일치해야한다.
-    데이터 변형하여 보내준다.
-    - views -
-        from .serializers import CategorySerializer
+데이터 변형을 하기위해 model내에 serializers.py를 생성한다. 앞으로 데이터를 변형할때 규칙을 정의 할 것이다.
 
+@serializers
+
+```py
+from rest_framework import serializers
+
+class CategorySerializer(serializers.Serializer):
+    name = serializers.CharField(required=True)  # model의 데이터타입을 알려준다. 변수명은 model명과 일치해야한다.
+```
+
+데이터 변형하여 보내준다.
+
+@views
+
+```py
+    from .serializers import CategorySerializer
+    ...
         categories = Categories.objects.all()
         serializer = CategorySerializer(categories)
         return Response(
             "data": serializer.data
         )
+```
+
     >>> AttributeError at /categories/
         Got AttributeError when attempting to get a value for field `name` on serializer `CategorySerializer`.
         The serializer field might be named incorrectly and not match any attribute or key on the `QuerySet` instance.
         Original exception text was: 'QuerySet' object has no attribute 'name'.
-    오류 발생...
-    여러 데이터(리스트)를 보낼때는 many 옵션을 부여해야한다.
-        serializer = CategorySerializer(categories, many=True)
+
+오류 발생...
+여러 데이터(리스트)를 보낼때는 many 옵션을 부여해야한다.
+
+```py
+serializer = CategorySerializer(categories, many=True)
+```
 
 #### [2_Django]
 
-    하나의 객체를 볼 화면을 구현해본다. url에 변수를 받고 view 에 구현할 클래스에 변수를 인수로 받아 사용하면 된다. get()사용
-    - views -
-        def category(request, pk)  # 인수는 urls에 사용된 변수명을 그대로 사용해야한다.
-            category = Category.objects.get(pk=pk)
-            ...
+하나의 객체를 볼 화면을 구현해본다. url에 변수를 받고 view 에 구현할 클래스에 변수를 인수로 받아 사용하면 된다. get()사용
+
+@views
+
+```py
+def category(request, pk)  # 인수는 urls에 사용된 변수명을 그대로 사용해야한다.
+    category = Category.objects.get(pk=pk)
+    ...
+```
 
 #### [5_Rest]
 
-    @api_view() 의 기본 설정은 get방식만 받는다. 매개변수에 리스트형식으로 값을 넣어줘서 형식을 추가할 수 있다.
-        @api_view(["GET", "POST"])
-    api_view() 는 POST형식을 추가하면 브라우져에서 post테스트 바로 해볼 수 있는 prompt을 지원한다.
-    프로토콜 방식에 따라 다른 로직이 타도록 적용한다.
-        if request.method == "GET":
-            ...
-        elif request.method == "POST":
-            ...
-    request 값을 통해 data를 넣어 줄 수 있다.
-        ...
-        Category.objects.create(
-            name = request.data["name"],
-            kind = request.data["kind"],
-        )
-    하지만 이렇게 데이터를 넣어주면 데이터 검증없이 바로 생성이된다. 이 방식은 사용하지 않는다.
-    Serializer를 사용하면 브라우져에서 오는 json파일을 queryset으로도 변경해준다. serializer설정을 그대로 사용하면 된다.
-    serializer에서 데이터 유효성검사를 한다. model에 있는 설정을 serializer에 그대로 사용해주면 된다.
-    json형식을 변형할때는 serializer() 안에 값을 그냥 넣어주지 않으며 data값을 지정해주며 넣어줘야한다.
-        serializer = CategorySerializer(data=request.data)
+@api_view() 의 기본 설정은 get방식만 받는다. 매개변수에 리스트형식으로 값을 넣어줘서 형식을 추가할 수 있다.
 
-    querySet으로 변경한 데이터 유효성을 확인할 수 있다.
-        print(serializer.is_valid())  # True, False 체크
-        print(serializer.errors)  # 에러를 표시해준다.
-    위방식을 이용하여 데이터 유효성검사를 하여 에러메세지를 표기할 수 있다.
-        if serializer.is_valid():
-            ...
-        else:
-            return Response(serializer.errors)
-    pk, created_at 값을 제외한 데이터를 넣어주니 pk와 created_at값을 보내주지 않았다며 알려준다.
-    해당값에 read_only옵션을 부여하면된다. model 정의를 따라 값을 넣어준다. (pk = 키넘버, created_at = 지금 시간)
-        pk = serializer.IntegerField(read_only=True,)
+```py
+@api_view(["GET", "POST"])
+```
 
-    model 에서 사용하던 charField의 choices 가져와 사용할 수 있다.
-    다만 serializer 에서는 charField 대신에 choiceField 를 사용해야 한다. choiceField 는 max_length 를 사용하지 않는다.
+api_view() 는 POST형식을 추가하면 브라우져에서 post테스트 바로 해볼 수 있는 prompt을 지원한다.
+프로토콜 방식에 따라 다른 로직이 타도록 적용한다.
 
-    serializer 에 save()가 있다. request.data 만을 받아 serializer.save()를 호출하면 serializer내의 create()를 호출한다.
-    create() 두번째 인수로 validate data 를 받으며 객체를 return해야 한다.
+```py
+if request.method == "GET":
+    ...
+elif request.method == "POST":
+    ...
+```
+
+request 값을 통해 data를 넣어 줄 수 있다.
+
+```py
+...
+Category.objects.create(
+    name = request.data["name"],
+    kind = request.data["kind"],
+)
+```
+
+하지만 이렇게 데이터를 넣어주면 데이터 검증없이 바로 생성이된다. 이 방식은 사용하지 않는다.
+Serializer를 사용하면 브라우져에서 오는 json파일을 queryset으로도 변경해준다. serializer설정을 그대로 사용하면 된다.
+serializer에서 데이터 유효성검사를 한다. model에 있는 설정을 serializer에 그대로 사용해주면 된다.
+json형식을 변형할때는 serializer() 안에 값을 그냥 넣어주지 않으며 data값을 지정해주며 넣어줘야한다.
+
+```py
+serializer = CategorySerializer(data=request.data)
+```
+
+querySet으로 변경한 데이터 유효성을 확인할 수 있다.
+
+```py
+print(serializer.is_valid())  # True, False 체크
+print(serializer.errors)  # 에러를 표시해준다.
+```
+
+위방식을 이용하여 데이터 유효성검사를 하여 에러메세지를 표기할 수 있다.
+
+```py
+if serializer.is_valid():
+    ...
+else:
+    return Response(serializer.errors)
+```
+
+pk, created_at 값을 제외한 데이터를 넣어주니 pk와 created_at값을 보내주지 않았다며 알려준다.
+해당값에 read_only옵션을 부여하면된다. model 정의를 따라 값을 넣어준다. (pk = 키넘버, created_at = 지금 시간)
+
+```py
+pk = serializer.IntegerField(read_only=True,)
+```
+
+model 에서 사용하던 charField의 choices 가져와 사용할 수 있다.
+다만 serializer 에서는 charFiel d 대신에 choiceField 를 사용해야 한다. choiceField 는 max_length 를 사용하지 않는다.
+
+serializer 에 save()가 있다. request.data 만을 받아 serializer.save()를 호출하면 serializer내의 create()를 호출한다.
+create() 두번째 인수로 validate data 를 받으며 객체를 return해야 한다.
 
 #### [1_python]
 
-    여러 인수를 받을 때 변명앞에 *를 붙이면 여러 변수를 받을 수 있다. 다수의 딕셔너리를 받을때는 **를 붙여서 사용하면 된다.
-        **validated_data
+여러 인수를 받을 때 변명앞에 \*를 붙이면 여러 변수를 받을 수 있다. 다수의 딕셔너리를 받을때는 \*\*를 붙여서 사용하면 된다.
+
+```py
+**validated_data
+```
 
 #### [2_Django, 5_Rest]
 
-    serializer>create() 함수에 return 을 구현 해준다.
-        create(self, validated_data)  # 해당 create()는 serializer의 create 이다.
-            return Category.objects.create(**validated_data)  # 해당 create()는 objects의 query create 이다.
+serializer create() 함수에 return 을 구현 해준다.
+
+```py
+create(self, validated_data)  # 해당 create()는 serializer의 create 이다.
+    return Category.objects.create(**validated_data)  # 해당 create()는 objects의 query create 이다.
+```
 
 #### [6_JSon]
 
-    변수명을 담을 때는 큰따옴표를 사용해야한다. (작은 따옴표 X)
+변수명을 담을 때는 큰따옴표를 사용해야한다. (작은 따옴표 X)
 
 #### [5_Rest]
 
-    PUT신호를 받을 때 업데이트가 실행되도록 코드를 구현해보자. POST신호로 모든걸 실행하도록 적용 할 수도 있지만 분리 구현하도록 하겠다.
-    전체페이지가 아닌 각 객체 페이지에서 수정이 되도 적용한다.
-        @api_view(["GET","PUT"])
-    GET 부분을 먼저 구현한다. 전체객체 조회와 달리 없는 객체를 호출할때를 위헤 try-extact 를 사용하여 예외처리를 한다.
-        from rest_framework.except import NotFound  # 팁이라면 notfound 소문자로 입력하면 자동완성으로 인식이 안된다.
-        ...
-            try:
-                category = Category.objects.get(pk=pk)
-            excapt Category.DoesNotExist:  # view함수 category가 아닌 model Category이다.
-                raise NotFound  # raise 예외 처리에는 raise를 사용한다.
+PUT신호를 받을 때 업데이트가 실행되도록 코드를 구현해보자. POST신호로 모든걸 실행하도록 적용 할 수도 있지만 분리 구현하도록 하겠다.
+전체페이지가 아닌 각 객체 페이지에서 수정이 되도 적용한다.
 
-    ! serializer에는 python객체인 Django Model을 넣어주면 된다.
-        serializer = CategorySerializer(data=request.data)
-        update_data = serializer.save()
-        print("serializer >>>:", type(serializer))
-        print("update_data >>>:", type(update_data))
-        serializer = CategorySerializer(update_data).data
+```py
+@api_view(["GET","PUT"])
+```
 
-        serializer >>>: <class 'categories.serializers.CategorySerializer'>
-        update_data >>>: <class 'categories.models.Category'>  # >>> Rooms: 미치광이 방
-    !
+GET 부분을 먼저 구현한다. 전체객체 조회와 달리 없는 객체를 호출할때를 위헤 try-extact 를 사용하여 예외처리를 한다.
 
-    Update 를 위해 serializer에 변경할 객체와 데이터를 같이 보내준다.
+```py
+from rest_framework.except import NotFound  # 팁이라면 notfound 소문자로 입력하면 자동완성으로 인식이 안된다.
+...
+    try:
         category = Category.objects.get(pk=pk)
-        serializer = CategorySerializer(
-            category,
-            data=request.data,
-            partial=True,  # 보내지 않는 일부 데이터는 기존 데이터로 저장한다. 필수값을 보내지 않아도 된다.
-        )
-        serializer.save()  # 이 save에서는 update()가 호출된다. serializer에 instance 인수를 보내면 update() overroading.
+    excapt Category.DoesNotExist:  # view함수 category가 아닌 model Category이다.
+        raise NotFound  # raise 예외 처리에는 raise를 사용한다.
+```
+
+# ! serializer에는 python객체인 Django Model을 넣어주면 된다.
+
+```py
+serializer = CategorySerializer(data=request.data)
+update_data = serializer.save()
+print("serializer >>>:", type(serializer))
+print("update_data >>>:", type(update_data))
+serializer = CategorySerializer(update_data).data
+```
+
+    serializer >>>: <class 'categories.serializers.CategorySerializer'>
+    update_data >>>: <class 'categories.models.Category'>  # >>> Rooms: 미치광이 방
+
+---
+
+Update 를 위해 serializer에 변경할 객체와 데이터를 같이 보내준다.
+
+```py
+category = Category.objects.get(pk=pk)
+serializer = CategorySerializer(
+    category,
+    data=request.data,
+    partial=True,  # 보내지 않는 일부 데이터는 기존 데이터로 저장한다. 필수값을 보내지 않아도 된다.
+)
+serializer.save()  # 이 save에서는 update()가 호출된다. serializer에 instance 인수를 보내면 update() overroading.
+```
 
 #### [1_python]
 
-    ! 지역변수가 함수밖에서 사용이 가능하다. 왜?
-        @api_view(["GET", "PUT"])
-        def category(request, pk):
+# ! 지역변수가 함수밖에서 사용이 가능하다. 왜?
 
-            print(category)  # 전역변수인지 확인차 사용해봄. 오류 발생. 전역변수는 아닌거 같다.
-            try:
-                category = Category.objects.get(pk=pk)
-                print(category)
-            extact:
-                ...
-            if ... :
-                print(cateogry)  # 오류가 발생하지 않으며 사용이 가능. 뭐지???
+```py
+@api_view(["GET", "PUT"])
+def category(request, pk):
+
+    print(category)  # 전역변수인지 확인차 사용해봄. 오류 발생. 전역변수는 아닌거 같다.
+    try:
+        category = Category.objects.get(pk=pk)
+        print(category)
+    extact:
+        ...
+    if ... :
+        print(cateogry)  # 오류가 발생하지 않으며 사용이 가능. 뭐지???
+```
+
+위와 같이 try내의 변수는 밖에서 사용이 가능하다. 검색해도 해당 질문을 해결하는 게시글이 없다. ! 업데이트 요구
 
 #### [5_Rest]
 
-    serializer>update()를 구현한다. 기본 python문법으로 표현하면
-        def update(self, instance, validated_data):
-            if validated_data["name"]:
-                instance.name = validated_data['name']
-            ...  # 각 객체마다 계속 if문을 넣어줘야한다. 코드가 길어진다.
-    Dictionary에 있는 .get() 를 이용하여 리스트 객체를 넣어주자.
-        instance.name = validated_data.get("name", instance.name)  # 두번째 인수는 찾는 값이 없을 경우 default 값이다.
-        ...  # 이것도 각 객체마다 계속 추가해줘야한다.
-        instance.save()  # save() 호출하지 않으면 오류발생. >>>: `update()` must be implemented.
-        return instance
+serializer update()를 구현한다. 기본 python문법으로 표현하면
 
-    각 객체 페이지 함수에 DELETE 를 구현해본다. api_view()에 delete를 추가해준다.
-    추가 후 delete()를 구현한다.
-        from rest_framework.status import HTTP_204_NO_CONTENT
+```py
+def update(self, instance, validated_data):
+    if validated_data["name"]:
+        instance.name = validated_data['name']
+    ...  # 각 객체마다 계속 if문을 넣어줘야한다. 코드가 길어진다.
+```
+
+Dictionary에 있는 .get() 를 이용하여 리스트 객체를 넣어주자.
+
+```py
+instance.name = validated_data.get("name", instance.name)  # 두번째 인수는 찾는 값이 없을 경우 default 값이다.
+...  # 이것도 각 객체마다 계속 추가해줘야한다.
+instance.save()  # save() 호출하지 않으면 오류발생. >>>: `update()` must be implemented.
+return instance
+```
+
+각 객체 페이지 함수에 DELETE 를 구현해본다. api_view()에 delete를 추가해준다.
+추가 후 delete()를 구현한다.
+
+```py
+from rest_framework.status import HTTP_204_NO_CONTENT
+...
+    if request.method == "DELETE":
+        category.delete()
+        return Response(data=HTTP_204_NO_CONTENT)
+```
+
+페이지에 delete버튼이 생성된다. 버튼을 클릭하며 재확인 창이 뜨며 rest_framework가 데이터를 한번더 보호해주며 확인 클릭시 삭제를 진행할 수 있디.
+
+지금까지 작성한 url은 admin한 페이지의 일부처럼 보일 수 있어서 변경을 진행한다. 확실히 API url 로 인지되도록 변경한다.
+@config/url.py에 admin을 제외한 urls는 앞에 'api/<버젼>/' 을 붙인다.
+
+```py
+path("api/v2/categories/", include("categories.urls")),
+...
+```
+
+@api_view() 를 사용하여 함수를 구현하는 대신에 클래스를 사용하여 구현할 수 있다. categories()를 대신하여 Categories 클래스를 구현한다.
+
+api 가이드. <https://www.django-rest-framework.org/api-guide/views/>
+
+@views
+
+```py
+from rest_framework.views import APIView
+
+class Categories(APIView):
+
+    def get(self, request):  # if문 대신에 함수를 사용해주면 된다.
         ...
-            if request.method == "DELETE":
-                category.delete()
-                return Response(data=HTTP_204_NO_CONTENT)
-    페이지에 delete버튼이 생성된다. 버튼을 클릭하며 재확인 창이 뜨며 rest_framework가 데이터를 한번더 보호해주며 확인 클릭시 삭제를 진행할 수 있디.
 
-
-    지금까지 작성한 url은 admin한 페이지의 일부처럼 보일 수 있어서 변경을 진행한다. 확실히 API url 로 인지되도록 변경한다.
-    config>url에 admin을 제외한 urls는 앞에 'api/<버젼>/' 을 붙인다.
-        path("api/v2/categories/", include("categories.urls")),
+    def post(self, request):  # 추가해준 함수명만 프로토콜 허용에 추가된다. (지금 구성에서는 Allow: GET, POST, HEAD, OPTIONS). 그러므로 함수명은 프로토콜명과 같게 사용한다.
         ...
+```
 
-    @api_view() 를 사용하여 함수를 구현하는 대신에 클래스를 사용하여 구현할 수 있다. categories()를 대신하여 Categories 클래스를 구현한다.
-    # api 가이드
+@urls
 
-<https://www.django-rest-framework.org/api-guide/views/>
+```py
+path("", views.Categories.as_view())  # as_view() 를 호출해야 프로토콜마다 get,post 함수를 실행시켜 준다.
+```
 
-    - views -
-        from rest_framework.views import APIView
+CategoryDetail 클래스(<- category() )도 위와 같이 구현을 한다. category()에는 pk값을 갖는 category를 찾는 중복된 코드가 존재한다.
+rest framework의 관습(convention)을 사용하여 중복되는 코드를 실행하는 함수를 구현한다.
 
-        class Categories(APIView):
+detail views 구성. <https://www.django-rest-framework.org/tutorial/3-class-based-views/>
 
-            def get(self, request):  # if문 대신에 함수를 사용해주면 된다.
-                ...
+```py
+def get_object(self, pk):
+    ...
+    return category
 
-            def post(self, request):  # 추가해준 함수명만 프로토콜 허용에 추가된다. (지금 구성에서는 Allow: GET, POST, HEAD, OPTIONS). 그러므로 함수명은 프로토콜명과 같게 사용한다.
-                ...
-    - urls -
-        path("", views.Categories.as_view())  # as_view() 를 호출해야 프로토콜마다 get,post 함수를 실행시켜 준다.
+def get, put, delete(self, request, pk):
+    self.get_object(pk)  # <- category애서 변경
+```
 
-    CategoryDetail 클래스(<- category() )도 위와 같이 구현을 한다. category()에는 pk값을 갖는 category를 찾는 중복된 코드가 존재한다.
-    rest framework의 관습(convention)을 사용하여 중복되는 코드를 실행하는 함수를 구현한다.
-    # detail views 구성
+한개의 객체를 가져올때(Detail) pk를 사용하여 값을 가져올때 사용된다.
 
-<https://www.django-rest-framework.org/tutorial/3-class-based-views/>
+model의 기본 모형을 갖고 serializer를 생성할 수 있다.
 
-        def get_object(self, pk):
-            ...
-            return category
+```py
+class CategorySerializer(serializers.ModelSerializer):  # Serializer -> ModelSerializer
+```
 
-        get, put, delete(self, request, pk):
-            category -> self.get_object(pk) 변경
-    한개의 객체를 가져올때(Detail) pk를 사용하여 값을 가져올때 사용된다.
+클래스를 Meta 클래스를 이용하여 정의한다.
 
-    model의 기본 모형을 갖고 serializer를 생성할 수 있다.
-        class CategorySerializer(serializers.ModelSerializer):  # Serializer -> ModelSerializer
-    클래스를 Meta 클래스를 이용하여 정의한다.
-        class Meta:
-            model = Category
-            fields = "__all__"  # fields <> exclude
-    이 세줄로 기존 serializer의 구현을 대체할 수 있다. create() 와 update()도 생성해준다.
+```py
+class Meta:
+    model = Category
+    fields = "__all__"  # fields <> exclude
+```
 
-    rest framework 의 viewset을 가져와서 views를 쉽게 구성할 수 있다.
-    # viewsets 구성 및 urls 구성방법
+이 세줄로 기존 serializer의 구현을 대체할 수 있다. create() 와 update()도 생성해준다.
 
-<https://www.django-rest-framework.org/api-guide/viewsets/>
+rest framework 의 viewset을 가져와서 views를 쉽게 구성할 수 있다.
 
-        from rest_framework.viewsets import ModelViewSet
+viewsets 구성 및 urls 구성방법. <https://www.django-rest-framework.org/api-guide/viewsets/>
 
-        class CategoryViewSet(ModelViewSet):
+```py
+from rest_framework.viewsets import ModelViewSet
 
-            serializer_class = CategorySerializer  # 이 두가지는 필수로 적용해줘야한다.
-            queryset = Category.objects.all()
-    urls에 as_view()에 사용할 프로토콜을 추가해줘야 한다.
-        path("", "views.CategoryViewSet.as_view({
-            "get": "list",
-            "post": "create",
-        }))
-    detail 페이지를 위한 path 도 구성해준다.
-        path("<int:pk>", "views.CategoryViewSet.as_view({
-            "get: "retieve",  # pk를 이용한 detail search
-            "put": "partial_update",
-            "delete": "destroy",  # 세 프로토콜은 pk값을 받는다.
-        }))
+class CategoryViewSet(ModelViewSet):
 
-    viewset 은 웹페이지에 기본 데이터 변경 구성을 갖는 Row data 탭과 html form 탭을 제공해준다.
+    serializer_class = CategorySerializer  # ! 이 두가지는 필수로 적용해줘야한다.
+    queryset = Category.objects.all()
+```
 
-    더많은 rest framework의 마법적이 기능들을 확인하고 싶다면 tutorial을 더 활용해보자.
+urls에 as_view()에 사용할 프로토콜을 추가해줘야 한다.
 
+```py
+path("", "views.CategoryViewSet.as_view({
+    "get": "list",
+    "post": "create",
+}))
+```
+
+detail 페이지를 위한 path 도 구성해준다.
+
+```py
+path("<int:pk>", views.CategoryViewSet.as_view({
+    "get": "retieve",  # pk를 이용한 detail search
+    "put": "partial_update",
+    "delete": "destroy",  # 세 프로토콜은 pk값을 받는다.
+}))
+```
+
+viewset 은 웹페이지에 기본 데이터 변경 구성을 갖는 Row data 탭과 html form 탭을 제공해준다.
+
+더많은 rest framework의 마법적이 기능들을 확인하고 싶다면 tutorial을 더 활용해보자.
 <https://www.django-rest-framework.org/tutorial/quickstart/>
 
-    viewset을 사용하게 되면 자동으로 완성되는 부분이 많아져서 코드가 단축되지만 코드가 너무 추상적으로 변한다.
-    그리고 추가기능을 구현할 때 코드가 더 길어지게 되는 경우가 발샐할 수 있다. 그때에는 전체를 다시 구현을 할지 viewset에서 커스텀할지 결정해야한다.
-    대체로 apiview를 다시 작성하는 것이 더 편리하며 관리상에도 좋다.
+viewset을 사용하게 되면 자동으로 완성되는 부분이 많아져서 코드가 단축되지만 코드가 너무 추상적으로 변한다.
+그리고 추가기능을 구현할 때 코드가 더 길어지게 되는 경우가 발샐할 수 있다. 그때에는 전체를 다시 구현을 할지 viewset에서 커스텀할지 결정해야한다.
+대체로 apiview를 다시 작성하는 것이 더 편리하며 관리상에도 좋다.
 
 ## 11. Rest API
 
