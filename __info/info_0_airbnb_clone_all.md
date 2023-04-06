@@ -1,36 +1,55 @@
-# Airbnb clone
+# Airbnb clone Back-end
 
 ## 목차
 
-- [chapter 0 ~ 3](#이동할-위치)
-- [4. Django Apps]()
-- [5. Users App]()
-- [6. Models and Admin]()
-- [7. ORM]()
-- [8. Power Admin]()
-- [9. urls and views]()
-- [10. Django Rest Framework]()
-- [11. Rest API]()
-- [12. Users API]()
-- [13. Check Point (Code Challenge)]()
-- [14. GraphQL API]()
-- [15. Authenticated]()
-- [16. API Testing]()
-- [17. Front-End SetUp]()
+- [chapter 0 ~ 3](#chapter-0)
+- [4. Django Apps](#4-django-apps)
+- [5. Users App](#5-users-app)
+- [6. Models and Admin](#6-models-and-admin)
+- [7. ORM](#7-orm)
+- [8. Power Admin](#8-power-admin)
+- [9. urls and views](#9-urls-and-views)
+- [10. Django Rest Framework](#10-django-rest-framework)
+- [11. Rest API](#11-rest-api)
+- [12. Users API](#12-users-api)
+- [13. Check Point (Code Challenge)](<#13-check-point-(code-challenge)>)
+- [14. GraphQL API](#14-graphQL-api)
+- [15. Authenticated](#15-authenticated)
+- [16. API Testing](#16-api-testing)
+- [17. Front-End SetUp](#17-front-end-setup)
 - chapter 18은 front-end 작업만 진행
-- [19. React Query]()
+- [19. React Query](#19-react-query)
 
-  > [20. Authentication]()
-  >
-  > > [20.1 Credentials]()
-  > > ...
-  > > [20.4 CSRF]()
-  > > ...
-  > > [20.6 Github Code]() > > [20.7 Access Token]() > > [20.8 Email]()
-  > > ...
-  > > [20.10 Kakao Talk App Auth]() > > [20.11 Kakao Log In]() > > [20.12 Log In Form]()
-  > > ...
-  > > [20.15 Recap]() > > [20.16 Code Challenge]() > [chapter 21]() > > [21.2 Dynamic Form]()
+- [20. Authentication](#20-authentication)
+  - [20.1 Credentials](#201-credentials)
+  - ...
+  - [20.4 CSRF](#204-csrf)
+  - ...
+  - [20.6 Github Code](#206-github-code)
+  - [20.7 Access Token](#207-access-token)
+  - [20.8 Email](#208-email)
+  - ...
+  - [20.10 Kakao Talk App Auth](#2010-kakao-talk-app-auth)
+  - [20.11 Kakao Log In](#2011-kakao-log-in)
+  - [20.12 Log In Form](#2012-log-in-form)
+  - ...
+  - [20.15 Recap](#2015-recap)
+  - [20.16 Code Challenge](#2016-code-challenge)
+- [21. Upload Room](#212-dynamic-form)
+  - ...
+  - [21.2 Dynamic Form](#212-dynamic-form)
+  - ...
+  - [21.4 Bugfix](#214-bugfix)
+  - ...
+  - [21.6 One Time Upload](#216-one-time-upload)
+- [22. Calendar](#221-booking-dates)
+  - [22.1 Booking Dates](#221-booking-dates)
+
+\*\*목차에 빈 부분은 front-end 작업만 진행.
+
+## 본문
+
+### chapter 0
 
 [1_python]
 
@@ -117,13 +136,17 @@ user 패널은 리스트 컬럼명과 filter기능이 기본 구현되어있다.
 
 app 내에 시간은 세계시간(UTC)기준으로 표기된다. @config/settings.py 변경해준다.
 
-    TIME_ZONE = "UTC"
-    >>>TIME_ZONE = "Asia/Seoul"
+```py
+TIME_ZONE = "UTC"
+>>>TIME_ZONE = "Asia/Seoul"
+```
 
 언어도 변경해준다.
 
-    LANGUAGE_CODE = "en-us"
-    >>>LANGUAGE_CODE = "ko-kr"
+```py
+LANGUAGE_CODE = "en-us"
+>>>LANGUAGE_CODE = "ko-kr"
+```
 
 @config/url.py 은 url path, 실행될 app을 구현한다.
 settings.py, urls.py 파일명과 구현된 variable은 프레임워크 요건에 충족시켜야 실행된다.
@@ -143,7 +166,9 @@ house 엡을 생성한다.
 
 @config/settings.py 에 INSTALLED_APPS 리스트에 앱을 추가하여 설치한다.
 
-        "houses.apps.HousesConfig",
+```py
+"houses.apps.HousesConfig",
+```
 
 추가를 해주면 설치가 완료되며 django가 해당 app을 인지한다.
 
@@ -161,10 +186,10 @@ Django 는 커스텀 데이터에 대한 관리 패널을 자동으로 생성해
 ```py
 from .models import House
 
-    @admin.register(House)  # admin(통제)할 앱을 넣어준다. 여러개 넣을 수 있다.
-    class HouseAdmin(admin.ModelAdmin):  # ModelAdmin 은 admin패널이다.
-        # admin 패널 화면 구현
-        pass
+@admin.register(House)  # admin(통제)할 앱을 넣어준다. 여러개 넣을 수 있다.
+class HouseAdmin(admin.ModelAdmin):  # ModelAdmin 은 admin패널이다.
+    # admin 패널 화면 구현
+    pass
 ```
 
 pass로 overriding 하면 구현된 model을 전부 넣어준다.
@@ -839,10 +864,10 @@ render()는 template_name 을 templates 폴더내에서 파일을 불러온다. 
 @templates/all_rooms.html
 
 ```html
+<!-- {{"변수명"}}. django에서 데이터를 바인딩해준다. python 웹스크립퍼만들기강의에서 기초 이론을 알려준다.-->
 <h1>{{title}}</h1>
-// {{"변수명"}}. django에서 데이터를 바인딩해준다. python 웹스크립퍼만들기
-강의에서 기초 이론을 알려준다. <span>{{rooms}}</span> // 해당 방식으로 하며
-queryset으로 표현이 된다.
+<!-- 해당 방식으로 하며 queryset으로 표현이 된다.-->
+<span>{{rooms}}</span>
 ```
 
 rooms list 구현이다. 앵커를 이용한 각 방페이지로 이동까지 구현했다.
@@ -1870,82 +1895,100 @@ view에서는 serializer.is_valid()를 사용하여 저장하는 기능을 구�
 
 #### [5_rest]
 
-    Django앱에서 다루지 않은 user의 패스워드, 인증 기능들을 사용해볼 것이다.
-    user의 자기 자신의 데이터를 확인 및 수정기능을 구현한다.
+Django앱에서 다루지 않은 user의 패스워드, 인증 기능들을 사용해볼 것이다.
+user의 자기 자신의 데이터를 확인 및 수정기능을 구현한다.
 
+user 회원가입 창을 구현한다. user의 패스워드를 받아서 해쉬값을 저장한다. row password를 저장해서는 안된다.
+@users.views.py
 
-    user 회원가입 창을 구현한다. user의 패스워드를 받아서 해쉬값을 저장한다. row password를 저장해서는 안된다.
-    - users>views -
-        def post(self, request):
-            password = request.data.get('password')
-            if not password:
-                raise ParseError()
-            ...
-            if serializer.is_valid():
-                saved_user = serializer.save()
-                saved_user.set_password(password)  # set_password(): 해쉬값으로 password값을 넣어준다.
-                saved_user.save()
-    추후에 비밀번호 인증기능을 추가할 수 있다.
+```py
+def post(self, request):
+    password = request.data.get('password')
+    if not password:
+        raise ParseError()
+    ...
+    if serializer.is_valid():
+        saved_user = serializer.save()
+        saved_user.set_password(password)  # set_password(): 해쉬값으로 password값을 넣어준다.
+        saved_user.save()
+```
+
+추후에 비밀번호 인증기능을 추가할 수 있다.
 
 #### ! url을 등록할때 변수를 받는 url은 같은레벨에 있는 url보다 밑에 위치를 시켜야한다.
 
-    - users>urls -
-        path("<str:username>", views.PublicUser.as_view()),
-        path("me", views.Me.as_view()),
-    url Me에 접근을 하여도 상단 <str:username> 로 판단하여 PublicUser로 접속된다.
-    같은 레벨에 있는 url에서 최하단에 위치하다록 한다.
-    ? 그럼 url에 포함된 username은 생성되지 못하도록 막아야 하나?. (이미 존재하는 username입니다. 이런식으로)
-    그래서 이번 프로젝트에서는 인스타그램과 같이 username앞에 @를 붙여서 관리하도록 하겠다.
-        path("@<str:username>", views.PublicUser.as_view()),
+@users.urls.py
+
+```py
+path("<str:username>", views.PublicUser.as_view()),
+path("me", views.Me.as_view()),
+```
+
+url Me에 접근을 하여도 상단 <str:username> 로 판단하여 PublicUser로 접속된다.
+같은 레벨에 있는 url에서 최하단에 위치하다록 한다.
+
+? 그럼 url에 포함된 username은 생성되지 못하도록 막아야 하나?. (이미 존재하는 username입니다. 이런식으로)
+그래서 이번 프로젝트에서는 인스타그램과 같이 username앞에 @를 붙여서 관리하도록 하겠다.
+
+```py
+path("@<str:username>", views.PublicUser.as_view()),
+```
 
 #### [5_Rest]
 
-    타유저에게 보여줄 유저정보창을 구현한다.
+타유저에게 보여줄 유저정보창을 구현한다.
 
-    !! 코드챌린지 !!  더 커다란 user serializer를 만들어보자. user의 방 보유량 및 여행간 횟수 등등..
+!! 코드챌린지 !! 더 커다란 user serializer를 만들어보자. user의 방 보유량 및 여행간 횟수 등등..
 
+user password 변경을 구현한다. 기존 패스워드와 새 패스워드를 받아서 값을 변경한다.
+@users.views
 
-    user password 변경을 구현한다. 기존 패스워드와 새 패스워드를 받아서 값을 변경한다.
-    - users>views -
-        def put(self, request):
-            user = request.user
-            old_password = request.data.get("old_password")
-            new_password = request.data.get("new_password")
+```py
+def put(self, request):
+    user = request.user
+    old_password = request.data.get("old_password")
+    new_password = request.data.get("new_password")
 
-            if user.check_password(old_password):  # check_password(): 해쉬값으로 비교하여 True,False를 반환한다.
-                user.set_password(new_password)  # 꼭 hash값으로 넣어야한다.
-                user.save()
+    if user.check_password(old_password):  # check_password(): 해쉬값으로 비교하여 True,False를 반환한다.
+        user.set_password(new_password)  # 꼭 hash값으로 넣어야한다.
+        user.save()
+```
 
+user의 login, logout 기능을 구현한다.
+login에 django에서 지원하는 함수를 사용한다.
 
-    user의 login, logout 기능을 구현한다.
-    login에 django에서 지원하는 함수를 사용한다.
-        from django.contrib.auth import authenticate, login
+```py
+from django.contrib.auth import authenticate, login
 
-        class LogIn(APIView):
-            def post(self, request):
-                username = request.data.get("username")
-                password = request.data.get("password")
-                ...
+class LogIn(APIView):
+    def post(self, request):
+        username = request.data.get("username")
+        password = request.data.get("password")
+        ...
 
-                user = authenticate(  # return user object
-                    request,
-                    username=username,  # 비교 요소
-                    password=password,
-                )
-                if user:
-                    login(request, user)  # 검증된 user 데이터로 로그인을 해준다.
-                    ...
+        user = authenticate(  # return user object
+            request,
+            username=username,  # 비교 요소
+            password=password,
+        )
+        if user:
+            login(request, user)  # 검증된 user 데이터로 로그인을 해준다.
+            ...
+```
 
-    logout도 django 함수를 이용하여 섹시하게(?) 기능구현이 가능하다.
-        from django.contrib.auth import ... , logout
+logout도 django 함수를 이용하여 섹시하게(?) 기능구현이 가능하다.
 
-        class LogOut(APIView):
+```py
+from django.contrib.auth import ... , logout
 
-            permission_classes = [IsAuthenticated]
+class LogOut(APIView):
 
-            def post(self, request):
-                logout(request)  # post 프로토콜의 request값만으로 logout이 가능하다.
-                ...
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        logout(request)  # post 프로토콜의 request값만으로 logout이 가능하다.
+        ...
+```
 
 ## 13. Check Point (Code Challenge)
 
@@ -1953,12 +1996,12 @@ view에서는 serializer.is_valid()를 사용하여 저장하는 기능을 구�
 
 ## 14. GraphQL API
 
-    기초 개념을 배우고 나서 수강을 해야한다.
+기초 개념을 배우고 나서 수강을 해야한다.
 
 GraphQL로 영화 API 만들기
 <https://nomadcoders.co/graphql-for-beginners/lobby>
 
-    GraphQL로 영화 API 만들기 완강 후 빠른 시일에 학습하자.
+GraphQL로 영화 API 만들기 완강 후 빠른 시일에 학습하자.
 
 ## 15. Authenticated
 
