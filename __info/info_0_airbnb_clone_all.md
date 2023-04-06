@@ -2301,217 +2301,281 @@ print(env("SECRET_KEY"))  # >>>: django-insecure-...
 
 #### [5_Rest]
 
-    그동안 코드를 작성하고 수동으로 테스트를 진행했지만 자동으로 테스트를 해주는 코드를 작성한다.
-    테스트에 필요한 규칙을 넣어놓기때문에 테스트 안정성이 높아진다.
-    테스트 코드를 작성하기 앞서 해당 app의 views를 참조하여 에러가 발생할 부분을 체크하여 리스트화하자.
-    로직에 오류가 발생하는 부분도 체크로직을 구성해야 오류를 확인 할 수 있다.
-    로직의 오류나 실행여부와 상관없이 체크부분만 확인한다. 서버를 실행하고 있지않아도 테스트가 가능하다.
+그동안 코드를 작성하고 수동으로 테스트를 진행했지만 자동으로 테스트를 해주는 코드를 작성한다.
+테스트에 필요한 규칙을 넣어놓기때문에 테스트 안정성이 높아진다.
+테스트 코드를 작성하기 앞서 해당 app의 views를 참조하여 에러가 발생할 부분을 체크하여 리스트화하자.
+로직에 오류가 발생하는 부분도 체크로직을 구성해야 오류를 확인 할 수 있다.
+로직의 오류나 실행여부와 상관없이 체크부분만 확인한다. 서버를 실행하고 있지않아도 테스트가 가능하다.
 
-    rooms>tests 에서 작성한다. Django의 TestCase 대신 rest framework를 사용한다.
-        from rest_framework.test import APITestCase
-    테스트하고자 하는 대상을 test_를 붙여서 함수선언을 해줘야 실행이된다.
+@rooms/tests.py 에서 작성한다. Django의 TestCase 대신 rest framework를 사용한다.
 
-        class TestAmenities(APITestCase):
+```py
+from rest_framework.test import APITestCase
+```
 
-            def test_two_plus_two(self):
-                self.assertEqual(first: Any, second: Any, msg: Any = ...)  # assert는 체크한다는 뜻이다.
-                     # first, second를 체크하여 틀릴경우 msg가 출력됨.
-    test명령어를 사용하여 테스트를 한다.
-    $ python manage.py test
-    >>>: Found 1 test(s).
-        Creating test database for alias 'default'...
-        System check identified no issues (0 silenced).
-        .
-        ----------------------------------------------------------------------
-        Ran 1 test in 0.000s
+테스트하고자 하는 대상을 test\_를 붙여서 함수선언을 해줘야 실행이된다.
 
-        OK
-        Destroying test database for alias 'default'...
-    전체 앱에 테스트를 찾아서 실행해준다.
-    대조값 두개를 틀리게 할경우 에러메세지다.
-        Found 1 test(s).
-        Creating test database for alias 'default'...
-        System check identified no issues (0 silenced).
-        F
-        ======================================================================
-        FAIL: test_two_plus_two (rooms.tests.TestAmenities)
-        ----------------------------------------------------------------------
-        Traceback (most recent call last):
-        File "/Users/ghbyeon22/Documents/Develop/airbnb-clone/airbnb-clone-backend/rooms/tests.py", line 6, in test_two_plus_two
-            self.assertEqual(2 + 2, 5, "The math is Wrong.")  # 내가 작성한 코드이다.
-        AssertionError: 4 != 5 : The math is Wrong.
+```py
+class TestAmenities(APITestCase):
 
-        ----------------------------------------------------------------------
-        Ran 1 test in 0.000s
+    def test_two_plus_two(self):
+        self.assertEqual(first: Any, second: Any, msg: Any = ...)  # assert는 체크한다는 뜻이다.
+                # first, second를 체크하여 틀릴경우 msg가 출력됨.
+```
 
-        FAILED (failures=1)
-        Destroying test database for alias 'default'...
-    값을 비교하기위해 자주 사용한다.
+test명령어를 사용하여 테스트를 한다.
 
+```shell
+$ python manage.py test
+>>>: Found 1 test(s).
+    Creating test database for alias 'default'...
+    System check identified no issues (0 silenced).
+    .
+    ----------------------------------------------------------------------
+    Ran 1 test in 0.000s
 
-    self.client를 사용하여 url을 request할 수 있다. (client.login()으로 로그인도 할 수 있다.)
-        class TestAmenities(APITestCase):
-            def test_all_amenities(self):
-                response = self.client.get("/api/v2/rooms/amenities/")
-                print(response)  # >>>: <Response status_code=200, "application/json">
-                print(response.json()) # >>>: []  # rooms/amenities에 값이 있어도 빈 list를 받는다.
-    테스트를 할 때 console text를 보면 새 데이터베이스를 생성한다고 한다. 기존에 있는 데이터를 가져오지 않는다.
-        data = response.json()
+    OK
+    Destroying test database for alias 'default'...
+```
 
+전체 앱에 테스트를 찾아서 실행해준다.
+대조값 두개를 틀리게 할경우 에러메세지다.
+
+```shell
+    Found 1 test(s).
+    Creating test database for alias 'default'...
+    System check identified no issues (0 silenced).
+    F
+    ======================================================================
+    FAIL: test_two_plus_two (rooms.tests.TestAmenities)
+    ----------------------------------------------------------------------
+    Traceback (most recent call last):
+    File "/Users/ghbyeon22/Documents/Develop/airbnb-clone/airbnb-clone-backend/rooms/tests.py", line 6, in test_two_plus_two
+        self.assertEqual(2 + 2, 5, "The math is Wrong.")  # 내가 작성한 코드이다.
+    AssertionError: 4 != 5 : The math is Wrong.
+
+    ----------------------------------------------------------------------
+    Ran 1 test in 0.000s
+
+    FAILED (failures=1)
+    Destroying test database for alias 'default'...
+```
+
+값을 비교하기위해 자주 사용한다.
+
+self.client를 사용하여 url을 request할 수 있다. (client.login()으로 로그인도 할 수 있다.)
+
+```py
+class TestAmenities(APITestCase):
+    def test_all_amenities(self):
+        response = self.client.get("/api/v2/rooms/amenities/")
+        print(response)  # >>>: <Response status_code=200, "application/json">
+        print(response.json()) # >>>: []  # rooms/amenities에 값이 있어도 빈 list를 받는다.
+```
+
+테스트를 할 때 console text를 보면 새 데이터베이스를 생성한다고 한다. 기존에 있는 데이터를 가져오지 않는다.
+
+```py
+    data = response.json()
+
+    self.assertEqual(
+        response.status_code,
+        200,
+        "Response status code isn't 200.",
+    )
+    self.assertIsInstance(data, list)  # 데이터가 list의 instance인지 확인
+```
+
+접속확인과 반환된 데이터 형식 테스트를 진행하였다.
+
+setUp()를 구현한다. setUp은 해당 클래스 내에 테스트 함수들보다 먼저 실행이 된다.
+
+```py
+    NAME = "Amenity test"  # 재사용을 위해 전역변수로 생성
+    DESC = "Amenity Des"
+
+    def setUp(self):
+        models.Amenity.objects.create(
+            name=self.NAME,
+            description=self.DESC,
+        )
+```
+
+들어온 데이터 검증 테스트.
+
+```py
+    def test_all_amenities(self):
+        ...
         self.assertEqual(
-            response.status_code,
-            200,
-            "Response status code isn't 200.",
-        )
-        self.assertIsInstance(data, list)  # 데이터가 list의 instance인지 확인
-    접속확인과 반환된 데이터 형식 테스트를 진행하였다.
-
-    setUp()를 구현한다. setUp은 해당 클래스 내에 테스트 함수들보다 먼저 실행이 된다.
-        NAME = "Amenity test"  # 재사용을 위해 전역변수로 생성
-        DESC = "Amenity Des"
-
-        def setUp(self):
-            models.Amenity.objects.create(
-                name=self.NAME,
-                description=self.DESC,
-            )
-    들어온 데이터 검증 테스트.
-        def test_all_amenities(self):
-            ...
-            self.assertEqual(
-                len(data),  # 데이터 개수
-                1,
-            )
-            self.assertEqual(
-                data[0]["name"],
-                self.NAME,
-            )
-            self.assertEqual(
-                data[0]["description"],
-                self.DESC,
-            )
-
-
-    데이터 생성 test를 진행한다.
-        response = self.client.post(
-            self.AMENITIES_URL,
-            data={
-                "name": "New Amenity",
-                "description": "New Amenity desc.",
-            },
+            len(data),  # 데이터 개수
+            1,
         )
         self.assertEqual(
-            response.status_code,
-            200,
-            "Create Failed.",
+            data[0]["name"],
+            self.NAME,
         )
-    이때 response에는 방금 생성된 데이터만 들어있다.
-    생성된 데이터를 검증한다.
-
-    기존 views로직을 확인하면 serializer에서 오류가 발생하면 serializer오류 내역을 보내 준다.
-    하지만 http프로토콜은 200을 전송하면서 정상신호로 받는다.
-    해당부분을 테스트해본다.
-        response = self.client.post(self.AMENITIES_URL)  # 데이터 생성에 amenity의 name은 필수값이다. serializer에 에러가 발생한다
-        print(response)
-        print(response.json())
-    $ python manage.py test
-    >>>: Found 2 test(s).
-        Creating test database for alias 'default'...
-        System check identified no issues (0 silenced).
-        .<Response status_code=200, "application/json">
-        {'name': ['이 필드는 필수 항목입니다.']}
-        .
-        ----------------------------------------------------------------------
-        Ran 2 tests in 0.004s
-
-        OK
-        Destroying test database for alias 'default'...
-    serializer에서 에러가 발생해도 http프로토콜은 200을 받는다.
-
-    모든 app의 views 파일을 변경해줘야한다.
-    - 모든 앱>views >  serializer 에러 전송부분 -
-        else:
-            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
-
-    해당 프로토콜에 오류가 발생하는지 확인한다.
-    - rooms>tests -
-        response = self.client.post(self.AMENITIES_URL)
         self.assertEqual(
-            response.status_code,  # >>>: 400
-            200,
-            "Post name is 필수",
+            data[0]["description"],
+            self.DESC,
         )
-    에러가 발생한다. 데이터 검증을 추가한다.
-        data = response.json()
-        print(data)  # >>>: {'name': ['이 필드는 필수 항목입니다.']}
-        # assertIn(member: Any, container: Iterable | Container, msg: Any = ...)
-        self.assertIn("name", data)  # 값이 있다면 True
-    오류메세지를 받기때문에 테스트에 오류가 발생하지 않는다.
+```
 
-    정상적인 데이터와 오류데이터를 테스트해보았다.
+데이터 생성 test를 진행한다.
 
+```py
+    response = self.client.post(
+        self.AMENITIES_URL,
+        data={
+            "name": "New Amenity",
+            "description": "New Amenity desc.",
+        },
+    )
+    self.assertEqual(
+        response.status_code,
+        200,
+        "Create Failed.",
+    )
+```
 
-    Amenity 테스트를 진행한다. 새로운 클래스를 생성한다.
-    test 클래스 하나가 실행이 끝날때마다 테스트 데이터베이스는 지워지며 다른 클래스가 실행될 때 새로 생성된다.
-    그러므로 테스트 데이터를 다시 생성해준다.
+이때 response에는 방금 생성된 데이터만 들어있다.
+생성된 데이터를 검증한다.
+
+기존 views로직을 확인하면 serializer에서 오류가 발생하면 serializer오류 내역을 보내 준다.
+하지만 http프로토콜은 200을 전송하면서 정상신호로 받는다.
+해당부분을 테스트해본다.
+
+```py
+    response = self.client.post(self.AMENITIES_URL)  # 데이터 생성에 amenity의 name은 필수값이다. serializer에 에러가 발생한다
+    print(response)
+    print(response.json())
+```
+
+```shell
+$ python manage.py test
+>>>: Found 2 test(s).
+    Creating test database for alias 'default'...
+    System check identified no issues (0 silenced).
+    .<Response status_code=200, "application/json">
+    {'name': ['이 필드는 필수 항목입니다.']}
+    .
+    ----------------------------------------------------------------------
+    Ran 2 tests in 0.004s
+
+    OK
+    Destroying test database for alias 'default'...
+```
+
+serializer에서 에러가 발생해도 http프로토콜은 200을 받는다.
+
+모든 app의 views 파일을 변경해줘야한다.
+
+@모든 앱/views -> serializer 에러 전송부분
+
+```py
+    else:
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+```
+
+해당 프로토콜에 오류가 발생하는지 확인한다.
+
+@rooms/tests.py
+
+```py
+    response = self.client.post(self.AMENITIES_URL)
+    self.assertEqual(
+        response.status_code,  # >>>: 400
+        200,
+        "Post name is 필수",
+    )
+```
+
+에러가 발생한다. 데이터 검증을 추가한다.
+
+```py
+    data = response.json()
+    print(data)  # >>>: {'name': ['이 필드는 필수 항목입니다.']}
+    # assertIn(member: Any, container: Iterable | Container, msg: Any = ...)
+    self.assertIn("name", data)  # 값이 있다면 True
+```
+
+오류메세지를 받기때문에 테스트에 오류가 발생하지 않는다.
+
+정상적인 데이터와 오류데이터를 테스트해보았다.
+
+Amenity 테스트를 진행한다. 새로운 클래스를 생성한다.
+test 클래스 하나가 실행이 끝날때마다 테스트 데이터베이스는 지워지며 다른 클래스가 실행될 때 새로 생성된다.
+그러므로 테스트 데이터를 다시 생성해준다.
 
 ## ! url주소 끝에 /를 제외하면 301에러를 반환한다.
 
+```py
     response = self.client.get("/api/v2/rooms/amenities/2")  # -> get(".../2/")
     print(response.status_code)  # >>>: 301
+```
 
-    근데 강의 영상에서는 끝에 /를 붙이지 않아도 오류가 발생하지 않는다. ??
+근데 강의 영상에서는 끝에 /를 붙이지 않아도 오류가 발생하지 않는다. ??
 
 #### [5_Rest]
 
-    Amenity를 조회한 데이터는 queryset이 아닌 dictionary타입으로 데이터를 가져온다.
-    get, delete를 구현한다. put기능은 코드 챌린지로 내가 작성해본다.
-    지금까지는 views의 기능을 테스트해봤다. models의 데이터 제한에도 걸리는지 확인해볼 수 있다.
+Amenity를 조회한 데이터는 queryset이 아닌 dictionary타입으로 데이터를 가져온다.
+get, delete를 구현한다. put기능은 코드 챌린지로 내가 작성해본다.
+지금까지는 views의 기능을 테스트해봤다. models의 데이터 제한에도 걸리는지 확인해볼 수 있다.
 
+인증 테스트를 구현해본다.(views Rooms) 해당 페이지는 IsAuthenticatedOrReadOnly 권한을 요구한다.
+인증이 안된 유저는 get 핸들러만 가능하며 post핸들러는 로그인한자만 가능하다.
+로그인을 하지 않고 rooms 생성로직을 작성한다.
 
-    인증 테스트를 구현해본다.(views Rooms) 해당 페이지는 IsAuthenticatedOrReadOnly 권한을 요구한다.
-    인증이 안된 유저는 get 핸들러만 가능하며 post핸들러는 로그인한자만 가능하다.
-    로그인을 하지 않고 rooms 생성로직을 작성한다.
-        URL = "/api/v2/rooms/"
+```py
+    URL = "/api/v2/rooms/"
 
-        def test_create_room_not_login(self):
-            response = self.client.post(self.URL)
+    def test_create_room_not_login(self):
+        response = self.client.post(self.URL)
 
-            self.assertEqual(response.status_code, 401)
-    401(Unauthorized) 인증되지 않은 상태(로그인 X)를 반환한다.
+        self.assertEqual(response.status_code, 401)
+```
 
-    아이디를 생성하여 로그인 후 방 생성까지 테스트해본다.
-        def test_create_room(self):
-            user = User.objects.create(
-                username="test",
-            )
-            user.set_password("123")
-            user.save()
+401(Unauthorized) 인증되지 않은 상태(로그인 X)를 반환한다.
 
-            self.client.login(
-                username="test",
-                password="123",
-            )
+아이디를 생성하여 로그인 후 방 생성까지 테스트해본다.
 
-            response = self.client.post(self.URL)
-            print(response.status_code)  # >>>: 400
-            print(response.json())
-            # >>>: {'price': ['이 필드는 필수 항목입니다.'], 'rooms': ['이 필드는 필수 항목입니다.'], ...}
-    필수값들을 넣지않아 room은 생성되지 않았지만 권한을 갖고 room생성 시도까지는 갈 수 있었다.
-
-    비밀번호 생성없이 강제 로그인 기능이 있다.
+```py
+    def test_create_room(self):
         user = User.objects.create(
             username="test",
         )
-        self.client.force_login(
-            user,
+        user.set_password("123")
+        user.save()
+
+        self.client.login(
+            username="test",
+            password="123",
         )
-    단지 인증을 통과하기에는 이방식을 사용하는게 편리하다. 하지만 유저를 생성하는 url을 테스트한다면 사용기 어렵다.
+
+        response = self.client.post(self.URL)
+        print(response.status_code)  # >>>: 400
+        print(response.json())
+        # >>>: {'price': ['이 필드는 필수 항목입니다.'], 'rooms': ['이 필드는 필수 항목입니다.'], ...}
+```
+
+필수값들을 넣지않아 room은 생성되지 않았지만 권한을 갖고 room생성 시도까지는 갈 수 있었다.
+
+비밀번호 생성없이 강제 로그인 기능이 있다.
+
+```py
+    user = User.objects.create(
+        username="test",
+    )
+    self.client.force_login(
+        user,
+    )
+```
+
+단지 인증을 통과하기에는 이방식을 사용하는게 편리하다. 하지만 유저를 생성하는 url을 테스트한다면 사용하기 어렵다.
 
 ## ! test 다른 앱도 구현해보기
 
-    더 많은 assert기능들이 있으니 테스트를 구현하는데 여러가지를 시도해보자.
-    틈틈히 다양한 방식으로 테스트를 해보며 프로그램 구동방식도 생각해보자.
+더 많은 assert기능들이 있으니 테스트를 구현하는데 여러가지를 시도해보자.
+틈틈히 다양한 방식으로 테스트를 해보며 프로그램 구동방식도 생각해보자.
 
 ## 17 Front-End SetUp
 
