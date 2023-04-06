@@ -1992,7 +1992,7 @@ class LogOut(APIView):
 
 ## 13. Check Point (Code Challenge)
 
-    exerience 부분과 일부 user의 view, serializer부분을 추가해보자. react를 하고 나서 백엑드와 연결해야하는 부분에서 다시 작업을 해보자.
+exerience 부분과 일부 user의 view, serializer부분을 추가해보자. react를 하고 나서 백엑드와 연결해야하는 부분에서 다시 작업을 해보자.
 
 ## 14. GraphQL API
 
@@ -2005,205 +2005,297 @@ GraphQL로 영화 API 만들기 완강 후 빠른 시일에 학습하자.
 
 ## 15. Authenticated
 
-    브라우져에서 사용할때 Django의 authentication 기능은 매우 훌륭하다. 하지만 브라우져외의 안드로이드 IOS에서의 보안은 취약하다.
-    이번 섹션에서는 토큰, JWT(Json Web Token)같은 커스텀 인증을 구현해보겠다.
+브라우져에서 사용할때 Django의 authentication 기능은 매우 훌륭하다. 하지만 브라우져외의 안드로이드, IOS에서의 보안은 취약하다.
+이번 섹션에서는 토큰, JWT(Json Web Token)같은 커스텀 인증을 구현해보겠다.
 
-    request.data는 쿠키를 이용해 데이터를 인식한다. 이 방법을 views를 변경하지 않으며 토큰과 JWT 방식으로 변경헤 해본다.
-        1. 멍청한 방법
-        2. 토큰 방식
-        3. JWT 방식
-    으로 테스트를 해보겠다.
+request.data는 쿠키를 이용해 데이터를 인식한다. 이 방법을 views를 변경하지 않으며 토큰과 JWT 방식으로 변경헤 해본다.
 
-    postman을 설치한다. postman은 브라우져밖에서 API와 상호작용할때 사용된다.
+1.  멍청한 방법
+2.  토큰 방식
+3.  JWT 방식
 
+으로 테스트를 해보겠다.
 
-    config>settings 에 Django_rest_framework의 default 인증방법을 명시하겠다.
-        REST_FRAMEWORK = {
-            'DEFAULT_AUTHENTICATION_CLASSES': [  # rest framework가 user를 찾는 방법들이 들어있다.
-                'rest_framework.authentication.SessionAuthentication',  # 기본으로 이 한개가 들어있다.
-            ]
-        }
-    입력하고 user창에 가도 이전과 같이 작동한다.
+postman을 설치한다. postman은 브라우져밖에서 API와 상호작용할때 사용된다.
 
-    rest_framework.authentication클래스에서 views로 request.user에 user데이터를 검증후 넣어준다.
+@config/settings.py 에 Django_rest_framework의 default 인증방법을 명시하겠다.
 
-    config내에 authentications.py를 생성해준다.
-    첫번째로 안좋은 방법으로 검증하는 법을 구현해본다. 검증이 되면 user데이터를 반환하며 아닐경우 None을 반환한다.
-        from rest_framework.authentication import BaseAuthentication
-
-        class TruthMeBroAuthentication(BaseAuthentication):
-            def authenticate(self, request):  # request에 쿠키와 헤더가 들어있다. user정보는 없다.
-                print(request.headers)
-                return None
-    postman에서 GET http://127.0.0.1:8000/api/v2/users/me send한 데이터이다.
-        print(request.headers)  # >>>: {'Content-Length': '', 'Content-Type': 'text/plain', 'User-Agent':
-                'PostmanRuntime/7.29.2', 'Accept': '*/*', 'Postman-Token': '16c510b9-ba75-4a00-9de7-69be9c84a95b',
-                'Host': '127.0.0.1:8000', 'Accept-Encoding': 'gzip, deflate, br', 'Connection': 'keep-alive'}
-    postman에서 header에 데이터를 담아 보내본다. ("Trust-Me": "gh") Trust-Me 키가 있을경우 value값에 해당하는 유저가 있는지 찾아본다.
-        username = request.headers.get("Trust-Me")
-        if not username:
-            return None
-        try:
-            user = User.objects.get(username=username)
-            return (user, None)  # user데이터와 None을 같이 보내는 것이 규정이다.
-        except User.DoesNotExist:
-            raise AuthenticationFailed
-    postman에서 ("Trust-Me": "gh") 헤더에 담아 보내면 user정보를 받을 수 있다.
-
-    위방식은 누구인지 말만하면 해당 user로 검증이 되어서 사용이 가능하다. 물론 이방식을 쓰면 안된다.
-
-    BasicAuthentication은 이전에 사용하던 로그인창이다.
-    기본 브라우져에서 제공하던 로그인방식인데 login화면으로 이동하면 조그만창이 뜨면서 username과 password를 입력할 폼이 있다.
-
-    token인식 방식을 구현해보겠다. token인증방식은 config>settings에 app추가로 구현가능하다. THIRD_PARTY_APPS에 추가하겠다.
-        THIRD_PARTY_APPS = [
-            ... ,
-            "rest_framework.authtoken",
+```py
+    REST_FRAMEWORK = {
+        'DEFAULT_AUTHENTICATION_CLASSES': [  # rest framework가 user를 찾는 방법들이 들어있다.
+            'rest_framework.authentication.SessionAuthentication',  # 기본으로 이 한개가 들어있다.
         ]
-    이걸 추가하는걸로 admin페이지에서 token 모델을 볼 수 있다. 즉, 데이터베이스에 새로운 모델을 추가해줘야한다.
-    INSERT_APPS에 추가될때 자동으로 makemigration 된다. migrate만 진행하면 된다.
+    }
+```
+
+입력하고 user창에 가도 이전과 같이 작동한다.
+
+rest_framework.authentication클래스에서 views로 request.user에 user데이터를 검증후 넣어준다.
+config내에 authentications.py를 생성해준다.
+
+첫번째로 안좋은 방법으로 검증하는 법을 구현해본다. 검증이 되면 user데이터를 반환하며 아닐경우 None을 반환한다.
+
+```py
+from rest_framework.authentication import BaseAuthentication
+
+class TruthMeBroAuthentication(BaseAuthentication):
+    def authenticate(self, request):  # request에 쿠키와 헤더가 들어있다. user정보는 없다.
+        print(request.headers)
+        return None
+```
+
+postman에서 GET http://127.0.0.1:8000/api/v2/users/me send한 데이터이다.
+
+```py
+    print(request.headers)
+```
+
+    # >>>: {'Content-Length': '', 'Content-Type': 'text/plain', 'User-Agent':
+            'PostmanRuntime/7.29.2', 'Accept': '*/*', 'Postman-Token': '16c510b9-ba75-4a00-9de7-69be9c84a95b',
+            'Host': '127.0.0.1:8000', 'Accept-Encoding': 'gzip, deflate, br', 'Connection': 'keep-alive'}
+
+postman에서 header에 데이터를 담아 보내본다. ("Trust-Me": "gh") Trust-Me 키가 있을경우 value값에 해당하는 유저가 있는지 찾아본다.
+
+```py
+username = request.headers.get("Trust-Me")
+if not username:
+    return None
+try:
+    user = User.objects.get(username=username)
+    return (user, None)  # user데이터와 None을 같이 보내는 것이 규정이다.
+except User.DoesNotExist:
+    raise AuthenticationFailed
+```
+
+postman에서 ("Trust-Me": "gh") 헤더에 담아 보내면 user정보를 받을 수 있다.
+
+위방식은 누구인지 말만하면 해당 user로 검증이 되어서 사용이 가능하다. 물론 이방식을 쓰면 안된다.
+
+BasicAuthentication은 이전에 사용하던 로그인창이다.
+기본 브라우져에서 제공하던 로그인방식인데 login화면으로 이동하면 조그만창이 뜨면서 username과 password를 입력할 폼이 있다.
+
+token인식 방식을 구현해보겠다. token인증방식은 @config/settings.py에 app추가로 구현가능하다. THIRD_PARTY_APPS에 추가하겠다.
+
+```py
+THIRD_PARTY_APPS = [
+    ... ,
+    "rest_framework.authtoken",
+]
+```
+
+이걸 추가하는걸로 admin페이지에서 token 모델을 볼 수 있다. 즉, 데이터베이스에 새로운 모델을 추가해줘야한다.
+INSERT_APPS에 추가될때 자동으로 makemigration 된다. migrate만 진행하면 된다.
+
     $ python manage.py migrate
     >>>: Running migrations:
-           Applying authtoken.0001_initial... OK
-           Applying authtoken.0002_auto_20160226_1747... OK
-           Applying authtoken.0003_tokenproxy... OK
-    token인증방식을 DEFAULT_AUTHENTICATION_CLASSES에 추가해준다.
-        REST_FRAMEWORK = {
-            "DEFAULT_AUTHENTICATION_CLASSES": [
-                ... ,
-                "rest_framework.authentication.TokenAuthentication",
-            ]
-        }
-    token login방식을 사용할 url을 추가한다.
-    - users>views -
-        from rest_framework.authtoken.views import obtain_auth_token
+            Applying authtoken.0001_initial... OK
+            Applying authtoken.0002_auto_20160226_1747... OK
+            Applying authtoken.0003_tokenproxy... OK
 
-        ...
-            path("token-login", obtain_auth_token),
-    obtain_auth_token views는 username, password를 보내면 token을 반환한다.
-    postman으로 해당 url로 전송을 하며 body부분에 username과 password를 POST로 전송한다.
-    token을 받는다. (참조 = 15.3_Token_Authentication_1.png)
-    해당 토큰을 user한테 주며 데이터베이스에 저장하는 시스템으로 구성되어있다.
+token인증방식을 DEFAULT_AUTHENTICATION_CLASSES에 추가해준다.
 
-    토큰을 보내는 규칙이 있다. headers에 넣어주며 key - authorization에 토큰값을 넣어준다.
-        authorization  -  Token [토큰값]
-    이렇게 전송하는 것이 규칙이다.
-    users.me 화면에 토큰전송 규칙으로 get 프로토콜을 보내면 내 user데이터를 받을 수 있다. (참조 = 15.3_Token_Authentication_2)
-    그리고 admin에 token페이지를 가면 token이 등록되어 있다. 자동으로 데이터베이스에 넣어준것이다.
-    해당 토큰을 삭제하면 더이상 그 토큰값으로 로그인이 되지 않는다. 토큰을 만료시킬 수 있는 것이다.!
+```py
+            REST_FRAMEWORK = {
+                "DEFAULT_AUTHENTICATION_CLASSES": [
+                    ... ,
+                    "rest_framework.authentication.TokenAuthentication",
+                ]
+            }
+```
 
+token login방식을 사용할 url을 추가한다.
 
-    JWT(Json Web Token)을 구현해본다. JWT은 데이터베이스 공간을 사용하지 않는다.
-    JWT를 사용하기 위해서 pyjwt를 설치해준다.
+@users/views.py
+
+```py
+from rest_framework.authtoken.views import obtain_auth_token
+
+...
+    path("token-login", obtain_auth_token),
+```
+
+obtain_auth_token views는 username, password를 보내면 token을 반환한다.
+postman으로 해당 url로 전송을 하며 body부분에 username과 password를 POST로 전송한다.
+token을 받는다. (참조 = 15.3_Token_Authentication_1.png)
+
+![Postman login](https://github.com/byeon2261/airbnb-clone-backend/blob/main/__img/15.3_Token_Authentication_1.png)
+
+해당 토큰을 user한테 주며 데이터베이스에 저장하는 시스템으로 구성되어있다.
+
+토큰을 보내는 규칙이 있다. headers에 넣어주며 key - authorization에 토큰값을 넣어준다.
+
+```
+authorization  -  Token [토큰값]
+```
+
+이렇게 전송하는 것이 규칙이다.
+users.me 화면에 토큰전송 규칙으로 get 프로토콜을 보내면 내 user데이터를 받을 수 있다. (참조 = 15.3_Token_Authentication_2)
+
+![15.3_Token_Authentication_2](https://github.com/byeon2261/airbnb-clone-backend/blob/main/__img/15.3_Token_Authentication_2.png)
+
+그리고 admin에 token페이지를 가면 token이 등록되어 있다. 자동으로 데이터베이스에 넣어준것이다.
+해당 토큰을 삭제하면 더이상 그 토큰값으로 로그인이 되지 않는다. 토큰을 만료시킬 수 있는 것이다.!
+
+JWT(Json Web Token)을 구현해본다. JWT은 데이터베이스 공간을 사용하지 않는다.
+JWT를 사용하기 위해서 pyjwt를 설치해준다.
+
     $ poetry add pyjwt  # >>>: Installing pyjwt (2.6.0)
 
-    users>urls에 url을 추가한다.
-        path("jwt-login", views.JWTLogIn.as_view()),
+@users/urls.py에 url을 추가한다.
 
-    users>view에 클래스를 추가해준다. 기본 유저 검증 로직을 추가한다.
-        class JWTLogIn(APIView):
-            def post(self, request):
-                username = request.data.get("username")
-                password = request.data.get("password")
-                if not username or not password:
-                    raise ParseError
+```py
+    path("jwt-login", views.JWTLogIn.as_view()),
+```
 
-                user = authenticate(
-                    request,
-                    username=username,
-                    password=password,
-                )
-    유저가 토큰에 사인하는 기능을 추가한다. 토큰은 암호화되어 있지만 내부데이터를 볼 수 있기때문에 중요한 정보는 넣지 않기로 한다.
-    유저pk만 넣도록 구현해본다.
-        import jwt
-        from config import settings
+@users/views.py에 클래스를 추가해준다. 기본 유저 검증 로직을 추가한다.
 
-        if user:
-            token = jwt.encode(  # encode(): token화 한다.
-                {"pk": user.pk},
-                settings.SECRET_KEY,  # 비밀키로 서명. 나만 갖고 있는 유일한 키다.
-                algorithm="HS256",  # 업계 표준 변경알고리즘
-            )
-            return Response({"token": token})
-        else:
-            return Response({"error": "Wrong password"})
+```py
+class JWTLogIn(APIView):
+    def post(self, request):
+        username = request.data.get("username")
+        password = request.data.get("password")
+        if not username or not password:
+            raise ParseError
 
-    jwt-login url로 BODY - username,password를 POST 보내주면 새로운 토큰을 보내준다.
-    토큰 길이가 훨씬길다. (참조 = 15.4 JWT Econde_1)
+        user = authenticate(
+            request,
+            username=username,
+            password=password,
+        )
+```
 
-    JWT 토큰을 복호화하는 기능을 구현한다.
-    config>Authentication 에 새 class를 만든다.
-        class JWTAuthentication(BaseAuthentication):
-            def authenticate(self, request):
-                print(request.headers)
-                return None
-    해당 클래스를 config>settings 의 DEFAULT_AUTHENTICATION_CLASSES에 추가해준다.
-    postman에서 이전에 받은 토큰을 이용해 users/me에 접속해본다.('jwt': [토큰값]) return이 none이기때문에 접속은 되지 않는다.
-        print(request.headers)  # >>>: {'Content-Length': '47', 'Content-Type': 'application/json', 'jwt':
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwayI6Mn0.pOJaHhPoahf0n-L1VUyc9SI3dMQjjZcN09Vi6wzT2Es', 'User-Agent':
-        'PostmanRuntime/7.29.2', 'Accept': '*/*', 'Postman-Token': '45865079-28ed-4102-9c4b-0946d4adbef5', 'Host':
-        '127.0.0.1:8000', 'Accept-Encoding': 'gzip, deflate, br', 'Connection': 'keep-alive'}
-    jwt 토큰값을 보낼때에는 value에 'token [토큰값]'형식이 아닌 그냥 토큰값을 보내면 된다.
-    jwt복호화 기능을 구현한다.
-        def authenticate(self, request):
-            token = request.headers.get("jwt")
-            decoded = jwt.decode(  # decode(): token을 복호화한다. encode()와 같게 넣어주면된다.
-                token,
-                settings.SECRET_KEY,
-                algorithms="HS256",
-            )
-            print(decoded)  # >>>: {'pk': 2}
-            return None
-    postman에서 users/me로 토큰값과 함께 접근하면 user데이터가 출력된다.(decoded)
-    pk로 user데이터를 찾아서 리턴해준다.
-        pk = decoded.get("pk")
-        if not pk:
-            raise AuthenticationFailed("Invalid Token.")
-        try:
-            user = User.objects.get(pk=pk)
-            return (user, None)  # user데이터와 None을 같이 보내줘야한다.
-        ...
+유저가 토큰에 사인하는 기능을 추가한다. 토큰은 암호화되어 있지만 내부데이터를 볼 수 있기때문에 중요한 정보는 넣지 않기로 한다.
+유저pk만 넣도록 구현해본다.
 
+```py
+import jwt
+from config import settings
+...
+    if user:
+        token = jwt.encode(  # encode(): token화 한다.
+            {"pk": user.pk},
+            settings.SECRET_KEY,  # 비밀키로 서명. 나만 갖고 있는 유일한 키다.
+            algorithm="HS256",  # 업계 표준 변경알고리즘
+        )
+        return Response({"token": token})
+    else:
+        return Response({"error": "Wrong password"})
+```
 
-    비밀키를 settings파일에서 다른 파일로 옮기며 파일을 안보여주도록 적용한다.
-    .env파일을 생성하여 secret key를 옮겨 준다.
-        SECRET_KEY="django-insecure-..."
-    .env파일을 작성할때 = 사이에 공백이 없어야한다!! ( [...]="..." ) 공백이 있으면 인식이 안됨
-        SECRET_KEY = "..."  # <- X. 인식안됨
-    해당파일을 gitignore에 추가하여 git에 올라가지 않도록 한다. (근데 이미 올렸다.)
-    보안상으로는 공개하면 안되지만 연습용이기때문에 그대로 작업을 진행하겠다.
+jwt-login url로 BODY - username,password를 POST 보내주면 새로운 토큰을 보내준다.
+토큰 길이가 훨씬길다. (참조 = 15.4 JWT Econde_1)
 
-    .env를 읽는 django-environ 패키지를 설치한다.
+![15.4 JWT Econde_1](https://github.com/byeon2261/airbnb-clone-backend/blob/main/__img/15.4%20JWT%20Econde_1.png)
+
+JWT 토큰을 복호화하는 기능을 구현한다.
+@config/authentications.py 에 새 class를 만든다.
+
+```py
+class JWTAuthentication(BaseAuthentication):
+    def authenticate(self, request):
+        print(request.headers)
+        return None
+```
+
+해당 클래스를 @config/settings.py 의 DEFAULT_AUTHENTICATION_CLASSES에 추가해준다.
+postman에서 이전에 받은 토큰을 이용해 users/me에 접속해본다.('jwt': [토큰값]) return이 none이기때문에 접속은 되지 않는다.
+
+```py
+        print(request.headers)
+```
+
+```shell
+        # >>>: {'Content-Length': '47',
+        'Content-Type': 'application/json',
+        'jwt': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwayI6Mn0.pOJaHhPoahf0n-L1VUyc9SI3dMQjjZcN09Vi6wzT2Es',
+        'User-Agent': 'PostmanRuntime/7.29.2',
+        'Accept': '*/*',
+        'Postman-Token': '45865079-28ed-4102-9c4b-0946d4adbef5',
+        'Host': '127.0.0.1:8000',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Connection': 'keep-alive'}
+```
+
+jwt 토큰값을 보낼때에는 value에 'token [토큰값]'형식이 아닌 그냥 토큰값을 보내면 된다.
+jwt복호화 기능을 구현한다.
+
+```py
+def authenticate(self, request):
+    token = request.headers.get("jwt")
+    decoded = jwt.decode(  # decode(): token을 복호화한다. encode()와 같게 넣어주면된다.
+        token,
+        settings.SECRET_KEY,
+        algorithms="HS256",
+    )
+    print(decoded)  # >>>: {'pk': 2}
+    return None
+```
+
+postman에서 users/me로 토큰값과 함께 접근하면 user데이터가 출력된다.(decoded)
+pk로 user데이터를 찾아서 리턴해준다.
+
+```py
+    pk = decoded.get("pk")
+    if not pk:
+        raise AuthenticationFailed("Invalid Token.")
+    try:
+        user = User.objects.get(pk=pk)
+        return (user, None)  # user데이터와 None을 같이 보내줘야한다.
+    ...
+```
+
+비밀키를 settings파일에서 다른 파일로 옮기며 파일을 안보여주도록 적용한다.
+.env파일을 생성하여 secret key를 옮겨 준다.
+
+```shell
+SECRET_KEY="django-insecure-..."
+```
+
+.env파일을 작성할때 = 사이에 공백이 없어야한다!! ( [...]="..." ) 공백이 있으면 인식이 안됨
+
+```shell
+SECRET_KEY = "..."  # <- X. 인식안됨
+```
+
+해당파일을 gitignore에 추가하여 git에 올라가지 않도록 한다. (근데 이미 올렸다.)
+보안상으로는 공개하면 안되지만 연습용이기때문에 그대로 작업을 진행하겠다.
+
+.env를 읽는 django-environ 패키지를 설치한다.
 
 <https://django-environ.readthedocs.io/en/latest/>
 
     $ poetry add django-environ
-    config>settings 에 os와 environ을 import한다.
-        import os
-        import environ
 
-        env = environ.Env()
+@config/settings.py 에 os와 environ을 import한다.
 
-        BASE_DIR = Path(__file__).resolve().parent.parent  # 기본으로 작성되어 있다.
+```py
+import os
+import environ
 
-        print(BASE_DIR)  # >>>: /Users/ghbyeon22/Documents/Develop/airbnb-clone/airbnb-clone-backend
+env = environ.Env()
 
-        # environ.Env.read_env(f"{BASE_DIR}/.env")  # os.path.join()와 같은 결과값을 갖는다.
-        environ.Env.read_env(os.path.join(BASE_DIR, ".env"))  # 읽을 파일로 추가
-        print(os.path.join(BASE_DIR, ".env"))
-        # >>>: /Users/ghbyeon22/Documents/Develop/airbnb-clone/airbnb-clone-backend/.env
+BASE_DIR = Path(__file__).resolve().parent.parent  # 기본으로 작성되어 있다.
 
-        SECRET_KEY = env("SECRET_KEY")
+print(BASE_DIR)  # >>>: /Users/ghbyeon22/Documents/Develop/airbnb-clone/airbnb-clone-backend
 
-        print(env("SECRET_KEY"))  # >>>: django-insecure-...
-    .env에 변수를 추가하여 불러올때 변수명을 인수로 보내주면된다.
+# environ.Env.read_env(f"{BASE_DIR}/.env")  # os.path.join()와 같은 결과값을 갖는다.
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))  # 읽을 파일로 추가
+print(os.path.join(BASE_DIR, ".env"))
+# >>>: /Users/ghbyeon22/Documents/Develop/airbnb-clone/airbnb-clone-backend/.env
 
-    다른 토큰인증 방법을 사용하고 싶다면 rest-framework사이트에서 확인 가능하다. django-rest-knox 를 추천(니꼬)
+SECRET_KEY = env("SECRET_KEY")
+
+print(env("SECRET_KEY"))  # >>>: django-insecure-...
+```
+
+.env에 변수를 추가하여 불러올때 변수명을 인수로 보내주면된다.
+
+다른 토큰인증 방법을 사용하고 싶다면 rest-framework사이트에서 확인 가능하다. django-rest-knox 를 추천(니꼬)
 
 <https://www.django-rest-framework.org/api-guide/authentication/#third-party-packages>
 
-    해당 프로젝트는 인증기능이 어떻게 작동되는지 확인하기위해 세부적으로 많이 코드를 작성했다.
-    다음부터 인증기능을 구현할때는 simple JWT를 사용하도록 한다.
+해당 프로젝트는 인증기능이 어떻게 작동되는지 확인하기위해 세부적으로 많이 코드를 작성했다.
+다음부터 인증기능을 구현할때는 simple JWT를 사용하도록 한다.
 
 ## 16. API Testing
 
