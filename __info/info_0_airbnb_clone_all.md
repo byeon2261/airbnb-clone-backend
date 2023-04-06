@@ -791,7 +791,7 @@ def say_hello(request):
     return HttpResponse("Hello world!")
 ```
 
-@config>urls.py
+@config/urls.py
 
 ```py
 import bookings import views as booking_views
@@ -905,7 +905,7 @@ except Room.DoesNotExist:
     )
 ```
 
-@room.detail.html
+@room/detail.html
 
 ```html
 {% if not not_found %}
@@ -1369,7 +1369,7 @@ depth = 1
 foriegn키의 값을 전부 전달해 준다. 데이터가 가져오는 양이 많아져 매우 느려지게 되며 사용자의 개인정보까지 보내져 보안에 문제가 발생한다.
 RoomDetail에 표기할 user의 데이터만 가져올 serializer를 생성한다.
 
-@users.serializers.py
+@users/serializers.py
 
 ```py
 class TinyUserSerializer
@@ -1640,7 +1640,7 @@ reviews = room.reviews.all()[start:end]  # .all()[offset:limit]: 리스트에서
 pagination 기능을 이용하여 amenities 페이지도 구현.
 
 page_size 셋팅값을 config>settings에 설정을 하고 가져와서 사용하는 것으로 설정한다.
-@config.settings
+@config/settings
 
 ```py
 PAGE_SIZE = 3
@@ -1656,7 +1656,7 @@ page_size = settings.PAGE_SIZE  # <- 3
 <https://docs.djangoproject.com/en/4.1/howto/static-files/#serving-files-uploaded-by-a-user-during-development>
 
 장고에서 파일 업로드을 할경우 기본 root에 저장을 한다. config>setting에 업로드 path를 설정할 수 있다.
-@config.settings
+@config/settings
 
 ```py
 MEDIA_ROOT = "upload"
@@ -1665,7 +1665,7 @@ MEDIA_ROOT = "upload"
 파일 업로드시 upload 폴더가 생성되며 폴더내에 파일이 생성된다.
 
 하지만 파일을 열경우 아직도 에러가 발생한다. 업로드된 파일을 열수 있는 url을 설정해 줘야한다.
-@config.settings
+@config/settings
 
 ```py
 MEDIA_URL = "user-uploads/"  # MEDIA_URL setting must end with a slash
@@ -1899,7 +1899,7 @@ Django앱에서 다루지 않은 user의 패스워드, 인증 기능들을 사�
 user의 자기 자신의 데이터를 확인 및 수정기능을 구현한다.
 
 user 회원가입 창을 구현한다. user의 패스워드를 받아서 해쉬값을 저장한다. row password를 저장해서는 안된다.
-@users.views.py
+@users/views.py
 
 ```py
 def post(self, request):
@@ -1917,7 +1917,7 @@ def post(self, request):
 
 #### ! url을 등록할때 변수를 받는 url은 같은레벨에 있는 url보다 밑에 위치를 시켜야한다.
 
-@users.urls.py
+@users/urls.py
 
 ```py
 path("<str:username>", views.PublicUser.as_view()),
@@ -1941,7 +1941,7 @@ path("@<str:username>", views.PublicUser.as_view()),
 !! 코드챌린지 !! 더 커다란 user serializer를 만들어보자. user의 방 보유량 및 여행간 횟수 등등..
 
 user password 변경을 구현한다. 기존 패스워드와 새 패스워드를 받아서 값을 변경한다.
-@users.views
+@users/views
 
 ```py
 def put(self, request):
