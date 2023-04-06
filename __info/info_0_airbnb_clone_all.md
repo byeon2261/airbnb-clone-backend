@@ -2118,7 +2118,7 @@ obtain_auth_token views는 username, password를 보내면 token을 반환한다
 postman으로 해당 url로 전송을 하며 body부분에 username과 password를 POST로 전송한다.
 token을 받는다. (참조 = 15.3_Token_Authentication_1.png)
 
-![Postman login](https://github.com/byeon2261/airbnb-clone-backend/blob/main/__img/15.3_Token_Authentication_1.png)
+![Postman login](https://raw.githubusercontent.com/byeon2261/airbnb-clone-backend/main/__img/15.3_Token_Authentication_1.png)
 
 해당 토큰을 user한테 주며 데이터베이스에 저장하는 시스템으로 구성되어있다.
 
@@ -2131,7 +2131,7 @@ authorization  -  Token [토큰값]
 이렇게 전송하는 것이 규칙이다.
 users.me 화면에 토큰전송 규칙으로 get 프로토콜을 보내면 내 user데이터를 받을 수 있다. (참조 = 15.3_Token_Authentication_2)
 
-![15.3_Token_Authentication_2](https://github.com/byeon2261/airbnb-clone-backend/blob/main/__img/15.3_Token_Authentication_2.png)
+![15.3_Token_Authentication_2](https://raw.githubusercontent.com/byeon2261/airbnb-clone-backend/main/__img/15.3_Token_Authentication_2.png)
 
 그리고 admin에 token페이지를 가면 token이 등록되어 있다. 자동으로 데이터베이스에 넣어준것이다.
 해당 토큰을 삭제하면 더이상 그 토큰값으로 로그인이 되지 않는다. 토큰을 만료시킬 수 있는 것이다.!
@@ -2185,7 +2185,7 @@ from config import settings
 jwt-login url로 BODY - username,password를 POST 보내주면 새로운 토큰을 보내준다.
 토큰 길이가 훨씬길다. (참조 = 15.4 JWT Econde_1)
 
-![15.4 JWT Econde_1](https://github.com/byeon2261/airbnb-clone-backend/blob/main/__img/15.4%20JWT%20Econde_1.png)
+![15.4 JWT Econde_1](https://raw.githubusercontent.com/byeon2261/airbnb-clone-backend/main/__img/15.4%20JWT%20Econde_1.png)
 
 JWT 토큰을 복호화하는 기능을 구현한다.
 @config/authentications.py 에 새 class를 만든다.
@@ -2579,68 +2579,88 @@ get, delete를 구현한다. put기능은 코드 챌린지로 내가 작성해�
 
 ## 17 Front-End SetUp
 
-    드디어 프론트 엔드를 시작한다! create-react-app을 사용하며 chakra 라이브러리를 사용할 것이다.
-    스크립트는 타입스크립트를 사용한다.
+드디어 프론트 엔드를 시작한다! create-react-app을 사용하며 chakra 라이브러리를 사용할 것이다.
+스크립트는 타입스크립트를 사용한다.
 
-    우선 react를 설치한다.
-    $ npm create-react-app airbnb-clone-frontend --templete=typescript
-    # Happy hacking!
+우선 react를 설치한다.
 
+```shell
+$ npm create-react-app airbnb-clone-frontend --templete=typescript
+# Happy hacking!
+```
 
-    18부터는 airbnb-clone-frontend 내 info에서 작성이 된다.
+18부터는 airbnb-clone-frontend 내 info에서 작성이 된다.
 
 ## 19 React Query
 
 #### [2_Django]
 
-    ...
+...
 
-    React 서버가 몇명 URL을 fetch하는 것을 허용해야한다.
-    django-cors-headers를 설치해야한다. 서버에서 브라우져로 fetch할 수 있는 사람을 지정할 수 있다.
-
+React 서버가 몇명 URL을 fetch하는 것을 허용해야한다.
+django-cors-headers를 설치해야한다. 서버에서 브라우져로 fetch할 수 있는 사람을 지정할 수 있다.
 <https://github.com/AdamChainz/django-cors-headers/>
+
 ! 사이트 순서대로 설치하면 된다오!
 
-    $ poetry add django-cors-headers
+```shell
+$ poetry add django-cors-headers
+```
 
-    corsheaders를 설치해준다.
-        INSTALLED_APPS = [
-            ...
-            "corsheaders",
-        ]
-    미들웨어에도 추가해준다.
-        MIDDLEWARE = [
-            ...,
-            "corsheaders.middleware.CorsMiddleware",
-            # "django.middleware.common.CommonMiddleware",  # 이건 추가를 안한다?
-        ]
+corsheaders를 설치해준다.
 
-    이제 settings파일에서 Configuration에 있는 속성들을 사용가능하다. CORS_ALLOWED_ORIGINS을 적용한다.
-    - settings -
-        CORS_ALLOWED_ORIGINS= ["http://localhost:3000"]  # 주소의 마지막 '/'는 지워줘야한다.
-    react브라우져 검사창에서 CORS에러가 발생 안한다.
-
-    방 리뷰 점수가 없을경우 'No Review'를 뜨도록하였는데 줄바뀜으로 예쁘지 않아서 0으로 변경.
-    # #19.0 Manual Fetching_1 참조
-
+```py
+INSTALLED_APPS = [
     ...
+    "corsheaders",
+]
+```
+
+미들웨어에도 추가해준다.
+
+```py
+MIDDLEWARE = [
+    ...,
+    "corsheaders.middleware.CorsMiddleware",
+    # "django.middleware.common.CommonMiddleware",  # 이건 추가를 안한다?
+]
+```
+
+이제 settings파일에서 Configuration에 있는 속성들을 사용가능하다. CORS_ALLOWED_ORIGINS을 적용한다.
+
+@config/settings.py
+
+```py
+CORS_ALLOWED_ORIGINS= ["http://localhost:3000"]  # 주소의 마지막 '/'는 지워줘야한다.
+```
+
+react브라우져 검사창에서 CORS에러가 발생 안한다.
+
+방 리뷰 점수가 없을경우 'No Review'를 뜨도록하였는데 줄바뀜으로 예쁘지 않아서 0으로 변경. # #19.0 Manual Fetching_1 참조
+
+![19.0 Manual Fetching_1](https://raw.githubusercontent.com/byeon2261/airbnb-clone-backend/main/__img/%2319.0%20Manual%20Fetching_1.png)
+
+...
 
 ## 19.4 Room Detail
 
 기족에 room데이터에 좋아요 버튼에서 유저데이터를 가져와 좋아요를 한 room객체인지 확인하는 로직이 있다.
 @rooms/serializers
 
-    class RoomDetailSerializer(...):
-        ...
-        def get_is_liked(self, room):
-            request = self.context["request"]
-            return Wishlist.objects.filter(
-                user=request.user,
-                rooms__pk=room.pk,
-            ).exists()
+```py
+class RoomDetailSerializer(...):
+    ...
+    def get_is_liked(self, room):
+        request = self.context["request"]
+        return Wishlist.objects.filter(
+            user=request.user,
+            rooms__pk=room.pk,
+        ).exists()
+```
 
 로그인안한상태에서 roomDetail객체를 확인하면 오류가 발생한다. 로그인을 안한 상태에서는 false를 반환한다.
 
+```py
     def get_is_liked(self, room):
         request = self.context["request"]
         if request.user.is_authenticated:
@@ -2649,6 +2669,7 @@ get, delete를 구현한다. put기능은 코드 챌린지로 내가 작성해�
                 rooms__pk=room.pk,
             ).exists()
         return False
+```
 
 로그아웃한 상태에서도 room detail확인시 오류가 발생하지 않는다. -frontend 작업 계속
 
@@ -2663,7 +2684,9 @@ react페이지를 도메인을 갖게 적용을 하면 데이터를 가져올 �
 
 fetch가능한 도메인을 변경해준다.
 
-    CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:3000"]  # 포트는 리액트가 사용하는 3000으로 적용
+```py
+CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:3000"]  # 포트는 리액트가 사용하는 3000으로 적용
+```
 
 Django에 설정을 추가해주면 아직 로그인을 확인하지는 못하지만 cookie에 sessionId 데이터가 추가된다.
 
@@ -2673,7 +2696,9 @@ Django에서 react에서 보내는 credential을 받도록 적용해야한다.
 
 @config/settings.py
 
-    CORS_ALLOW_CREDENTIALS = True
+```py
+CORS_ALLOW_CREDENTIALS = True
+```
 
 react페이지에서 로그인 확인이 가능하다.
 
@@ -2683,10 +2708,14 @@ react페이지에서 로그인 확인이 가능하다.
 
 Django에 post가 가능한 url을 추가해줘야한다.
 
+@config/settings.py
+
+```py
     CSRF_TRUSTED_ORIGINS = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
     ]
+```
 
 하지만 아직도 오류가 발생한다.
 
@@ -2694,9 +2723,9 @@ Django에 post가 가능한 url을 추가해줘야한다.
 
 # ! react에서 유저인증 오류 발생 정리
 
-    처음 react페이지를 열었을 때 로그인 창이 떳던 이유는 Django에 settings의 설정때문이였다.
-    인증 클래스에 BasicAuthentication 기능이 추가되어 있어서 로그인창이 떴다.
-    해당 기능을 지우면 로그인창이 뜨지 않는다.(모든 오류의 원흉)
+처음 react페이지를 열었을 때 로그인 창이 떳던 이유는 Django에 settings의 설정때문이였다.
+인증 클래스에 BasicAuthentication 기능이 추가되어 있어서 로그인창이 떴다.
+해당 기능을 지우면 로그인창이 뜨지 않는다.(모든 오류의 원흉)
 
 Django 페이지에서도 login정보가 없을 때 계속 로그인창이 떴다.
 
@@ -2707,18 +2736,22 @@ Django 페이지에서도 login정보가 없을 때 계속 로그인창이 떴�
 react에서 github login페이지를 구현하여 Django에 user code를 보내준다.
 보내주는 url이 아직 생성이 되어있지 않으므로 url을 생성해준다.
 
-@users/urls
+@users/urls.py
 
+```py
     ...
     path("github", views.GithubLogin.as_view()),  # url은 react에서 code를 보내주는 url을 사용해야한다.
+```
 
-@users/views
+@users/views.py
 
-    class GithubLogIn(APIView):
-        def post(self, request):
-            code = request.data.get("code")
-            print(code)  # >>>: 15ac72cf76f174002643
-            return Response()
+```py
+class GithubLogIn(APIView):
+    def post(self, request):
+        code = request.data.get("code")
+        print(code)  # >>>: 15ac72cf76f174002643
+        return Response()
+```
 
 react에서 보내준 데이터를 받게 된다.
 
@@ -2728,39 +2761,54 @@ react에서 보내준 데이터를 받게 된다.
 <https://docs.github.com/en/developers/apps/building-oauth-apps/authorizing-oauth-apps>
 github api로 post요청을 보내야한다. requests를 설치하여 전송기능을 구현한다.
 
-    $ poetry add requests
+```shell
+$ poetry add requests
+```
 
-@users/views
+@users/views.py
 
-    import requests
+```py
+import requests
 
-    ...
-        access_token = requests.post(f"https://github.com/login/oauth/access_token
-            ?code={code}
-            &client_id=f61c955f466d92d1cac9  # github login app을 생성한 페이지에 데이터가 있다.
-            &client_secret=")
+...
+    access_token = requests.post(f"https://github.com/login/oauth/access_token
+        ?code={code}
+        &client_id=f61c955f466d92d1cac9  # github login app을 생성한 페이지에 데이터가 있다.
+        &client_secret=")
+```
 
-[github login 생성한 app 정보]<https://github.com/settings/applications/2101837>
+github login 생성한 app 정보 <https://github.com/settings/applications/2101837>
+
 client secret정보가 아직생성이 안되었다. 상단의 app정보 페이지에서 client secret정보를 생성 후 .env파일에 추가를 해준다.
 추가 후 settings에 추가하여 views에서 가져다 사용한다.
 
-@config/settings
+@config/settings.py
 
-    GH_SECRET = env("GH_SECRET")
+```py
+GH_SECRET = env("GH_SECRET")
+```
 
-@users/views
+@users/views.py
 
+```py
     ...
         request.post("...&client_secret={settings.GH_SECRET}")
+```
 
 완료 후 로그인을 시도하면 토큰 데이터를 보내준다.
 
-    // scope는 react app에서 github 앱에 추가로 요구한 데이터이다.
-    >>>: {'access_token': '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', 'token_type': 'bearer',
-         'scope': 'read:user,user:email'}
+```shell
+    # scope는 react app에서 github 앱에 추가로 요구한 데이터이다.
+    >>>: {
+            'access_token': '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',
+            'token_type': 'bearer',
+            'scope': 'read:user,user:email'
+        }
+```
 
 해당 access_token으로 user데이터를 가져온다.
 
+```py
     access_token = requests.post(...)
     access_token = access_token.json().get("access_token")
     user_data = requests.get(
@@ -2771,12 +2819,64 @@ client secret정보가 아직생성이 안되었다. 상단의 app정보 페이�
         },
     )
     print("user_data >>>>>: ", user_data.json())
+```
 
-    user_data >>>>>: {'login': 'byeon2261', 'id': 114720002, 'node_id': 'U_kgDOBtZ9Ag', 'avatar_url': 'https://avatars.githubusercontent.com/u/114720002?v=4', 'gravatar_id': '', 'url': 'https://api.github.com/users/byeon2261', 'html_url': 'https://github.com/byeon2261', 'followers_url': 'https://api.github.com/users/byeon2261/followers', 'following_url': 'https://api.github.com/users/byeon2261/following{/other_user}', 'gists_url': 'https://api.github.com/users/byeon2261/gists{/gist_id}', 'starred_url': 'https://api.github.com/users/byeon2261/starred{/owner}{/repo}', 'subscriptions_url': 'https://api.github.com/users/byeon2261/subscriptions', 'organizations_url': 'https://api.github.com/users/byeon2261/orgs', 'repos_url': 'https://api.github.com/users/byeon2261/repos', 'events_url': 'https://api.github.com/users/byeon2261/events{/privacy}', 'received_events_url': 'https://api.github.com/users/byeon2261/received_events', 'type': 'User', 'site_admin': False, 'name': None, 'company': None, 'blog': '', 'location': None, 'email': 'ghbyeon2261@gmail.com', 'hireable': None, 'bio': None, 'twitter_username': None, 'public_repos': 13, 'public_gists': 0, 'followers': 0, 'following': 0, 'created_at': '2022-09-30T04:57:01Z', 'updated_at': '2023-02-03T05:55:16Z', 'private_gists': 0, 'total_private_repos': 0, 'owned_private_repos': 0, 'disk_usage': 50855, 'collaborators': 0, 'two_factor_authentication': False, 'plan': {'name': 'free', 'space': 976562499, 'collaborators': 0, 'private_repos': 10000}}
+```shell
+user_data
+>>>:
+{
+    'login': 'byeon2261',
+    'id': 114720002,
+    'node_id': 'U_kgDOBtZ9Ag',
+    'avatar_url': 'https://avatars.githubusercontent.com/u/114720002?v=4',
+    'gravatar_id': '',
+    'url': 'https://api.github.com/users/byeon2261',
+    'html_url': 'https://github.com/byeon2261',
+    'followers_url': 'https://api.github.com/users/byeon2261/followers',
+    'following_url': 'https://api.github.com/users/byeon2261/following{/other_user}',
+    'gists_url': 'https://api.github.com/users/byeon2261/gists{/gist_id}',
+    'starred_url': 'https://api.github.com/users/byeon2261/starred{/owner}{/repo}',
+    'subscriptions_url': 'https://api.github.com/users/byeon2261/subscriptions',
+    'organizations_url': 'https://api.github.com/users/byeon2261/orgs',
+    'repos_url': 'https://api.github.com/users/byeon2261/repos',
+    'events_url': 'https://api.github.com/users/byeon2261/events{/privacy}',
+    'received_events_url': 'https://api.github.com/users/byeon2261/received_events',
+    'type': 'User',
+    'site_admin': False,
+    'name': None,
+    'company': None,
+    'blog': '',
+    'location': None,
+    'email': 'ghbyeon2261@gmail.com',
+    'hireable': None,
+    'bio': None,
+    'twitter_username': None,
+    'public_repos': 13,
+    'public_gists': 0,
+    'followers': 0,
+    'following': 0,
+    'created_at': '2022-09-30T04:57:01Z',
+    'updated_at': '2023-02-03T05:55:16Z',
+    'private_gists': 0,
+    'total_private_repos': 0,
+    'owned_private_repos': 0,
+    'disk_usage': 50855,
+    'collaborators': 0
+    'two_factor_authentication': False
+    'plan': {
+        'name': 'free'
+        'space': 976562499
+        'collaborators': 0
+        'private_repos': 10000
+    }
+}
+```
 
 private정보는 아직 가져오지 못했다. email이 예이다.
 
+```shell
     email: null
+```
 
 ### 20.8 Email
 
@@ -2784,14 +2884,28 @@ github api에서 email을 가져오기 위해서는 githun user/email에 post요
 
 <https://docs.github.com/ko/rest/users/emails?apiVersion=2022-11-28#add-an-email-address-for-the-authenticated-user>
 
+```py
     user_emails = requests.get(
         "https://api.github.com/user/emails",
         ...
     )
     user_emails = user_emails.json()
     print(user_emails)
+```
 
-    >>>: [{'email': 'ghbyeon2261@gmail.com', 'primary': True, 'verified': True, 'visibility': 'public'}, {'email': '114720002+byeon2261@users.noreply.github.com', 'primary': False, 'verified': True, 'visibility': None}]
+```shell
+>>>:
+[{
+    'email': 'ghbyeon2261@gmail.com'
+    'primary': True
+    'verified': True
+    'visibility': 'public'}
+    {'email': '114720002+byeon2261@users.noreply.github.com'
+    'primary': False
+    'verified': True,
+    'visibility': None
+}]
+```
 
 post요청이 두번가면서 두번째에는 bad requests오류가 발생한다.
 react는 develop모드에서 screen을 두번 렌더링한다. 메모리 누수나 버그를 잡기 위해서 그런거다.
@@ -2803,17 +2917,17 @@ email이 가져올때 값이 없을 경우 회원가입을 할려는 경우이�
 
 @users/views
 
-    # 유저가 있는지 체크
-        # 유저 확인
-        # 유저 로그인
-        return Response(status=200)
-    # 유저가 없다면
-        # 유저 회원가입
-            # 유저 데이터
-        # 유저 사용불가능한 패스워드 함수  # 유저가 쇼셜 로그인으로만 로그인이 가능함.
-        # 유저 저장
-        # 유저 로그인
-        return Response(status=200)
+- 유저가 있는지 체크
+  - 유저 확인
+  - 유저 로그인
+    > return Response(status=200)
+- 유저가 없다면
+  - 유저 회원가입
+    - 유저 데이터
+  - 유저 사용불가능한 패스워드 함수 # 유저가 쇼셜 로그인으로만 로그인이 가능함.
+  - 유저 저장
+  - 유저 로그인
+    > return Response(status=200)
 
 django에 있는 유저 model의 함수들이다.
 <https://docs.djangoproject.com/en/4.1/ref/contrib/auth/#methods>
@@ -2824,35 +2938,40 @@ github login post()내 전체에 try를 씌워서 오류 발생시 bad request�
 
 # ! user데이터를 가져오는데 오류 체크가 제대로 이뤄지지 않음.
 
+```py
+try:
     try:
-        try:
-            user = User.objects.get(email=user_emails[0]["email"])
-            ...
-        except User.DoesNotExist:
-            ...
-            return Response(status=...200)
-    except Exception:
-        return Response(status=...400)
+        user = User.objects.get(email=user_emails[0]["email"])
+        ...
+    except User.DoesNotExist:
+        ...
+        return Response(status=...200)
+except Exception:
+    return Response(status=...400)
+```
 
-    유저 데이터가 없으면 User.DoesNotExist로 빠지는것이 아니라 Exception로직으로 빠짐. (status code 400반환)
-    니꼬 강의에는 User.DostNotExist로 빠지는 것으로 보임. 아이디가 생성되며 로그인이 성공됨. (status code 200)
+유저 데이터가 없으면 User.DoesNotExist로 빠지는것이 아니라 Exception로직으로 빠짐. (status code 400반환)
+니꼬 강의에는 User.DostNotExist로 빠지는 것으로 보임. 아이디가 생성되며 로그인이 성공됨. (status code 200)
 
     !!! Exeption as e:
         print(e) 코드로 에러내용을 확인
 
         >>>: get() returned more than one User -- it returned 2!
-    유저정보중에 ghbyeon2261@gmail.com를 갖은 유저 정보가 2개이다.
-    두 유저 이메일정보를 github email과 다르게 적용.
+
+유저정보중에 ghbyeon2261@gmail.com를 갖은 유저 정보가 2개이다.
+두 유저 이메일정보를 github email과 다르게 적용.
 
 # ! github user데이터에 name이 없는 경우 user create에 오류가 발생함. 해당 오류 해결 로직을 구현해보자.
 
 1.  임의의 유저 이름을 넣어준다.
 2.  아이디를 name으로 넣어준다.
 
-        username을 name으로 넣어주도록 적용하기로 했다.
+username을 name으로 넣어주도록 적용하기로 했다.
 
-        if user_data.get("name") == None:
-            user_data["name"] = user_data.get("login")
+```py
+if user_data.get("name") == None:
+    user_data["name"] = user_data.get("login")
+```
 
 완성이 되면 github 로그인시 github에 등록된 email을 사용하는 user가 없다면 유저를 생성하여 로그인한다.
 유저 정보가 있다면 로그인한다.
@@ -2863,94 +2982,124 @@ github login post()내 전체에 try를 씌워서 오류 발생시 bad request�
 
 ### 20.11 Kakao Log In
 
+...
+
 이제 back-end 작업을 진행한다.
 
 kakao app server에서 요구하는 데이터를 보내주어 token을 받는다.
 
 <https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-token-sample>
 
-        code = request.data.get("code")
-        access_token = requests.post(
-            "https://kauth.kakao.com/oauth/token",
-            headers={"content Type": "application/x-www-form-urlencoded"},
-            data={
-                "grant_type": "authorization_code",
-                "client_id": "f4fdce8bfd733f3368f97c47a87266b6",
-                "redirect_uri": "http://127.0.0.1:3000/api/v2/social/kakao",
-                "code": code,
-            },
-        )
-        print(access_token.json())
+```py
+code = request.data.get("code")
+access_token = requests.post(
+    "https://kauth.kakao.com/oauth/token",
+    headers={"content Type": "application/x-www-form-urlencoded"},
+    data={
+        "grant_type": "authorization_code",
+        "client_id": "f4fdce8bfd733f3368f97c47a87266b6",
+        "redirect_uri": "http://127.0.0.1:3000/api/v2/social/kakao",
+        "code": code,
+    },
+)
+print(access_token.json())
+```
 
-        >>>: {'access_token': 'LAdY0wVbrBFmL_Tby9QzOLP78T_MgPlJzKmwr992CisNIAAAAYY07Wkl', 'token_type': 'bearer', 'refresh_token': 'P0uIshWtKnAIhQrkHW2-ly7klrptNRIKJvSVW9vVCisNIAAAAYY07Wkk', 'expires_in': 21599, 'scope': 'account_email profile_image profile_nickname', 'refresh_token_expires_in': 5183999}
+```shell
+>>>:
+{
+    'access_token': 'LAdY0wVbrBFmL_Tby9QzOLP78T_MgPlJzKmwr992CisNIAAAAYY07Wkl'
+    'token_type': 'bearer'
+    'refresh_token': 'P0uIshWtKnAIhQrkHW2-ly7klrptNRIKJvSVW9vVCisNIAAAAYY07Wkk'
+    'expires_in': 21599
+    'scope': 'account_email profile_image profile_nickname'
+    'refresh_token_expires_in': 5183999
+}
+```
 
 유저 데이터를 토큰을 통해 가져온다.
 
+```py
     print(user_data.json())
+```
 
-    >>>:
-    {
-        'id': 2657773776,
-        'connected_at': '2023-02-09T06:42:03Z',
-        'properties': {
+```shell
+>>>:
+{
+    'id': 2657773776,
+    'connected_at': '2023-02-09T06:42:03Z',
+    'properties': {
+        'nickname': '건형',
+        'profile_image': 'http://k.kakaocdn.net/dn/chZnlT/btrXa1IANGX/YQKhi2C2Etw0mQgn7IV3jk/img_640x640.jpg',
+        'thumbnail_image': 'http://k.kakaocdn.net/dn/chZnlT/btrXa1IANGX/YQKhi2C2Etw0mQgn7IV3jk/img_110x110.jpg'
+    },
+    'kakao_account': {
+        'profile_nickname_needs_agreement': False,
+        'profile_image_needs_agreement': False,
+        'profile': {
             'nickname': '건형',
-            'profile_image': 'http://k.kakaocdn.net/dn/chZnlT/btrXa1IANGX/YQKhi2C2Etw0mQgn7IV3jk/img_640x640.jpg',
-            'thumbnail_image': 'http://k.kakaocdn.net/dn/chZnlT/btrXa1IANGX/YQKhi2C2Etw0mQgn7IV3jk/img_110x110.jpg'
+            'thumbnail_image_url': 'http://k.kakaocdn.net/dn/chZnlT/btrXa1IANGX/YQKhi2C2Etw0mQgn7IV3jk/img_110x110.jpg',
+            'profile_image_url': 'http://k.kakaocdn.net/dn/chZnlT/btrXa1IANGX/YQKhi2C2Etw0mQgn7IV3jk/img_640x640.jpg',
+            'is_default_image': False
         },
-        'kakao_account': {
-            'profile_nickname_needs_agreement': False,
-            'profile_image_needs_agreement': False,
-            'profile': {
-                'nickname': '건형',
-                'thumbnail_image_url': 'http://k.kakaocdn.net/dn/chZnlT/btrXa1IANGX/YQKhi2C2Etw0mQgn7IV3jk/img_110x110.jpg',
-                'profile_image_url': 'http://k.kakaocdn.net/dn/chZnlT/btrXa1IANGX/YQKhi2C2Etw0mQgn7IV3jk/img_640x640.jpg',
-                'is_default_image': False
-            },
-            'has_email': True,
-            'email_needs_agreement': False,
-            'is_email_valid': True,
-            'is_email_verified': True,
-            'email': 'abc930113@naver.com'
-        }
+        'has_email': True,
+        'email_needs_agreement': False,
+        'is_email_valid': True,
+        'is_email_verified': True,
+        'email': 'abc930113@naver.com',
     }
+}
+```
 
 kakao_account에 있는 email로 유저 데이터를 찾는다.(깃허브 로그인과 동일하다)
 
-            kakao_account = user_data.json().get("kakao_account")
-            profile = kakao_account.get("profile")
-            try:
-                user = User.objects.get(email=kakao_account.get("email"))
-                login(request, user)
-                return Response(status=status.HTTP_200_OK)
-            except User.DoesNotExist:
-                print(1)
-                user = User.objects.create(
-                    username=user_data.get("id"),
-                    name=profile.get("nickname"),
-                    avatar=profile.get("thumbnail_image_url"),
-                    email=kakao_account.get("email"),
-                )
-                user.set_unusable_password()
-                login(request, user)
-                return Response(status=status.HTTP_200_OK)
-        except Exception as e:
-            print("KakaoLogIn POST() Error >>>: ", e)
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+```py
+    kakao_account = user_data.json().get("kakao_account")
+    profile = kakao_account.get("profile")
+    try:
+        user = User.objects.get(email=kakao_account.get("email"))
+        login(request, user)
+        return Response(status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        print(1)
+        user = User.objects.create(
+            username=user_data.get("id"),
+            name=profile.get("nickname"),
+            avatar=profile.get("thumbnail_image_url"),
+            email=kakao_account.get("email"),
+        )
+        user.set_unusable_password()
+        login(request, user)
+        return Response(status=status.HTTP_200_OK)
+except Exception as e:
+    print("KakaoLogIn POST() Error >>>: ", e)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+```
 
 # ! User Create Error
 
-    유저 생성 부분에서 에러발생한 것으로 추측.
+유저 생성 부분에서 에러발생한 것으로 추측.
 
-    >>>: 1
-         KakaoLogIn POST() Error >>>:  'Response' object has no attribute 'get'
+```shell
+>>>: 1
+    KakaoLogIn POST() Error >>>:  'Response' object has no attribute 'get'
+```
 
-    !! user_data는 response 데이터임으로 status 데이터가 있다.
+!! user_data는 response 데이터임으로 status 데이터가 있다.
+
+```py
     print(user_data)
+```
 
+```shell
     >>>: <Response [200]>
+```
 
+```py
     username=user_data.get("id") -> user_data.json().get("id")
-    변경하여 해결
+```
+
+변경하여 해결 !!
 
 ### 20.12 Log In Form
 
@@ -2967,17 +3116,19 @@ return에 status를 같이 보내주면서 login성공여부를 front에서 인�
 
 @users/views - class LogIn
 
-    if user:
-        login(request, user)
-        return Response(
-            {"ok": "welcome!"},
-            status=status.HTTP_200_OK,  # 해당 부분 추가
-        )
-    else:
-        return Response(
-            {"error": "Wrong Password."},
-            status=status.HTTP_400_BAD_REQUEST,  # 해당 부분 추가
-        )
+```py
+if user:
+    login(request, user)
+    return Response(
+        {"ok": "welcome!"},
+        status=status.HTTP_200_OK,  # 해당 부분 추가
+    )
+else:
+    return Response(
+        {"error": "Wrong Password."},
+        status=status.HTTP_400_BAD_REQUEST,  # 해당 부분 추가
+    )
+```
 
 front-end에서는 response.data를 받지 않아도 로그인 성공여부를 알 수 있게 된다.
 
@@ -2988,23 +3139,31 @@ user models 오타 수정.
 
 ### 21.2 Dynamic Form
 
-...frontend에서 방을 등록하는 화면을 구현중이다. 방 categories만 가져오는 쿼리가 필요하다.(experience제외)
+...
+
+frontend에서 방을 등록하는 화면을 구현중이다. 방 categories만 가져오는 쿼리가 필요하다.(experience제외)
 
 Category의 Room 리스트를 가져오는 views를 추가한다. 해당 view에 접근하는 url도 추가해준다.
 일부 serializer에 가져오는 데이터에 pk를 추가해준다.
 
-이제 frontend에서 데이터를 가져오는 작업을 진행한다...
+이제 frontend에서 데이터를 가져오는 작업을 진행한다
+
+...
 
 ### 21.4 Bugfix
 
 ...일부 오류를 수정한다. is_liked
 Response로 데이터를 보낼때 context값을 보내지 않아 발생한 오류이다.
 
-    def get_is_liked(self, room):
-        # 값이 없을 경우 null을 반환한다.
-        self.context["request"] -> self.context.get("request")
-        if request:  # 값이 있을경우 로직이 진행되도록 변경
-            ...
+```py
+def get_is_liked(self, room):
+    # 값이 없을 경우 null을 반환한다.
+    self.context["request"] -> self.context.get("request")
+    if request:  # 값이 있을경우 로직이 진행되도록 변경
+        ...
+```
+
+...
 
 ### 21.6 One Time Upload
 
@@ -3056,6 +3215,8 @@ def get(self, request, pk):
 
 테스트시 해당 url에 파람을 같이 보내줘서 값을 확인한다.
 
-    .../check?check_in=2023-01-01&check_out=2023-01-15
+```
+.../check?check_in=2023-01-01&check_out=2023-01-15
+```
 
 frontend애서 해당 url을 불러오는 api를 구현한다...
