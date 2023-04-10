@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "airbnb-clone-backend"
 version = "0.1.0"
-description = ""
+description = "Have a good day!"
 authors = ["byeon2261 <114720002+byeon2261@users.noreply.github.com>"]
 license = "MIT"
 readme = "README.md"

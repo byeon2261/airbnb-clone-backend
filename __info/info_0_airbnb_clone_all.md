@@ -2,6 +2,11 @@
 
 ## 목차
 
+- [목차](#목차)
+- [기술서](#기술서)
+
+---
+
 - [chapter 0 ~ 3](#chapter-0)
 - [4. Django Apps](#4-django-apps)
 - [5. Users App](#5-users-app)
@@ -46,6 +51,19 @@
   - [22.1 Booking Dates](#221-booking-dates)
 
 \*\*목차에 빈 부분은 front-end 작업만 진행.
+
+## 기술서
+
+| Name                  | Version | Description                                                                               |
+| --------------------- | ------- | ----------------------------------------------------------------------------------------- |
+| Python                | 3.10    | 기본으로 사용된 언어이다. 특히 웹어플리케이션 및 데이터분석에 강점을 보이고 있다.         |
+| Poetry                | 1.4     | 패키지 관리자이다. 일반적으로 많이 사용하는 pip보다 의존성 관리 기능이 더 좋다.           |
+| Django                | 4.1.3   | 웹 프레임워크이다. flask와 같이 가장 많이 사용되는 python 프레임워크이다.                 |
+| Django REST framework | 3.14.0  | django기능을 확장한 프레임워크이다. 산업표준이 될만큼 django와 같이 사용이 된다.          |
+| PyJWT                 | 2.6.0   | 사용자 인증기능을 사용할 수 있도록 한다. 웹을 제외한 IOS, 안드로이드에서도 사용 가능하다. |
+| Django-environ        | 0.9.0   | 환경변수를 .env파일에 따로 구성할 수 있도록 해준다.                                       |
+| Django-CORS-headers   | 3.13.0  | 데이터를 요청 및 접근 권한을 관리하기위한 라이브러리이다.                                 |
+| Requests              | 2.28.2  | HTTP 통신을 위한 라이브러리이다.                                                          |
 
 ## 본문
 
@@ -2589,7 +2607,7 @@ $ npm create-react-app airbnb-clone-frontend --templete=typescript
 # Happy hacking!
 ```
 
-18부터는 airbnb-clone-frontend 내 info에서 작성이 된다.
+17부터는 airbnb-clone-frontend 내 info에서 작성이 된다.
 
 ## 19 React Query
 
