@@ -297,6 +297,8 @@ Djaog는 기본 베이스의 user모델을 사용하더라도 user모델을 생�
 
 ---
 
+# 개발환경 구성
+
 #### [1_python]
 
 vscode내에서 python코드 및 django코드에 노란줄이 그어지며 인식은 하지못한다면 확장프로그램에 pylance를 설치해준다.
@@ -3238,3 +3240,155 @@ def get(self, request, pk):
 ```
 
 frontend애서 해당 url을 불러오는 api를 구현한다...
+
+## 23. Deployment
+
+### 23.0 Render Blueprint
+
+render서비스를 이용하여 프로젝트를 배포한다. Document를 참고하여 진행한다.
+<https://render.com/docs/deploy-django#update-your-app-for-render>
+
+secret키 설정은 이전시간에 진행했으니 다음으로 진행한다. 기존설정인 'DEBUG = True'는 절대 사용하면 안된다고 한다. 해당기능은 잘못된 페이지로 이동할때 열리는 페이지이다.
+
+![23.0 Render Blueprint_1](https://raw.githubusercontent.com/byeon2261/airbnb-clone-backend/main/__img/23.0%20Render%20Blueprint_1.png)
+
+설정 변경을 진행한다.
+
+@config/settings.py
+
+```py
+DEBUG = 'RENDER' not in os.environ
+```
+
+RENDER라는 환경변수의 존재 여부에 따라 DEBUG기능이 사용될 것이다.
+
+DEBUG기능이 사용되지않을때는 ALLOWED_HOSTS를 설정해줘야한다. allowed_host는 우리 앱을 실행시킬 수 있는 도메인 리스트이다.
+
+```py
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+```
+
+RENDER_EXTERNAL_HOSTNAME이 있다면 렌더에서 임의로 만든 url(HOSTNAME)을 append해준다.
+
+배포를 진행할때 postgreDB를 사용하도록 설정을 해야한다. DJ-Database-URL와 psycopg2를 설치 진행한다.
+
+'''shell
+$ poetry add dj-database-url psycopg2-binary
+'''
+
+config/settings에 dj-database-url를 추가해준다.
+
+```py
+import dj-database-url
+```
+
+그리고 database설정을 변경해줘야한다.
+
+```py
+if DEBUG:
+    #기존 코드
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+else:
+    # render사용시 코드
+    DATABASES = {
+        "default": dj_database_url.config(
+            # Feel free to alter this value to suit your needs.
+            # default="postgresql://postgres:postgres@localhost:5432/mysite",
+            conn_max_age=600,
+        )
+    }
+```
+
+dj_database_url.config에서 이전에 넣어준 환경변수 값을 사용한다.
+
+이젠 static file을 설정한다.statics파일은 admin판넬에서 사용될 css, js파일이다.
+django의 rest framework인 browsable api에 필요한 css, js파일도 포함된다.
+
+```shell
+$ poetry add 'whitenoise[brotli]'
+```
+
+@settings.py에 미들웨어를 설치해준다.
+
+```py
+MIDDLEWARE = [
+    ...
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+]
+```
+
+설정은 완료되었으며 코드가 업로드 되었을 때 실행될 script를 작성하면 된다. @build.sh를 생성해준다.
+
+```sh
+#!/usr/bin/env bash
+# exit on error
+set -o errexit
+
+poetry install
+
+python manage.py collectstatic --no-input
+python manage.py migrate
+```
+
+poetry install을 하면 poetry.lock과 pyproject.toml을 찾아서 패키지구성을 확인한다.
+collectstatic명령어는 말그대로 static파일을 수집한다. 파일 모두 모아서 STATIC_ROOT폴더에 넣는다.
+
+<https://docs.djangoproject.com/en/4.2/ref/contrib/staticfiles/#collectstatic>
+
+그리고 migrate를 하는 이유는 다른 db를 사용하기 때문에 진행한다.
+
+**강의에는 '$ chmod a+x build.sh'부분은 제외했다.**
+
+그리고 gunicorn을 설치한다. gunicorn은 production환경에서 Django서버를 실행하는 방법이다.
+
+```sh
+$ poetry add gunicorn
+```
+
+'python manage.py runserver'를 개발환경에서는 사용해도 되지만 실제서비스에서는 사용하면 안된다.
+서버를 실행하는 utility를 사용해야하는데 그것이 gunicorn이다.
+
+이제 render.yaml를 생성한다. 문서에 있는 설정값을 그대로 가져온다.
+
+```yaml
+databases:
+  - name: airbnbclone
+    databaseName: airbnbclone
+    user: airbnbclone
+    region: singapore # 강의에서 추가되었다.
+
+services:
+  - type: web
+    name: airbnbclone
+    env: python
+    region: singapore
+    buildCommand: "./build.sh" # build할때 실행될 명령어이다.
+    startCommand: "gunicorn mysite.wsgi:application" # build후 실행될 명령어
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: airbnbclone
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: 4
+```
+
+이젠 render 사이트에서 회원가입 후 배포를 진행해보자.
+
+로그인 후 Blueprints에서 Github repo를 연결해준다. github에 등록된 repository가 표시된다.
+
+![23.0 Render Blueprint_2](https://raw.githubusercontent.com/byeon2261/airbnb-clone-backend/main/__img/23.0%20Render%20Blueprint_2.png)
+
+연결을 진행하기전에 꼭 커밋 및 푸쉬를 한 후에 진행해야한다.
+
+푸쉬 후 render페이지의 Dashboard에서 backend repo를 컨넥트한다.
+render.yaml을 찾지못했다는 페이지가 나오면 render.yaml을 푸쉬해준 뒤 진행한다.
